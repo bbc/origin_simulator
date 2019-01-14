@@ -1,0 +1,6 @@
+{
+    "origin": "https://www.bbc.co.uk/news",
+    "stages": [
+        { "at": 0, "status": 504, "latency": 1000}
+    ]
+}
