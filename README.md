@@ -163,4 +163,13 @@ recipe
 >
 > So don't use this setup for load tests, and why would you in any case!
 
-### Setup
+### Docker releases
+
+To generate a release targeted for Centos:
+
+``` shell
+docker build -t origin_simulator .
+docker run --mount=source=/path/to/build,target=/build,type=bind -it origin_simulator
+```
+
+You'll find the package in `/build`
