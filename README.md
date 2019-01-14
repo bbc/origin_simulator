@@ -2,8 +2,6 @@
 
 A tool to simulate a flacky upstream origin during load and stress tests.
 
-![Snow Day](./snow_day.jpg)
-
 Every year, when a big snow day happens, we experience some unexpected slow down in some of our services. In our constant quest to improve our services to be more fault tolerant and handle faulty conditions without nasty surprises, we are trying to make load and stress test mnre automated and reproducible.
 
 This tool is designed to be a simple helper to simulate an upstream service going funny for a programmable prolonged period of time. We can then use a load test to see how our downstream service react.
