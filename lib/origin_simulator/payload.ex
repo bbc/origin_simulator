@@ -11,6 +11,10 @@ defmodule OriginSimulator.Payload do
     GenServer.cast(server, {:fetch, origin})
   end
 
+  def generate(server, size) do
+    GenServer.cast(server, {:generate, size})
+  end
+
   def body(_server, status) do
     case status do
       200 -> cache_lookup()
@@ -38,6 +42,15 @@ defmodule OriginSimulator.Payload do
   @impl true
   def handle_cast({:fetch, origin}, state) do
     {:ok, %HTTPoison.Response{body: body } } = OriginSimulator.HTTPClient.get(origin)
+    :ets.insert(:payload, {"body", body })
+
+    {:noreply, state}
+  end
+
+  @impl true
+  def handle_cast({:generate, size}, state) do
+    size = size * 1024
+    body = :crypto.strong_rand_bytes(size) |> Base.encode64 |> binary_part(0, size)
     :ets.insert(:payload, {"body", body })
 
     {:noreply, state}

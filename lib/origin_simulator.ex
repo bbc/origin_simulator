@@ -25,7 +25,12 @@ defmodule OriginSimulator do
 
     recipe = parse_body(conn)
     Simulation.add_recipe(:simulation, recipe)
-    Payload.fetch(:payload, recipe["origin"])
+
+    if recipe["origin"] do
+      Payload.fetch(:payload, recipe["origin"])
+    else
+      Payload.generate(:payload, recipe["random"])
+    end
 
     conn
     |> put_resp_content_type("application/json")

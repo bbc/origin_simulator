@@ -1,0 +1,6 @@
+{
+    "random": 50,
+    "stages": [
+        { "at": 0, "status": 200, "latency": 0}
+    ]
+}
