@@ -13,14 +13,15 @@
 ##-heart
 
 ## Enable kernel poll and a few async threads
-##+K true
-##+A 5
++K true
++A 256
+
 ## For OTP21+, the +A flag is not used anymore,
 ## +SDio replace it to use dirty schedulers
-##+SDio 5
++SDio 256
 
 ## Increase number of concurrent ports/sockets
-##-env ERL_MAX_PORTS 4096
+-env ERL_MAX_PORTS 65536
 
 ## Tweak GC to run more often
 ##-env ERL_FULLSWEEP_AFTER 10
@@ -28,3 +29,5 @@
 # Enable SMP automatically based on availability
 # On OTP21+, this is not needed anymore.
 -smp auto
+
++P 64000

@@ -11,12 +11,19 @@ defmodule OriginSimulator.Payload do
     GenServer.cast(server, {:fetch, origin})
   end
 
-  def body(server, status) do
+  def body(_server, status) do
     case status do
-      200 -> GenServer.call(server, :body)
-      404 -> "Not found"
-      406 -> "Recipe not set, please POST a recipe to /add_recipe"
-      _   -> "Error #{status}"
+      200 -> cache_lookup()
+      404 -> {:ok, "Not found"}
+      406 -> {:ok, "Recipe not set, please POST a recipe to /add_recipe"}
+      _   -> {:ok, "Error #{status}"}
+    end
+  end
+
+  defp cache_lookup() do
+    case :ets.lookup(:payload, "body") do
+      [{"body", body}] -> {:ok, body}
+      [] -> :error
     end
   end
 
@@ -24,21 +31,15 @@ defmodule OriginSimulator.Payload do
 
   @impl true
   def init(_) do
+    :ets.new(:payload, [:set, :protected, :named_table, read_concurrency: true])
     {:ok, nil}
   end
 
   @impl true
-  def handle_cast({:fetch, origin}, _state) do
-    {:ok, response} = http_client().get(origin)
-    {:noreply, response}
-  end
+  def handle_cast({:fetch, origin}, state) do
+    {:ok, %HTTPoison.Response{body: body } } = OriginSimulator.HTTPClient.get(origin)
+    :ets.insert(:payload, {"body", body })
 
-  @impl true
-  def handle_call(:body, _from, state) do
-    {:reply, state.body, state}
-  end
-
-  defp http_client() do
-    Application.get_env(:origin_simulator, :http_client)
+    {:noreply, state}
   end
 end

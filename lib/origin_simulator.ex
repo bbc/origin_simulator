@@ -35,11 +35,14 @@ defmodule OriginSimulator do
   get "/" do
     {status, latency} = Simulation.state(:simulation)
 
-    :timer.sleep(latency)
+    if latency > 0 do
+      :timer.sleep(latency)
+    end
 
+    {:ok, body} = Payload.body(:payload, status)
     conn
     |> put_resp_content_type("text/html")
-    |> send_resp(status, Payload.body(:payload, status))
+    |> send_resp(status, body)
   end
 
   match _ do
