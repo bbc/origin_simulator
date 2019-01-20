@@ -58,6 +58,17 @@ Where `at` represent the time points (in milliseconds) for a state mutation, and
        HTTP 404 50ms           HTTP 503 2s       HTTP 200 100ms
 ```
 
+You can also define **fixed lenght random content**. In this example we are requiring a continuous successful response with no simulated latency, returning a 428kb payload:
+
+```json
+{
+    "random": 428,
+    "stages": [
+        { "at": 0, "status": 200, "latency": 0}
+    ]
+}
+
+```
 ## Usage
 
 First run the Elixir app:
@@ -113,15 +124,15 @@ HTTP/1.1 200 OK
 ...
 ```
 
-At any time you can reset the scenario by simly POSTing a new one to `/add_recipe`.
+At any time you can reset the scenario by simply POSTing a new one to `/add_recipe`.
 
 ## Performance
 
-OriginSimulator should be performant, it leverages on the concurrency and parallelism model offered by the Erlang BEAM VM and should sustain significant amount of load. If you need performance just add more cores!
+OriginSimulator should be performant, it leverages on the concurrency and parallelism model offered by the Erlang BEAM VM and should sustain significant amount of load.
 
 To demonstate this, we have run a number of load testsusing Nginx/OpenResty as benchmark. We used [WRK2](https://github.com/giltene/wrk2) as load test tool and ran the tests on AWS EC2 instances.
 
-For the tests we used two EC2 instances. The load test client ran on a c5.2xlarge instance. We tried c5.large,c5.xlarge,c5.2xlarge and i3.xlarge instanses for the Simulator and OpenResty targets. Interestingly the results didn't show major performance improvements with bigger instances, full results are available here. In the next sections we'll use the results against i3.xlarge.
+For the tests we used two EC2 instances. The load test client ran on a c5.2xlarge instance. We tried c5.large,c5.xlarge,c5.2xlarge and i3.xlarge instanses for the Simulator and OpenResty targets. Interestingly the results didn't show major performance improvements with bigger instances, full results are [available here](https://gist.github.com/ettomatic/6d2ad680fc331b942a5f535f76eb9d02). In the next sections we'll use the results against i3.xlarge.
 
 #### Successful responses with no additional latency
 
@@ -188,7 +199,7 @@ recipe
 
 *payload 428kb 1s added latency*
 
-|concurrent connections|throughput|OriginSimulator|	OpenResty|
+|concurrent connections|throughput|OriginSimulator|OpenResty|
 |---:|---:|---:|---:|
 |100|100|1.03|1.02|
 |500|500|1.05|1.03|
