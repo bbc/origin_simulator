@@ -136,7 +136,7 @@ recipe:
     ]
 }
 ```
-*Throughtput with 0ms additional latency*
+*Throughput with 0ms additional latency*
 
 |payload size|OriginSimulator|OpenResty|
 |---|---:|---:|
@@ -144,6 +144,9 @@ recipe:
 |100kb|12,000|12,000|
 |200kb|6,000|6,000|
 |428kb|2,900|2,800|
+
+<img src="/img/throughput_no_latency.png" width="500" alt="No latency chart">
+
 
 #### Successful responses with 100ms additional latency
 
@@ -159,13 +162,15 @@ recipe:
 }
 ```
 
-*payload 428kb 100ms added latency*	
+*payload 428kb 100ms added latency*
 
 |concurrent connections|throughput|OriginSimulator|OpenResty|
 |---:|---:|---:|---:|
 |100|900|104.10|101.46|
 |1,000|1,000|214.73|225.70|
 |5,000|5,000|161.81|755.43|
+
+<img src="/img/response_time_100ms_latency.png" width="500" alt="100ms latency chart">
 
 #### Successful responses with 1s additional latency
 
@@ -181,8 +186,8 @@ recipe
 }
 ```
 
-*payload 428kb 1s added latency*		
-		
+*payload 428kb 1s added latency*
+
 |concurrent connections|throughput|OriginSimulator|	OpenResty|
 |---:|---:|---:|---:|
 |100|100|1.03|1.02|
