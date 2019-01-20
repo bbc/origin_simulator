@@ -156,8 +156,7 @@ recipe:
 |200kb|6,000|6,000|
 |428kb|2,900|2,800|
 
-<img src="/img/throughput_no_latency.png" width="500" alt="No latency chart">
-
+![No latency char](/img/throughput_no_latency.png)
 
 #### Successful responses with 100ms additional latency
 
@@ -181,7 +180,7 @@ recipe:
 |1,000|1,000|214.73|225.70|
 |5,000|5,000|161.81|755.43|
 
-<img src="/img/response_time_100ms_latency.png" width="500" alt="100ms latency chart">
+![100ms latency chart](/img/response_time_100ms_latency.png)
 
 #### Successful responses with 1s additional latency
 
