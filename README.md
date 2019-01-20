@@ -119,9 +119,13 @@ At any time you can reset the scenario by simly POSTing a new one to `/add_recip
 
 OriginSimulator should be performant, it leverages on the concurrency and parallelism model offered by the Erlang BEAM VM and should sustain significant amount of load. If you need performance just add more cores!
 
-To demonstate this, we have run a basic and very much *naive* load test. We used [WRK2](https://github.com/giltene/wrk2) as load test tool and ran the tests on the same machine (a 2017 Macbook pro 3.1 GHz Intel Core i5, 2 cores with 16Gb ram). We'll update these results once tested on a EC2 instance.
+To demonstate this, we have run a number of load testsusing Nginx/OpenResty as benchmark. We used [WRK2](https://github.com/giltene/wrk2) as load test tool and ran the tests on AWS EC2 instances.
+
+For the tests we used two EC2 instances. The load test client ran on a c5.2xlarge instance. We tried c5.large,c5.xlarge,c5.2xlarge and i3.xlarge instanses for the Simulator and OpenResty targets. Interestingly the results didn't show major performance improvements with bigger instances, full results are available here. In the next sections we'll use the results against i3.xlarge.
 
 #### Successful responses with no additional latency
+
+In this scenario we were looking for maximum throughput. Notice how Opernresty excels on smaller files were results were pretty equal for bigger files.
 
 recipe:
 ```json
@@ -132,8 +136,18 @@ recipe:
     ]
 }
 ```
+*Throughtput with 0ms additional latency*
+
+|payload size|OriginSimulator|OpenResty|
+|---|---:|---:|
+|50kb|17,000|24,000|
+|100kb|12,000|12,000|
+|200kb|6,000|6,000|
+|428kb|2,900|2,800|
 
 #### Successful responses with 100ms additional latency
+
+In this scenario we had almost identical results with 100 concurrent connections, only after 5,000 connections we started seeing Openresty failing down, this is possibly due to misconfiguration.
 
 recipe:
 ```json
@@ -144,17 +158,37 @@ recipe:
     ]
 }
 ```
-#### Successful responses with 2s additional latency
+
+*payload 428kb 100ms added latency*	
+
+|concurrent connections|throughput|OriginSimulator|OpenResty|
+|---:|---:|---:|---:|
+|100|900|104.10|101.46|
+|1,000|1,000|214.73|225.70|
+|5,000|5,000|161.81|755.43|
+
+#### Successful responses with 1s additional latency
+
+With 1s of latency we could see any difference in terms of performance.
 
 recipe
 ```json
 {
     "origin": "https://www.bbc.co.uk/news",
     "stages": [
-        { "at": 0, "status": 200, "latency": 2000}
+        { "at": 0, "status": 200, "latency": 1000}
     ]
 }
 ```
+
+*payload 428kb 1s added latency*		
+		
+|concurrent connections|throughput|OriginSimulator|	OpenResty|
+|---:|---:|---:|---:|
+|100|100|1.03|1.02|
+|500|500|1.05|1.03|
+|600|600|-|1.20|
+
 
 ## Docker
 
