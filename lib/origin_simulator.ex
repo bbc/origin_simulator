@@ -1,7 +1,6 @@
 defmodule OriginSimulator do
   use Plug.Router
-  alias OriginSimulator.Simulation
-  alias OriginSimulator.Payload
+  alias OriginSimulator.{Payload,Recipe,Simulation}
 
   plug(:match)
   plug(:dispatch)
@@ -21,16 +20,13 @@ defmodule OriginSimulator do
   end
 
   post "/add_recipe" do
-    restart_server()
+    Simulation.restart(:simulation)
+    Process.sleep(10)
 
-    recipe = parse_body(conn)
+    recipe = Recipe.parse(conn)
     Simulation.add_recipe(:simulation, recipe)
 
-    if recipe["origin"] do
-      Payload.fetch(:payload, recipe["origin"])
-    else
-      Payload.generate(:payload, recipe["random"])
-    end
+    Payload.fetch(:payload, recipe)
 
     conn
     |> put_resp_content_type("application/json")
@@ -52,21 +48,5 @@ defmodule OriginSimulator do
 
   match _ do
     send_resp(conn, 404, "not found")
-  end
-
-  @spec parse_body(%Plug.Conn{}) :: String.t()
-  defp parse_body(conn) do
-    {:ok, body, _conn} = Plug.Conn.read_body(conn)
-
-    Poison.decode!(body)
-  end
-
-  defp restart_server() do
-    server_pid = GenServer.whereis(:simulation)
-
-    if server_pid do
-      Process.exit(server_pid, :kill)
-      :timer.sleep(50) #just the time to restart the Simulation server
-    end
   end
 end
