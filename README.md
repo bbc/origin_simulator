@@ -130,13 +130,15 @@ At any time you can reset the scenario by simply POSTing a new one to `/add_reci
 
 OriginSimulator should be performant, it leverages on the concurrency and parallelism model offered by the Erlang BEAM VM and should sustain significant amount of load.
 
-To demonstate this, we have run a number of load testsusing Nginx/OpenResty as benchmark. We used [WRK2](https://github.com/giltene/wrk2) as load test tool and ran the tests on AWS EC2 instances.
+Our goal was to have performance comparable to Nginx serving static files. To demonstate this, we have run a number of load testsusing Nginx/OpenResty as benchmark. We used [WRK2](https://github.com/giltene/wrk2) as load test tool and ran the tests on AWS EC2 instances.
 
 For the tests we used two EC2 instances. The load test client ran on a c5.2xlarge instance. We tried c5.large,c5.xlarge,c5.2xlarge and i3.xlarge instanses for the Simulator and OpenResty targets. Interestingly the results didn't show major performance improvements with bigger instances, full results are [available here](https://gist.github.com/ettomatic/6d2ad680fc331b942a5f535f76eb9d02). In the next sections we'll use the results against i3.xlarge.
 
+The Nginx/OpenResty configuration is very simple and available [here](confs/openresty.conf). While not perfect, we tried to keep it simple, the number of workers has been updated depending of the instance type used.
+
 #### Successful responses with no additional latency
 
-In this scenario we were looking for maximum throughput. Notice how Opernresty excels on smaller files were results were pretty equal for bigger files.
+In this scenario we were looking for maximum throughput. Notice how OpenResty excels on smaller files were results were pretty equal for bigger files.
 
 recipe:
 ```json
