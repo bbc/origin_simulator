@@ -149,14 +149,15 @@ recipe:
 ```
 *Throughput with 0ms additional latency*
 
-|payload size|OriginSimulator|OpenResty|
-|---|---:|---:|
-|50kb|17,000|24,000|
-|100kb|12,000|12,000|
-|200kb|6,000|6,000|
-|428kb|2,900|2,800|
+| payload size | OriginSimulator | OpenResty |
+|--------------|----------------:|----------:|
+| 50kb         |          17,000 |    24,000 |
+| 100kb        |          12,000 |    12,000 |
+| 200kb        |           6,000 |     6,000 |
+| 428kb        |           2,900 |     2,800 |
+|              |                 |           |
 
-![No latency char](/img/throughput_no_latency.png)
+![No latency char](/gnuplot/throughput_no_latency.png)
 
 #### Successful responses with 100ms additional latency
 
@@ -174,13 +175,18 @@ recipe:
 
 *payload 428kb 100ms added latency*
 
-|concurrent connections|throughput|OriginSimulator|OpenResty|
-|---:|---:|---:|---:|
-|100|900|104.10|101.46|
-|1,000|1,000|214.73|225.70|
-|5,000|5,000|161.81|755.43|
+| concurrent connections | throughput | OriginSimulator |  OpenResty |
+|-----------------------:|-----------:|-----------------|-----------:|
+|                    100 |        900 | 104.10ms        |   101.46ms |
+|                  1,000 |      1,000 | 214.73ms        |   225.70ms |
+|                  3,000 |      2,000 | 220.50ms        | 244.30ms * |
+|                  5,000 |      1,400 | 161.81ms        | 397.67ms * |
+|                 10,000 |      2,000 | 168.18ms        | 384.92ms * |
 
-![100ms latency chart](/img/response_time_100ms_latency.png)
+> **NOTE:** * OpenResty started increasingly timing out and 500ing after 3K
+concurrent requests.
+
+![100ms latency chart](/gnuplot/response_time_100ms_latency.png)
 
 #### Successful responses with 1s additional latency
 
@@ -198,12 +204,18 @@ recipe
 
 *payload 428kb 1s added latency*
 
-|concurrent connections|throughput|OriginSimulator|OpenResty|
-|---:|---:|---:|---:|
-|100|100|1.03|1.02|
-|500|500|1.05|1.03|
-|600|600|-|1.20|
+| concurrent connections | throughput | OriginSimulator | OpenResty |
+|-----------------------:|-----------:|----------------:|----------:|
+|                    100 |        100 |           1.03s |     1.02s |
+|                    500 |        500 |           1.05s |     1.03s |
+|                    600 |        600 |           1.24s |     1.20s |
+|                  2,000 |      1,000 |           1.10s |  1.11s ** |
+|                  4,000 |      2,000 |         1.09s * |  1.10s ** |
 
+> **NOTE:** * OriginSimulator had a few timeouts at 4K concurrent connections. ** OpenResty started increasingly timing out and 500ing after 2K
+concurrent requests.
+
+![100ms latency chart](/gnuplot/response_time_1s_latency.png)
 
 ## Docker
 
