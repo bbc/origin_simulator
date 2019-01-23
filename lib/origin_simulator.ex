@@ -23,7 +23,7 @@ defmodule OriginSimulator do
     Simulation.restart(:simulation)
     Process.sleep(10)
 
-    recipe = Recipe.parse(conn)
+    recipe = Recipe.parse(Plug.Conn.read_body(conn))
     Simulation.add_recipe(:simulation, recipe)
 
     Payload.fetch(:payload, recipe)
@@ -41,6 +41,7 @@ defmodule OriginSimulator do
     end
 
     {:ok, body} = Payload.body(:payload, status)
+
     conn
     |> put_resp_content_type("text/html")
     |> send_resp(status, body)

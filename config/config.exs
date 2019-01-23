@@ -18,7 +18,6 @@ use Mix.Config
 #
 #     config :logger, level: :info
 #
-
-config :origin_simulator, http_client: OriginSimulator.HTTPClient
+config :origin_simulator, env: Mix.env()
 
 import_config "#{Mix.env()}.exs"
