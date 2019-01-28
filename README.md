@@ -235,4 +235,4 @@ docker build -t origin_simulator .
 docker run --mount=source=/path/to/build,target=/build,type=bind -it origin_simulator
 ```
 
-You'll find the package in `/build`
+You'll find the package in `./build`

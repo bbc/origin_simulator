@@ -16,7 +16,7 @@ defmodule OriginSimulator.Simulation do
   end
 
   def add_recipe(server, new_recipe) do
-    GenServer.cast(server, {:add_recipe, new_recipe})
+    GenServer.call(server, {:add_recipe, new_recipe})
   end
 
   def restart(server) do
@@ -45,12 +45,12 @@ defmodule OriginSimulator.Simulation do
   end
 
   @impl true
-  def handle_cast({:add_recipe, new_recipe}, state) do
-    Enum.map(new_recipe["stages"], fn item ->
+  def handle_call({:add_recipe, new_recipe}, _caller, state) do
+    Enum.map(new_recipe.stages, fn item ->
       Process.send_after(self(), {:update, item["status"], item["latency"]}, item["at"])
     end)
 
-    {:noreply,  %{state | recipe: new_recipe }}
+    {:reply, :ok, %{state | recipe: new_recipe }}
   end
 
   @impl true
