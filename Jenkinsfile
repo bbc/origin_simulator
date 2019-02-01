@@ -2,7 +2,7 @@
 
 library 'BBCNews'
 
-String cosmosService = 'origina-simulator'
+String cosmosService = 'origin-simulator'
 
 node {
   cleanWs()
@@ -18,7 +18,8 @@ node {
   stage('Build executable') {
     sh 'mkdir -p SOURCES'
     docker.image('elixir:1.8.1').inside('-u root') {
-      sh 'mix deps.get'
+      sh 'yes | mix deps.get'
+      sh 'mix local.rebar --force'
       sh 'mix release'
       sh 'cp _build/prod/rel/origin_simulator/releases/*/origin_simulator.tar.gz SOURCES/'
       sh 'rm -rf _build'
