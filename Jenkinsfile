@@ -27,5 +27,6 @@ node {
     }
   }
   BBCNews.buildRPMWithMock(cosmosService, 'origin-simulator.spec', params.FORCE_RELEASE)
+  BBCNews.setRepositories(cosmosService, 'repositories.json')
   BBCNews.cosmosRelease(cosmosService, 'RPMS/*.x86_64.rpm', params.FORCE_RELEASE)
 }
