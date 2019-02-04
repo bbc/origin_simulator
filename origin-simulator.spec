@@ -22,6 +22,7 @@ on a Cosmos CentOS service.
 TODO: add a systemctl unit file to start the service
 
 %install
+mkdir -p %{buildroot}/opt/origin_simulator
 tar -C %{buildroot}/opt/origin_simulator -xzf %{SOURCE0}
 
 
