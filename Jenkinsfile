@@ -17,10 +17,8 @@ node {
 
   stage('Build executable') {
     sh 'mkdir -p SOURCES'
-    docker.image('elixir:1.8.1').inside('-u root -e MIX_ENV=prod') {
-      sh 'mix local.hex --force'
+    docker.image('qixxit/elixir-centos').inside('-u root -e MIX_ENV=prod') {
       sh 'mix deps.get'
-      sh 'mix local.rebar --force'
       sh 'mix release'
       sh 'cp _build/prod/rel/origin_simulator/releases/*/origin_simulator.tar.gz SOURCES/'
       sh 'rm -rf _build'
