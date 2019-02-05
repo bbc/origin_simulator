@@ -22,6 +22,7 @@ This RPM allows the loadtest package to be installed
 on a Cosmos CentOS service.
 
 %install
+mkdir -p %{buildroot}/home/component
 mkdir -p %{buildroot}/opt/origin_simulator
 tar -C %{buildroot}/opt/origin_simulator -xzf %{SOURCE0}
 mkdir -p %{buildroot}/usr/lib/systemd/system
@@ -31,5 +32,6 @@ cp %{SOURCE1} %{buildroot}/usr/lib/systemd/system/origin_simulator.service
 systemctl enable origin_simulator
 
 %files
+/home/component
 /opt/origin_simulator
 /usr/lib/systemd/system/origin_simulator.service
