@@ -3,6 +3,7 @@ Description=Start the origin simulator service
 After=network.target network-online.target
 [Service]
 Environment=HOME=/home/component
+Environment=PORT=8080
 ExecStart=/opt/origin_simulator/bin/origin_simulator start
 ExecStop=/opt/origin_simulator/bin/origin_simulator stop
 ExecReload=/opt/origin_simulator/bin/origin_simulator reboot
