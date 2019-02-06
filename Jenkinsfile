@@ -24,6 +24,7 @@ node {
       sh 'rm -rf _build'
     }
   }
+  BBCNews.archiveDirectoryAsPackageSource('bake-scripts', 'bake-scripts.tar.gz')
   BBCNews.buildRPMWithMock(cosmosService, 'origin-simulator.spec', params.FORCE_RELEASE)
   BBCNews.setRepositories(cosmosService, 'repositories.json')
   BBCNews.cosmosRelease(cosmosService, 'RPMS/*.x86_64.rpm', params.FORCE_RELEASE)
