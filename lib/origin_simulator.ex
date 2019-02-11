@@ -20,7 +20,7 @@ defmodule OriginSimulator do
   end
 
   post "/add_recipe" do
-    Simulation.restart(:simulation)
+    Simulation.restart
     Process.sleep(10)
 
     recipe = Recipe.parse(Plug.Conn.read_body(conn))
@@ -33,7 +33,19 @@ defmodule OriginSimulator do
     |> send_resp(201, Poison.encode!(Simulation.recipe(:simulation)))
   end
 
-  get "/" do
+  get "/*glob" do
+    serve_payload(conn)
+  end
+
+  post "/*glob" do
+    serve_payload(conn)
+  end
+
+  match _ do
+    send_resp(conn, 404, "not found")
+  end
+
+  defp serve_payload(conn) do
     {status, latency} = Simulation.state(:simulation)
 
     if latency > 0 do
@@ -45,9 +57,5 @@ defmodule OriginSimulator do
     conn
     |> put_resp_content_type("text/html")
     |> send_resp(status, body)
-  end
-
-  match _ do
-    send_resp(conn, 404, "not found")
   end
 end

@@ -19,12 +19,9 @@ defmodule OriginSimulator.Simulation do
     GenServer.call(server, {:add_recipe, new_recipe})
   end
 
-  def restart(server) do
-    server_pid = GenServer.whereis(server)
-
-    if server_pid do
-      Process.exit(server_pid, :kill)
-    end
+  def restart do
+    GenServer.stop(:simulation)
+    GenServer.stop(:payload)
   end
 
   ## Server Callbacks
