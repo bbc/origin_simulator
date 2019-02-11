@@ -12,7 +12,6 @@ defmodule OriginSimulator.Application do
       ),
       OriginSimulator.Simulation,
       OriginSimulator.Payload
-      #:hackney_pool.child_spec(:origin_pool, [timeout: 10_000, max_connections: 8000]),
     ]
 
     opts = [strategy: :one_for_one, name: OriginSimulator.Supervisor, max_restarts: 30]

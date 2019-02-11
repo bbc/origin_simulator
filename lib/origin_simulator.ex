@@ -26,8 +26,6 @@ defmodule OriginSimulator do
     recipe = Recipe.parse(Plug.Conn.read_body(conn))
     Simulation.add_recipe(:simulation, recipe)
 
-    Payload.fetch(:payload, recipe)
-
     conn
     |> put_resp_content_type("application/json")
     |> send_resp(201, Poison.encode!(Simulation.recipe(:simulation)))

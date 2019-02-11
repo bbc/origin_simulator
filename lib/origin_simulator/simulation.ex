@@ -1,6 +1,8 @@
 defmodule OriginSimulator.Simulation do
   use GenServer
 
+  alias OriginSimulator.Payload
+
   ## Client API
 
   def start_link(opts) do
@@ -43,6 +45,8 @@ defmodule OriginSimulator.Simulation do
 
   @impl true
   def handle_call({:add_recipe, new_recipe}, _caller, state) do
+    Payload.fetch(:payload, new_recipe)
+
     Enum.map(new_recipe.stages, fn item ->
       Process.send_after(self(), {:update, item["status"], item["latency"]}, item["at"])
     end)
