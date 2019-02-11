@@ -8,7 +8,7 @@ defmodule OriginSimulator.Application do
       Plug.Adapters.Cowboy.child_spec(
         scheme: :http,
         plug: OriginSimulator,
-        options: [port: 8080, protocol_options: [max_keepalive: 5_000_000]]
+        options: [port: Application.fetch_env!(:origin_simulator, :http_port), protocol_options: [max_keepalive: 5_000_000]]
       ),
       OriginSimulator.Simulation,
       OriginSimulator.Payload
