@@ -8,14 +8,21 @@ defmodule OriginSimulator.Application do
       Plug.Adapters.Cowboy.child_spec(
         scheme: :http,
         plug: OriginSimulator,
-        options: [port: 8080, protocol_options: [max_keepalive: 5_000_000]]
+        options: [
+          port: Application.fetch_env!(:origin_simulator, :http_port),
+          protocol_options: [max_keepalive: 5_000_000]
+        ]
       ),
       OriginSimulator.Simulation,
       OriginSimulator.Payload
-      #:hackney_pool.child_spec(:origin_pool, [timeout: 10_000, max_connections: 8000]),
     ]
 
-    opts = [strategy: :one_for_one, name: OriginSimulator.Supervisor]
+    opts = [
+      strategy: :one_for_all,
+      name: OriginSimulator.Supervisor,
+      max_restarts: 30
+    ]
+
     Supervisor.start_link(children, opts)
   end
 end

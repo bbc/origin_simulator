@@ -25,8 +25,8 @@ defmodule OriginSimulator.SimulationTest do
 
   describe "with no recipe loaded" do
     setup do
-      Simulation.restart(:simulation)
-      Process.sleep(100)
+      Simulation.restart()
+      Process.sleep(10)
     end
 
     test "state() returns a tuple with default values" do
