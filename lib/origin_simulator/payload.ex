@@ -2,6 +2,7 @@ defmodule OriginSimulator.Payload do
   use GenServer
 
   alias OriginSimulator.Recipe
+
   ## Client API
 
   def start_link(opts) do

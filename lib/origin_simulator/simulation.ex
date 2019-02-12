@@ -23,7 +23,6 @@ defmodule OriginSimulator.Simulation do
 
   def restart do
     GenServer.stop(:simulation)
-    GenServer.stop(:payload)
   end
 
   ## Server Callbacks
