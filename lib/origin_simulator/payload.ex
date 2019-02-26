@@ -13,6 +13,10 @@ defmodule OriginSimulator.Payload do
     GenServer.call(server, {:fetch, value})
   end
 
+  def fetch(server, %Recipe{body: value}) when is_binary(value) do
+    GenServer.call(server, {:parse, value})
+  end
+
   def fetch(server, %Recipe{random: value}) when is_number(value) do
     GenServer.call(server, {:generate, value})
   end
@@ -46,6 +50,13 @@ defmodule OriginSimulator.Payload do
     env = Application.get_env(:origin_simulator, :env)
 
     {:ok, %HTTPoison.Response{body: body}} = OriginSimulator.HTTPClient.get(origin, env)
+    :ets.insert(:payload, {"body", body})
+
+    {:reply, :ok, state}
+  end
+
+  @impl true
+  def handle_call({:parse, body}, _from, state) do
     :ets.insert(:payload, {"body", body})
 
     {:reply, :ok, state}

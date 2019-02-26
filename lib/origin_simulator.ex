@@ -53,7 +53,15 @@ defmodule OriginSimulator do
     {:ok, body} = Payload.body(:payload, status)
 
     conn
-    |> put_resp_content_type("text/html")
+    |> put_resp_content_type(content_type(body))
     |> send_resp(status, body)
+  end
+
+  defp content_type(body) do
+    if String.first(body) == "{" do
+      "application/json"
+    else
+      "text/html"
+    end
   end
 end
