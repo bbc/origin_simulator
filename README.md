@@ -1,12 +1,12 @@
 # OriginSimulator
 
-A tool to simulate a flacky upstream origin during load and stress tests.
+A tool to simulate a (flaky) upstream origin during load and stress tests.
 
-Every year, when a big snow day happens, we experience some unexpected slow down in some of our services. In our constant quest to improve our services to be more fault tolerant and handle faulty conditions without nasty surprises, we are trying to make load and stress test mnre automated and reproducible.
+In our constant quest to improve our services to be more fault tolerant and handle faulty conditions without nasty surprises, we are trying to make load and stress test more automated and reproducible.
 
-This tool is designed to be a simple helper to simulate an upstream service going funny for a programmable prolonged period of time. We can then use a load test to see how our downstream service react.
+This tool is designed to be a simple helper to simulate an upstream service behaving unexpectedly for a programmable prolonged period of time. We can then use a load test to see how our downstream service react.
 
-OriginSimulator could also be used to simply simulate a continuous given latency in a fake service.
+OriginSimulator can also be used to simulate continuous responses with a given latency from a fake service.
 
 These are the moving parts of a simple load test:
 
@@ -20,12 +20,12 @@ These are the moving parts of a simple load test:
 
 Where:
 * A **Load Test Client**, could be a tool like [WRK2](https://github.com/giltene/wrk2), [AB](https://httpd.apache.org/docs/2.4/programs/ab.html) or [Vegeta](https://github.com/tsenart/vegeta).
-* The load test **Target** is the app you want to test, Something like NGINX or whatever fetches data from an upstream source.
-* **OriginSimulator** fetches the data from the original endpoint, caches it and then acts as a slow and unstable service just having a bad day.
+* The load test **Target** is the service you want to test, such as NGINX, custom app or whatever fetches data from an upstream source.
+* **OriginSimulator** can simulate an origin and can be programatically set to behave slow or unstable.
 
 ## Scenarios
 
-A JSON recipe defines the different stages of the scenario:
+A JSON recipe defines the different stages of the scenario. This is an example of specifying an origin with stages:
 
 ```json
 {
@@ -50,7 +50,7 @@ A JSON recipe defines the different stages of the scenario:
 }
 ```
 
-Where `at` represent the time points (in milliseconds) for a state mutation, and latency the simulated response time in milliseconds. In this case:
+Where `at` represents the time points (in milliseconds) for a state mutation, and latency the simulated response time in milliseconds. In this case:
 ```
   0s                     4s                   6s                  ∞
   *──────────────────────*────────────────────*───────────────────▶
@@ -58,17 +58,59 @@ Where `at` represent the time points (in milliseconds) for a state mutation, and
        HTTP 404 50ms           HTTP 503 2s       HTTP 200 100ms
 ```
 
-You can also define **fixed lenght random content**. In this example we are requiring a continuous successful response with no simulated latency, returning a 428kb payload:
+## Sources
+
+OriginSimulator can be used in three ways.
+
+* Serving cached content from an origin.
+
+```json
+{
+    "origin": "https://www.bbc.co.uk/news",
+    "stages": [
+        {
+            "at": 0,
+            "latency": 100,
+            "status": 200
+        }
+    ]
+}
+```
+
+* Serving random sized content.
+
+In this example we are requiring a continuous successful response with no simulated latency, returning a 428kb payload
 
 ```json
 {
     "random": 428,
     "stages": [
-        { "at": 0, "status": 200, "latency": 0}
+        {
+            "at": 0,
+            "latency": 100,
+            "status": 200
+        }
     ]
 }
-
 ```
+
+* Serving content posted to it.
+
+In this example content is posted along with the recipe. Where the payload body section can be any content such as HTML or JSON.
+
+```json
+{
+    "body": "{\"hello\":\"world\"}",
+    "stages": [
+        {
+            "at": 0,
+            "latency": 100,
+            "status": 200
+        }
+    ]
+}
+```
+
 ## Usage
 
 First run the Elixir app:
