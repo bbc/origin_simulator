@@ -1,0 +1,10 @@
+{
+    "body": "{\"hello\":\"world\"}",
+    "stages": [
+        {
+            "at": 0,
+            "latency": 0,
+            "status": 200
+        }
+    ]
+}
