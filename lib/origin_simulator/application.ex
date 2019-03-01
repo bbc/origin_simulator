@@ -13,13 +13,12 @@ defmodule OriginSimulator.Application do
           protocol_options: [max_keepalive: 5_000_000]
         ]
       ),
-      OriginSimulator.Simulation,
-      OriginSimulator.Payload
+      OriginSimulator.Supervisor
     ]
 
     opts = [
-      strategy: :one_for_all,
-      name: OriginSimulator.Supervisor,
+      strategy: :one_for_one,
+      name: OriginSimulator.AppSupervisor,
       max_restarts: 30
     ]
 
