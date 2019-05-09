@@ -8,10 +8,15 @@ defmodule OriginSimulator.SimulationTest do
                             stages: [%{"at" => 0, "status" => 200, "latency" => 1000}]}
   end
 
+  def test_range_recipe() do
+    %OriginSimulator.Recipe{origin: "foo",
+                            stages: [%{"at" => 0, "status" => 200, "latency" => [1000, 1200]}]}
+  end
+
   describe "with loaded recipe" do
     setup do
       Simulation.add_recipe(:simulation, test_recipe())
-      Process.sleep(10)
+      Process.sleep(5)
     end
 
     test "state() returns a tuple with http status and latency in ms" do
@@ -23,10 +28,25 @@ defmodule OriginSimulator.SimulationTest do
     end
   end
 
+  describe "with a recipe containing a range" do
+    setup do
+      Simulation.add_recipe(:simulation, test_range_recipe())
+      Process.sleep(5)
+    end
+
+    test "state() returns a tuple with http status and latency in ms" do
+      assert Simulation.state(:simulation) == {200, 1000..1200}
+    end
+
+    test "recipe() returns the loaded recipe" do
+      assert Simulation.recipe(:simulation) == test_range_recipe()
+    end
+  end
+
   describe "with no recipe loaded" do
     setup do
       Simulation.restart()
-      Process.sleep(10)
+      Process.sleep(5)
     end
 
     test "state() returns a tuple with default values" do

@@ -46,9 +46,7 @@ defmodule OriginSimulator do
   defp serve_payload(conn) do
     {status, latency} = Simulation.state(:simulation)
 
-    if latency > 0 do
-      :timer.sleep(latency)
-    end
+    sleep(latency)
 
     {:ok, body} = Payload.body(:payload, status)
 
@@ -63,5 +61,15 @@ defmodule OriginSimulator do
     else
       "text/html"
     end
+  end
+
+  defp sleep(0), do: nil
+
+  defp sleep(time) when is_integer(time) do
+    :timer.sleep(time)
+  end
+
+  defp sleep(%Range{} = time) do
+    :timer.sleep(Enum.random(time))
   end
 end
