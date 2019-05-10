@@ -58,6 +58,25 @@ Where `at` represents the time points (in milliseconds) for a state mutation, an
        HTTP 404 50ms           HTTP 503 2s       HTTP 200 100ms
 ```
 
+## Latency
+
+Any stage defines the simulated latency in ms. Is possible to simulate random latency using an array of values. 
+In the example below any response will take a random amount of time within the range 1000..1500:
+
+```json
+{
+    "random": 428,
+    "stages": [
+        {
+            "at": 0,
+            "latency": [1000, 1500],
+            "status": 200
+        }
+    ]
+}
+```
+
+
 ## Sources
 
 OriginSimulator can be used in three ways.
