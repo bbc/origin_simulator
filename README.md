@@ -33,17 +33,17 @@ A JSON recipe defines the different stages of the scenario. This is an example o
     "stages": [
         {
             "at": 0,
-            "latency": 50,
+            "latency": "50ms",
             "status": 404
         },
         {
             "at": 4000,
-            "latency": 2000,
+            "latency": "2s",
             "status": 503
         },
         {
             "at": 6000,
-            "latency": 100,
+            "latency": "100ms"",
             "status": 200
         }
     ]
@@ -69,7 +69,7 @@ In the example below any response will take a random amount of time within the r
     "stages": [
         {
             "at": 0,
-            "latency": [1000, 1500],
+            "latency": "1000ms..1500ms",
             "status": 200
         }
     ]
@@ -89,7 +89,7 @@ OriginSimulator can be used in three ways.
     "stages": [
         {
             "at": 0,
-            "latency": 100,
+            "latency": "100ms",
             "status": 200
         }
     ]
@@ -106,7 +106,7 @@ In this example we are requiring a continuous successful response with no simula
     "stages": [
         {
             "at": 0,
-            "latency": 100,
+            "latency": "100ms",
             "status": 200
         }
     ]
@@ -161,9 +161,9 @@ $ cat examples/sample_recipe.json
 {
     "origin": "https://www.bbc.co.uk/news",
     "stages": [
-        { "at": 0,    "status": 404, "latency": 50},
-        { "at": 4000, "status": 503, "latency": 2000},
-        { "at": 9000, "status": 200, "latency": 100}
+        { "at": 0,    "status": 404, "latency": "50ms"},
+        { "at": 4000, "status": 503, "latency": "2s"},
+        { "at": 9000, "status": 200, "latency": "100ms"}
     ]
 }
 
@@ -206,7 +206,7 @@ recipe:
 {
     "origin": "https://www.bbc.co.uk/news",
     "stages": [
-        { "at": 0, "status": 200, "latency": 0}
+        { "at": 0, "status": 200, "latency": "0ms"}
     ]
 }
 ```
@@ -231,7 +231,7 @@ recipe:
 {
     "origin": "https://www.bbc.co.uk/news",
     "stages": [
-        { "at": 0, "status": 200, "latency": 100}
+        { "at": 0, "status": 200, "latency": "100ms"}
     ]
 }
 ```
@@ -260,7 +260,7 @@ recipe
 {
     "origin": "https://www.bbc.co.uk/news",
     "stages": [
-        { "at": 0, "status": 200, "latency": 1000}
+        { "at": 0, "status": 200, "latency": "1s"}
     ]
 }
 ```
