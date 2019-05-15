@@ -7,6 +7,10 @@ defmodule OriginSimulator.DurationTest do
     test "0" do
       assert Duration.parse(0) == nil
     end
+
+    test "1" do
+      assert_raise RuntimeError, "Invalid stage latency, please use time in s or ms", fn -> Duration.parse(1) end
+    end
   end
 
   describe "parsing a binary string" do
