@@ -59,9 +59,16 @@ defmodule OriginSimulator.Simulation do
     {:noreply, new_state}
   end
 
-  defp parse_latency(latency) when is_integer(latency), do: latency
-
-  defp parse_latency(latency) when is_list(latency) do
-    apply(Range, :new, latency)
+  defp parse_latency(latency) when is_binary(latency) do
+    String.split(latency, "..")
+    |> Enum.map(fn d -> process_duration(Integer.parse(d)) end)
   end
+
+  defp parse_latency(latency) when is_integer(latency) do
+    Integer.to_string(latency) |> parse_latency()
+  end
+
+  defp process_duration({duration, "ms"}), do: duration
+  defp process_duration({duration, "s"}), do: duration * 1000
+  defp process_duration({duration, ""}), do: duration
 end

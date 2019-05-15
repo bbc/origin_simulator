@@ -63,13 +63,13 @@ defmodule OriginSimulator do
     end
   end
 
-  defp sleep(0), do: nil
+  defp sleep([0]), do: nil
 
-  defp sleep(time) when is_integer(time) do
-    :timer.sleep(time)
-  end
+  defp sleep([time]), do: :timer.sleep(time)
 
-  defp sleep(%Range{} = time) do
-    :timer.sleep(Enum.random(time))
+  defp sleep(times) when is_list(times) do
+    apply(Range, :new, times)
+    |> Enum.random
+    |> :timer.sleep()
   end
 end

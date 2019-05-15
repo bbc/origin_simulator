@@ -10,7 +10,7 @@ defmodule OriginSimulator.SimulationTest do
 
   def test_range_recipe() do
     %OriginSimulator.Recipe{origin: "foo",
-                            stages: [%{"at" => 0, "status" => 200, "latency" => [1000, 1200]}]}
+                            stages: [%{"at" => 0, "status" => 200, "latency" => "1s..1200ms"}]}
   end
 
   describe "with loaded recipe" do
@@ -20,7 +20,7 @@ defmodule OriginSimulator.SimulationTest do
     end
 
     test "state() returns a tuple with http status and latency in ms" do
-      assert Simulation.state(:simulation) == {200, 1000}
+      assert Simulation.state(:simulation) == {200, [1000]}
     end
 
     test "recipe() returns the loaded recipe" do
@@ -35,7 +35,7 @@ defmodule OriginSimulator.SimulationTest do
     end
 
     test "state() returns a tuple with http status and latency in ms" do
-      assert Simulation.state(:simulation) == {200, 1000..1200}
+      assert Simulation.state(:simulation) == {200, [1000,1200]}
     end
 
     test "recipe() returns the loaded recipe" do

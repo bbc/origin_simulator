@@ -96,7 +96,7 @@ defmodule OriginSimulatorTest do
     test "will return the origin page" do
       payload = %{
         "body" =>   "{\"hello\":\"world\"}",
-        "stages" => [%{ "at" => 0, "status" => 200, "latency" => [10, 50]}]
+        "stages" => [%{ "at" => 0, "status" => 200, "latency" => "10ms..50ms"}]
       }
 
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
