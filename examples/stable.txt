@@ -1,6 +1,0 @@
-http:///www.bbc.co.uk/news
-----
-duration, status, latency
-1m,       200,    100ms
-2m,       503,    200ms
-*,        200,     50ms
