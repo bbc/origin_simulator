@@ -5,7 +5,7 @@ defmodule OriginSimulator.DurationTest do
 
   describe "parsing a integer" do
     test "0" do
-      assert Duration.parse(0) == nil
+      assert Duration.parse(0) == 0
     end
 
     test "1" do
@@ -15,7 +15,7 @@ defmodule OriginSimulator.DurationTest do
 
   describe "parsing a binary string" do
     test "0" do
-      assert Duration.parse("0") == nil
+      assert Duration.parse("0") == 0
     end
 
     test "0ms" do
@@ -49,7 +49,7 @@ defmodule OriginSimulator.DurationTest do
 
   describe "parsing a tuple" do
     test "0" do
-      assert Duration.parse({0, ""}) == nil
+      assert Duration.parse({0, ""}) == 0
     end
 
     test "0ms" do
