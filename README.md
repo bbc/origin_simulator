@@ -43,7 +43,7 @@ A JSON recipe defines the different stages of the scenario. This is an example o
         },
         {
             "at": 6000,
-            "latency": "100ms"",
+            "latency": "100ms",
             "status": 200
         }
     ]
@@ -123,7 +123,7 @@ In this example content is posted along with the recipe. Where the payload body 
     "stages": [
         {
             "at": 0,
-            "latency": 100,
+            "latency": "100ms",
             "status": 200
         }
     ]
