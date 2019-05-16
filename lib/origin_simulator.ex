@@ -64,12 +64,6 @@ defmodule OriginSimulator do
   end
 
   defp sleep(0), do: nil
-
-  defp sleep(time) when is_integer(time) do
-    :timer.sleep(time)
-  end
-
-  defp sleep(%Range{} = time) do
-    :timer.sleep(Enum.random(time))
-  end
+  defp sleep(%Range{} = time), do: :timer.sleep(Enum.random(time))
+  defp sleep(duration), do: :timer.sleep(duration)
 end

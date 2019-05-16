@@ -33,7 +33,26 @@ defmodule OriginSimulatorTest do
     test "will return the payload if set" do
       payload = %{
         "origin" => "https://www.bbc.co.uk/news",
-        "stages" => [%{ "at" => 0, "status" => 200, "latency" => 100}],
+        "stages" => [%{ "at" => 0, "status" => 200, "latency" => "100ms"}],
+        "random" => nil,
+        "body"   => nil
+      }
+
+      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+
+      conn = conn(:get, "/current_recipe")
+      conn = OriginSimulator.call(conn, [])
+
+      assert conn.state == :sent
+      assert conn.status == 200
+      assert get_resp_header(conn, "content-type") == ["application/json; charset=utf-8"]
+      assert Poison.decode!(conn.resp_body) == payload
+    end
+
+    test "will return the payload if set for ranged latencies" do
+      payload = %{
+        "origin" => "https://www.bbc.co.uk/news",
+        "stages" => [%{ "at" => 0, "status" => 200, "latency" => "100ms..200ms"}],
         "random" => nil,
         "body"   => nil
       }
@@ -96,7 +115,7 @@ defmodule OriginSimulatorTest do
     test "will return the origin page" do
       payload = %{
         "body" =>   "{\"hello\":\"world\"}",
-        "stages" => [%{ "at" => 0, "status" => 200, "latency" => [10, 50]}]
+        "stages" => [%{ "at" => 0, "status" => 200, "latency" => "10ms..50ms"}]
       }
 
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
