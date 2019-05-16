@@ -1,7 +1,9 @@
 defmodule OriginSimulator.Duration do
   def parse(0), do: 0
 
-  def parse(time) when is_integer(time), do: raise("Invalid stage latency, please use time in s or ms")
+  def parse(time) when is_integer(time) do
+    raise("Invalid stage latency, please define time in s or ms")
+  end
 
   def parse(time) when is_binary(time) do
     cond do

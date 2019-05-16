@@ -9,7 +9,7 @@ defmodule OriginSimulator.DurationTest do
     end
 
     test "1" do
-      assert_raise RuntimeError, "Invalid stage latency, please use time in s or ms", fn -> Duration.parse(1) end
+      assert_raise RuntimeError, "Invalid stage latency, please define time in s or ms", fn () -> Duration.parse(1) end
     end
   end
 

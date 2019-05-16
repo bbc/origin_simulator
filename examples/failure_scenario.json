@@ -1,0 +1,7 @@
+{
+    "origin": "https://www.bbc.co.uk/news",
+    "stages": [
+        { "at": "0s", "status": 200, "latency": "100ms"},
+        { "at": "6s", "status": 504, "latency": "1s"}
+    ]
+}

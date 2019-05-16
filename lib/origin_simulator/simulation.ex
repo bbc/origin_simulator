@@ -47,7 +47,9 @@ defmodule OriginSimulator.Simulation do
     Payload.fetch(:payload, new_recipe)
 
     Enum.map(new_recipe.stages, fn item ->
-      Process.send_after(self(), {:update, item["status"], Duration.parse(item["latency"])}, Duration.parse(item["at"]))
+      Process.send_after(self(),
+        {:update, item["status"], Duration.parse(item["latency"])},
+        Duration.parse(item["at"]))
     end)
 
     {:reply, :ok, %{state | recipe: new_recipe }}

@@ -37,12 +37,12 @@ A JSON recipe defines the different stages of the scenario. This is an example o
             "status": 404
         },
         {
-            "at": 4000,
+            "at": "4s",
             "latency": "2s",
             "status": 503
         },
         {
-            "at": 6000,
+            "at": "6s",
             "latency": "100ms",
             "status": 200
         }
@@ -162,8 +162,8 @@ $ cat examples/sample_recipe.json
     "origin": "https://www.bbc.co.uk/news",
     "stages": [
         { "at": 0,    "status": 404, "latency": "50ms"},
-        { "at": 4000, "status": 503, "latency": "2s"},
-        { "at": 9000, "status": 200, "latency": "100ms"}
+        { "at": "4s", "status": 503, "latency": "2s"},
+        { "at": "9s", "status": 200, "latency": "100ms"}
     ]
 }
 
