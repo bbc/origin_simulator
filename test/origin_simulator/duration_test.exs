@@ -9,7 +9,7 @@ defmodule OriginSimulator.DurationTest do
     end
 
     test "1" do
-      assert_raise RuntimeError, "Invalid stage latency, please define time in s or ms", fn () -> Duration.parse(1) end
+      assert_raise RuntimeError, "Invalid timing, please define time in s or ms", fn () -> Duration.parse(1) end
     end
   end
 
@@ -30,7 +30,7 @@ defmodule OriginSimulator.DurationTest do
       assert Duration.parse("100ms") == 100
     end
 
-    test "1ms" do
+    test "1s" do
       assert Duration.parse("1s") == 1000
     end
 
@@ -45,10 +45,14 @@ defmodule OriginSimulator.DurationTest do
     test "range 800ms..1s" do
       assert Duration.parse("800ms..1s") == 800..1000
     end
+
+    test "invalid range" do
+      assert_raise RuntimeError, "Invalid timing, please define time in s or ms", fn () -> Duration.parse("1..2s") end
+    end
   end
 
   describe "parsing a tuple" do
-    test "0" do
+    test 0 do
       assert Duration.parse({0, ""}) == 0
     end
 
@@ -64,7 +68,7 @@ defmodule OriginSimulator.DurationTest do
       assert Duration.parse({100, "ms"}) == 100
     end
 
-    test "1ms" do
+    test "1s" do
       assert Duration.parse({1, "s"}) == 1000
     end
   end

@@ -2,7 +2,7 @@ defmodule OriginSimulator.Duration do
   def parse(0), do: 0
 
   def parse(time) when is_integer(time) do
-    raise("Invalid stage latency, please define time in s or ms")
+    raise("Invalid timing, please define time in s or ms")
   end
 
   def parse(time) when is_binary(time) do
@@ -19,8 +19,11 @@ defmodule OriginSimulator.Duration do
 
   def parse({0, _}), do: 0
 
-  def parse(times) when is_list(times) do
-    min_max = Enum.map(times, fn (t) -> parse(t) end)
-    apply(Range, :new, min_max)
+  def parse({_, _}) do
+    raise("Invalid timing, please define time in s or ms")
+  end
+
+  def parse([min, max]) do
+    Range.new(parse(min), parse(max))
   end
 end
