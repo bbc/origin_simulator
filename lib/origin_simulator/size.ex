@@ -13,7 +13,7 @@ defmodule OriginSimulator.Size do
     size * 1024 * 1024
   end
 
-  def parse({_, _}) do
+  def parse(_) do
     raise("Invalid size, please define size in b, kb or mb")
   end
 end
