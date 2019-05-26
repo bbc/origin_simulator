@@ -4,6 +4,6 @@ defmodule OriginSimulator.RecipeTest do
   alias OriginSimulator.Recipe
 
   test "Parse valid JSON" do
-    assert Recipe.parse({:ok, ~s[{"random": "123kb"}], nil}) ==  %OriginSimulator.Recipe{random: "123kb"}
+    assert Recipe.parse({:ok, ~s[{"random_content": "123kb"}], nil}) ==  %OriginSimulator.Recipe{random_content: "123kb"}
   end
 end

@@ -17,7 +17,7 @@ defmodule OriginSimulator.Payload do
     GenServer.call(server, {:parse, value})
   end
 
-  def fetch(server, %Recipe{random: value}) when is_binary(value) do
+  def fetch(server, %Recipe{random_content: value}) when is_binary(value) do
     GenServer.call(server, {:generate, value})
   end
 

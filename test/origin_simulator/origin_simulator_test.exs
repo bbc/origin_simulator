@@ -34,7 +34,7 @@ defmodule OriginSimulatorTest do
       payload = %{
         "origin" => "https://www.bbc.co.uk/news",
         "stages" => [%{ "at" => 0, "status" => 200, "latency" => "100ms"}],
-        "random" => nil,
+        "random_content" => nil,
         "body"   => nil
       }
 
@@ -53,7 +53,7 @@ defmodule OriginSimulatorTest do
       payload = %{
         "origin" => "https://www.bbc.co.uk/news",
         "stages" => [%{ "at" => 0, "status" => 200, "latency" => "100ms..200ms"}],
-        "random" => nil,
+        "random_content" => nil,
         "body"   => nil
       }
 
@@ -114,7 +114,7 @@ defmodule OriginSimulatorTest do
   describe "GET page with random content" do
     test "will return random content of the passed size" do
       payload = %{
-        "random" =>   "50kb",
+        "random_content" =>   "50kb",
         "stages" => [%{ "at" => 0, "status" => 200, "latency" => 0}]
       }
 
