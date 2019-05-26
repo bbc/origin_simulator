@@ -1,5 +1,5 @@
 {
-    "random": 50,
+    "random_content": "50kb",
     "stages": [
         { "at": 0, "status": 200, "latency": 0}
     ]
