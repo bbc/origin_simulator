@@ -34,7 +34,7 @@ defmodule OriginSimulatorTest do
       payload = %{
         "origin" => "https://www.bbc.co.uk/news",
         "stages" => [%{ "at" => 0, "status" => 200, "latency" => "100ms"}],
-        "random" => nil,
+        "random_content" => nil,
         "body"   => nil
       }
 
@@ -53,7 +53,7 @@ defmodule OriginSimulatorTest do
       payload = %{
         "origin" => "https://www.bbc.co.uk/news",
         "stages" => [%{ "at" => 0, "status" => 200, "latency" => "100ms..200ms"}],
-        "random" => nil,
+        "random_content" => nil,
         "body"   => nil
       }
 
@@ -91,7 +91,7 @@ defmodule OriginSimulatorTest do
   end
 
   describe "GET page with content" do
-    test "will return the origin page" do
+    test "will return the passed content" do
       payload = %{
         "body" =>   "{\"hello\":\"world\"}",
         "stages" => [%{ "at" => 0, "status" => 200, "latency" => 0}]
@@ -108,6 +108,27 @@ defmodule OriginSimulatorTest do
       assert conn.status == 200
       assert get_resp_header(conn, "content-type") == ["application/json; charset=utf-8"]
       assert conn.resp_body == "{\"hello\":\"world\"}"
+    end
+  end
+
+  describe "GET page with random content" do
+    test "will return random content of the passed size" do
+      payload = %{
+        "random_content" =>   "50kb",
+        "stages" => [%{ "at" => 0, "status" => 200, "latency" => 0}]
+      }
+
+      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+
+      Process.sleep 20
+
+      conn = conn(:get, "/")
+      conn = OriginSimulator.call(conn, [])
+
+      assert conn.state == :sent
+      assert conn.status == 200
+      assert get_resp_header(conn, "content-type") == ["text/html; charset=utf-8"]
+      assert String.length(conn.resp_body) == 50 * 1024
     end
   end
 

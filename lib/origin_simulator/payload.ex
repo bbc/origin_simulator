@@ -1,7 +1,7 @@
 defmodule OriginSimulator.Payload do
   use GenServer
 
-  alias OriginSimulator.Recipe
+  alias OriginSimulator.{Recipe, Size}
 
   ## Client API
 
@@ -17,7 +17,7 @@ defmodule OriginSimulator.Payload do
     GenServer.call(server, {:parse, value})
   end
 
-  def fetch(server, %Recipe{random: value}) when is_number(value) do
+  def fetch(server, %Recipe{random_content: value}) when is_binary(value) do
     GenServer.call(server, {:generate, value})
   end
 
@@ -64,8 +64,12 @@ defmodule OriginSimulator.Payload do
 
   @impl true
   def handle_call({:generate, size}, _from, state) do
-    size = size * 1024
-    body = :crypto.strong_rand_bytes(size) |> Base.encode64 |> binary_part(0, size)
+    size_in_bytes = Size.parse(size)
+
+    body = :crypto.strong_rand_bytes(size_in_bytes)
+    |> Base.encode64
+    |> binary_part(0, size_in_bytes)
+
     :ets.insert(:payload, {"body", body })
 
     {:reply, :ok, state}

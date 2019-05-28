@@ -65,7 +65,7 @@ In the example below any response will take a random amount of time within the r
 
 ```json
 {
-    "random": 428,
+    "random_content": "428kb",
     "stages": [
         {
             "at": 0,
@@ -102,7 +102,7 @@ In this example we are requiring a continuous successful response with no simula
 
 ```json
 {
-    "random": 428,
+    "random_content": "428kb",
     "stages": [
         {
             "at": 0,
