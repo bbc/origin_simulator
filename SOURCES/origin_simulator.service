@@ -1,0 +1,13 @@
+[Unit]
+Description=Start the origin simulator service
+After=network.target network-online.target
+[Service]
+Environment=HOME=/home/component
+Environment=PORT=8080
+User=component
+Group=component
+WorkingDirectory=/home/component/origin_simulator
+ExecStart=/home/component/origin_simulator/bin/origin_simulator foreground
+Restart=on-failure
+[Install]
+WantedBy=multi-user.target
