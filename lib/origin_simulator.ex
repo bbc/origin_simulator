@@ -24,8 +24,8 @@ defmodule OriginSimulator do
     Counter.clear()
 
     conn
-    |> put_resp_content_type("text/html")
-    |> send_resp(200, "<p>Counter cleared</p>")
+    |> put_resp_content_type("application/json")
+    |> send_resp(200, ~s({"cleared": "yes"}))
   end
 
   get "/current_count" do
