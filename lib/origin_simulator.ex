@@ -1,6 +1,7 @@
 defmodule OriginSimulator do
   use Plug.Router
-  alias OriginSimulator.{Payload,Recipe,Simulation}
+  alias OriginSimulator.{Payload,Recipe,Simulation,PlugResponseCounter,Counter}
+  plug(PlugResponseCounter)
 
   plug(:match)
   plug(:dispatch)
@@ -17,6 +18,20 @@ defmodule OriginSimulator do
     conn
     |> put_resp_content_type("application/json")
     |> send_resp(200, Poison.encode!(msg))
+  end
+
+  get "/clear_current_count" do
+    Counter.clear()
+
+    conn
+    |> put_resp_content_type("text/html")
+    |> send_resp(200, "<p>Counter cleared</p>")
+  end
+
+  get "/current_count" do
+    conn
+    |> put_resp_content_type("application/json")
+    |> send_resp(200, Poison.encode!(Counter.value()))
   end
 
   post "/add_recipe" do
