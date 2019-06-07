@@ -1,0 +1,20 @@
+{
+    "origin": "https://www.bbc.co.uk",
+    "stages": [
+        {
+            "at": 0,
+            "latency": "200ms",
+            "status": 200
+        },
+        {
+            "at": "10s",
+            "latency": "500ms",
+            "status": 500
+        },
+        {
+            "at": "30s",
+            "latency": "200ms",
+            "status": 200
+        }
+    ]
+}
