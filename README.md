@@ -132,6 +132,8 @@ In this example content is posted along with the recipe. Where the payload body 
 
 ## Usage
 
+You can post recipes using `curl` and the `mix upload_recipe` task.
+
 First run the Elixir app:
 ```
 $ env MIX_ENV=prod iex -S mix
@@ -186,6 +188,12 @@ HTTP/1.1 200 OK
 ```
 
 At any time you can reset the scenario by simply POSTing a new one to `/add_recipe`.
+
+#### Using `mix upload_recipe`
+`mix upload_recipe demo` will upload the recipe located at `examples/demo.json` to origin simulator running locally.
+
+If you have deployed origin simulator, you can specify the host when uploading the recipe. For example:
+`mix upload_recipe "http://origin-simulator.com" demo`
 
 ## Performance
 
