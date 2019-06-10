@@ -4,7 +4,7 @@ defmodule Mix.Tasks.UploadRecipe do
   def run([host, recipe]) do
     {:ok, _started} = Application.ensure_all_started(:httpoison)
 
-    recipe = get_json("./recipes/#{recipe}.json")
+    recipe = get_json("./examples/#{recipe}.json")
 
     HTTPoison.post("#{host}/add_recipe", recipe)
   end
