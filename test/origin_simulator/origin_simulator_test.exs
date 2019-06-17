@@ -35,7 +35,8 @@ defmodule OriginSimulatorTest do
         "origin" => "https://www.bbc.co.uk/news",
         "stages" => [%{ "at" => 0, "status" => 200, "latency" => "100ms"}],
         "random_content" => nil,
-        "body"   => nil
+        "body"   => nil,
+        "id" => "default"
       }
 
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
@@ -54,7 +55,8 @@ defmodule OriginSimulatorTest do
         "origin" => "https://www.bbc.co.uk/news",
         "stages" => [%{ "at" => 0, "status" => 200, "latency" => "100ms..200ms"}],
         "random_content" => nil,
-        "body"   => nil
+        "body"   => nil,
+        "id" => "default"
       }
 
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
@@ -192,6 +194,35 @@ defmodule OriginSimulatorTest do
       assert conn.status == 200
       assert get_resp_header(conn, "content-type") == ["application/json; charset=utf-8"]
       assert conn.resp_body == "{\"hello\":\"world\"}"
+    end
+  end
+
+  describe "Multiple pages" do
+    test "stores and returns two pages" do
+        foo_payload = %{
+          "body" => "<p>foo</p>",
+          "stages" => [%{ "at" => 0, "status" => 200, "latency" => 0}],
+          "id" => "/foo"
+        }
+
+        bar_payload = %{
+          "body" => "<p>bar</p>",
+          "id" => "/bar"
+        }
+
+        conn(:post, "/add_recipe", Poison.encode!(foo_payload)) |> OriginSimulator.call([])
+        conn(:post, "/add_recipe", Poison.encode!(bar_payload)) |> OriginSimulator.call([])
+
+        Process.sleep 20
+
+        foo_conn = conn(:get, "/foo") |> OriginSimulator.call([])
+        bar_conn = conn(:get, "/bar") |> OriginSimulator.call([])
+
+        assert foo_conn.resp_body == "<p>foo</p>"
+        assert foo_conn.status == 200
+
+        assert bar_conn.resp_body == "<p>bar</p>"
+        assert bar_conn.status == 200
     end
   end
 end

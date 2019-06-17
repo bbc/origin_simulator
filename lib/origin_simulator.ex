@@ -1,6 +1,6 @@
 defmodule OriginSimulator do
   use Plug.Router
-  alias OriginSimulator.{Payload,Recipe,Simulation,PlugResponseCounter,Counter}
+  alias OriginSimulator.{Recipe,Simulation,PlugResponseCounter,Counter}
   plug(PlugResponseCounter)
 
   plug(:match)
@@ -35,9 +35,6 @@ defmodule OriginSimulator do
   end
 
   post "/add_recipe" do
-    Simulation.restart
-    Process.sleep(10)
-
     recipe = Recipe.parse(Plug.Conn.read_body(conn))
     Simulation.add_recipe(:simulation, recipe)
 
@@ -46,39 +43,5 @@ defmodule OriginSimulator do
     |> send_resp(201, Poison.encode!(Simulation.recipe(:simulation)))
   end
 
-  get "/*glob" do
-    serve_payload(conn)
-  end
-
-  post "/*glob" do
-    serve_payload(conn)
-  end
-
-  match _ do
-    send_resp(conn, 404, "not found")
-  end
-
-  defp serve_payload(conn) do
-    {status, latency} = Simulation.state(:simulation)
-
-    sleep(latency)
-
-    {:ok, body} = Payload.body(:payload, status)
-
-    conn
-    |> put_resp_content_type(content_type(body))
-    |> send_resp(status, body)
-  end
-
-  defp content_type(body) do
-    if String.first(body) == "{" do
-      "application/json"
-    else
-      "text/html"
-    end
-  end
-
-  defp sleep(0), do: nil
-  defp sleep(%Range{} = time), do: :timer.sleep(Enum.random(time))
-  defp sleep(duration), do: :timer.sleep(duration)
+  match(_, via: [:post, :get], to: OriginSimulator.Serve)
 end
