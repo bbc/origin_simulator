@@ -130,6 +130,22 @@ In this example content is posted along with the recipe. Where the payload body 
 }
 ```
 
+It's also possible to define random content inside the posted body. This can be useful to
+simulate JSON contracts, structured text, etc.
+
+```json
+{
+    "body": "{\"data\":\"<<256kb>>\", \"metadata\":\"<<128b>>and<<16b>>\"}",
+    "stages": [
+        {
+            "at": 0,
+            "latency": "100ms",
+            "status": 200
+        }
+    ]
+}
+```
+
 ## Usage
 
 You can post recipes using `curl` and the `mix upload_recipe` task.
