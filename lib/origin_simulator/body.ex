@@ -1,5 +1,5 @@
 defmodule OriginSimulator.Body do
-  @regex ~r"{{(.+?)}}"
+  @regex ~r"<<(.+?)>>"
 
   alias OriginSimulator.Size
 

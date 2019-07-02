@@ -3,15 +3,27 @@ defmodule OriginSimulator.RandomiserTest do
 
   alias OriginSimulator.Body
 
-  describe "parsing a string containg placeholders" do
+  describe "parsing a string containg a placeholder" do
     test "keeps text outside of placeholders " do
-      parsed_string = Body.parse("abc{{4b}}def{{8b}}ghi")
-      assert parsed_string =~ "abc"
+      decoded_body = Body.parse("{\"data\":\"<<1kb>>\"}") |> Poison.decode!()
+      assert String.length(decoded_body["data"]) == 1024
+    end
+
+    test "replaces placeholders with random content" do
+      parsed_string = Body.parse("{\"data\":\"some random<<4kb>>and also<<10kb>>this\"}")
+      refute parsed_string =~ ~r"<<.+?>>"
+    end
+  end
+
+  describe "parsing a string containg multiple placeholders" do
+    test "keeps text outside of placeholders " do
+      parsed_string = Body.parse("{\"data\":\"some random<<4kb>>and also<<10kb>>this\"}")
+      assert parsed_string =~ "some random"
     end
 
     test "replaces placeholders with random content " do
-      parsed_string = Body.parse("abc{{4b}}def{{8b}}ghi")
-      refute parsed_string =~ ~r"{{.+?}}"
+      parsed_string = Body.parse("{\"data\":\"some random<<4kb>>and also<<10kb>>this\"}")
+      refute parsed_string =~ ~r"<<.+?>>"
     end
   end
 
