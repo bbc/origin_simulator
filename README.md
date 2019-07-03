@@ -135,7 +135,7 @@ simulate JSON contracts, structured text, etc.
 
 ```json
 {
-    "body": "{\"data\":\"<<256kb>>\", \"metadata\":\"<<128b>>and<<16b>>\"}",
+    "body": "{\"data\":\"<<256kb>>\", \"metadata\":\"<<128b>>and<<16b>>\", \"collection\":[\"<<128kb>>\", \"<<256kb>>\"]}\"}",
     "stages": [
         {
             "at": 0,
