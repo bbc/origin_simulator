@@ -21,9 +21,14 @@ defmodule OriginSimulator.RandomiserTest do
       assert parsed_string =~ "some random"
     end
 
-    test "replaces placeholders with random content " do
+    test "replaces placeholders with random content" do
       parsed_string = Body.parse("{\"data\":\"some random<<4kb>>and also<<10kb>>this\"}")
       refute parsed_string =~ ~r"<<.+?>>"
+    end
+
+    test "produces a random string of the expected size" do
+      decoded_body = Body.parse("{\"data\":\"some random<<4kb>>and also<<10kb>>this\"}")  |> Poison.decode!()
+      assert String.length(decoded_body["data"]) == 14_359
     end
   end
 
