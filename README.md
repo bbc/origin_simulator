@@ -1,4 +1,4 @@
-# OriginSimulator
+# OriginSimulator [![Build Status](https://travis-ci.org/bbc/origin_simulator.svg?branch=master)](https://travis-ci.org/bbc/origin_simulator)
 
 A tool to simulate a (flaky) upstream origin during load and stress tests.
 
