@@ -1,0 +1,16 @@
+language: elixir
+
+elixir:
+  - 1.8
+otp_release:
+  - 21.0
+
+env:
+  global:
+    - MIX_ENV=test
+
+before_script:
+  - mix deps.get
+
+script:
+  - mix test
