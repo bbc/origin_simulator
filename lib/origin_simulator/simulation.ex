@@ -9,16 +9,16 @@ defmodule OriginSimulator.Simulation do
     GenServer.start_link(__MODULE__, opts, name: :simulation)
   end
 
-  def state(server) do
-    GenServer.call(server, :state)
+  def state(server, route) do
+    GenServer.call(server, {:state, route})
   end
 
-  def recipe(server) do
-    GenServer.call(server, :recipe)
+  def recipe_book(server) do
+    GenServer.call(server, :recipe_book)
   end
 
-  def add_recipe(server, new_recipe) do
-    GenServer.call(server, {:add_recipe, new_recipe})
+  def add_recipe_book(server, new_recipe_book) do
+    GenServer.call(server, {:add_recipe_book, new_recipe_book})
   end
 
   def restart do
@@ -29,35 +29,46 @@ defmodule OriginSimulator.Simulation do
 
   @impl true
   def init(_) do
-    {:ok, %{ recipe: nil, status: 406, latency: 0 }}
+    {:ok, %{ recipe_book: nil, recipe_stages: %{} }}
   end
 
   @impl true
-  def handle_call(:state, _from, state) do
-    {:reply, { state.status, state.latency }, state}
+  def handle_call({:state, route}, _from, state) do
+    stage = Map.get(state, :recipe_stages)
+    |> Map.get(route)
+
+    case stage do
+      nil -> {:reply, {:error}, state}
+      _   -> {:reply, {:ok, stage.status, stage.latency}, state}
+    end
   end
 
   @impl true
-  def handle_call(:recipe, _from, state) do
-    {:reply, state.recipe, state}
+  def handle_call(:recipe_book, _from, state) do
+    {:reply, state.recipe_book, state}
   end
 
   @impl true
-  def handle_call({:add_recipe, new_recipe}, _caller, state) do
-    Payload.fetch(:payload, new_recipe)
-
-    Enum.map(new_recipe.stages, fn item ->
-      Process.send_after(self(),
-        {:update, item["status"], Duration.parse(item["latency"])},
-        Duration.parse(item["at"]))
+  def handle_call({:add_recipe_book, new_recipe_book}, _caller, state) do
+    Enum.each(new_recipe_book, fn recipe ->
+      Payload.fetch(:payloads, recipe)
     end)
 
-    {:reply, :ok, %{state | recipe: new_recipe }}
+    Enum.map(new_recipe_book, fn recipe ->
+      Enum.map(recipe.stages, fn stage ->
+        Process.send_after(self(),
+          {:update, {recipe.route, stage["status"], Duration.parse(stage["latency"])}},
+          Duration.parse(stage["at"]))
+      end)
+    end)
+
+    {:reply, :ok, %{state | recipe_book: new_recipe_book }}
   end
 
   @impl true
-  def handle_info({:update, status, latency}, state) do
-    new_state = Map.merge(state, %{status: status, latency: latency})
-    {:noreply, new_state}
+  def handle_info({:update, {route, status, latency}}, state) do
+    updated_stages = Map.get(state, :recipe_stages)
+    |> Map.put(route, %{status: status, latency: latency})
+    {:noreply, Map.put(state, :recipe_stages, updated_stages)}
   end
 end

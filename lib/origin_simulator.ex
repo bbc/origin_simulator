@@ -1,6 +1,6 @@
 defmodule OriginSimulator do
   use Plug.Router
-  alias OriginSimulator.{Payload,Recipe,Simulation,PlugResponseCounter,Counter}
+  alias OriginSimulator.{Payload,RecipeBook,Simulation,PlugResponseCounter,Counter}
   plug(PlugResponseCounter)
 
   plug(:match)
@@ -13,7 +13,7 @@ defmodule OriginSimulator do
   end
 
   get "/current_recipe" do
-    msg = Simulation.recipe(:simulation) || "Not set, please POST a recipe to /add_recipe"
+    msg = Simulation.recipe_book(:simulation) || "Not set, please POST a recipe book to /add_recipe"
 
     conn
     |> put_resp_content_type("application/json")
@@ -38,12 +38,12 @@ defmodule OriginSimulator do
     Simulation.restart
     Process.sleep(10)
 
-    recipe = Recipe.parse(Plug.Conn.read_body(conn))
-    Simulation.add_recipe(:simulation, recipe)
+    recipe_book = RecipeBook.parse(Plug.Conn.read_body(conn))
+    Simulation.add_recipe_book(:simulation, recipe_book)
 
     conn
     |> put_resp_content_type("application/json")
-    |> send_resp(201, Poison.encode!(Simulation.recipe(:simulation)))
+    |> send_resp(201, Poison.encode!(Simulation.recipe_book(:simulation)))
   end
 
   get "/*glob" do
@@ -59,11 +59,12 @@ defmodule OriginSimulator do
   end
 
   defp serve_payload(conn) do
-    {status, latency} = Simulation.state(:simulation)
+    route = conn.request_path
+    {:ok, status, latency} = Simulation.state(:simulation, route)
 
     sleep(latency)
 
-    {:ok, body} = Payload.body(:payload, status)
+    {:ok, body} = Payload.body(:payload, status, route)
 
     conn
     |> put_resp_content_type(content_type(body))
