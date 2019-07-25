@@ -2,7 +2,10 @@
 
 library 'BBCNews'
 
-String cosmosService = 'origin-simulator'
+def cosmosServices = [
+    'origin-simulator',
+    'origin-simulator-data-pres'
+]
 
 node {
   cleanWs()
@@ -23,7 +26,10 @@ node {
     sh 'cp _build/prod/rel/origin_simulator/releases/*/origin_simulator.tar.gz SOURCES/'
   }
 
-  BBCNews.buildRPMWithMock(cosmosService, 'origin-simulator.spec', params.FORCE_RELEASE)
-  BBCNews.setRepositories(cosmosService, 'repositories.json')
-  BBCNews.cosmosRelease(cosmosService, 'RPMS/*.x86_64.rpm', params.FORCE_RELEASE)
+  BBCNews.buildRPMWithMock(cosmosServices.first(), 'origin-simulator.spec', params.FORCE_RELEASE)
+
+  cosmosServices.each { service ->
+    BBCNews.setRepositories(service, 'repositories.json')
+    BBCNews.cosmosRelease(service, 'RPMS/*.x86_64.rpm', params.FORCE_RELEASE)
+  }
 }
