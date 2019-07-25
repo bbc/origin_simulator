@@ -1,7 +1,7 @@
 defmodule OriginSimulator.Payload do
   use GenServer
 
-  alias OriginSimulator.{Body, Recipe, Size}
+  alias OriginSimulator.{Body, Recipe}
 
   ## Client API
 
@@ -9,16 +9,8 @@ defmodule OriginSimulator.Payload do
     GenServer.start_link(__MODULE__, opts, name: :payloads)
   end
 
-  def fetch(server, %Recipe{origin: value, route: route}) when is_binary(value) do
-    GenServer.call(server, {:fetch, route, value})
-  end
-
-  def fetch(server, %Recipe{body: value, route: route}) when is_binary(value) do
-    GenServer.call(server, {:parse, route, value})
-  end
-
-  def fetch(server, %Recipe{random_content: value, route: route}) when is_binary(value) do
-    GenServer.call(server, {:generate, route, value})
+  def update_recipe_book(server, recipe_book) do
+    GenServer.call(server, {:update_recipe_book, recipe_book})
   end
 
   def body(_server, status, route) do
@@ -28,6 +20,10 @@ defmodule OriginSimulator.Payload do
       406 -> {:ok, "Recipe not set, please POST a recipe to /add_recipe"}
       _   -> {:ok, "Error #{status}"}
     end
+  end
+
+  def restart do
+    GenServer.stop(:payloads)
   end
 
   defp cache_lookup(route) do
@@ -46,26 +42,29 @@ defmodule OriginSimulator.Payload do
   end
 
   @impl true
-  def handle_call({:fetch, route, origin}, _from, state) do
+  def handle_call({:update_recipe_book, recipe_book}, _from, state) do
+    Enum.each(recipe_book, &cache_payload/1)
+
+    {:reply, :ok, state}
+  end
+
+  @impl true
+  def terminate(_reason, _state) do
+    :ets.delete(:payloads)
+  end
+
+  defp cache_payload(%Recipe{origin: origin, route: route}) when is_binary(origin) do
     env = Application.get_env(:origin_simulator, :env)
 
     {:ok, %HTTPoison.Response{body: body}} = OriginSimulator.HTTPClient.get(origin, env)
     :ets.insert(:payloads, {route, body})
-
-    {:reply, :ok, state}
   end
 
-  @impl true
-  def handle_call({:parse, route, body}, _from, state) do
+  defp cache_payload(%Recipe{body: body, route: route}) when is_binary(body) do
     :ets.insert(:payloads, {route, Body.parse(body)})
-
-    {:reply, :ok, state}
   end
 
-  @impl true
-  def handle_call({:generate, route, size}, _from, state) do
+  defp cache_payload(%Recipe{random_content: size, route: route}) when is_binary(size) do
     :ets.insert(:payloads, {route, Body.randomise(size) })
-
-    {:reply, :ok, state}
   end
 end

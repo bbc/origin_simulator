@@ -12,8 +12,8 @@ defmodule OriginSimulator do
     |> send_resp(200, "ok!")
   end
 
-  get "/current_recipe" do
-    msg = Simulation.recipe_book(:simulation) || "Not set, please POST a recipe book to /add_recipe"
+  get "/current_recipe_book" do
+    msg = Simulation.recipe_book(:simulation) || "Not set, please POST a recipe book to /add_recipe_book"
 
     conn
     |> put_resp_content_type("application/json")
@@ -34,8 +34,9 @@ defmodule OriginSimulator do
     |> send_resp(200, Poison.encode!(Counter.value()))
   end
 
-  post "/add_recipe" do
+  post "/add_recipe_book" do
     Simulation.restart
+    Payload.restart
     Process.sleep(10)
 
     recipe_book = RecipeBook.parse(Plug.Conn.read_body(conn))

@@ -50,9 +50,7 @@ defmodule OriginSimulator.Simulation do
 
   @impl true
   def handle_call({:add_recipe_book, new_recipe_book}, _caller, state) do
-    Enum.each(new_recipe_book, fn recipe ->
-      Payload.fetch(:payloads, recipe)
-    end)
+    Payload.update_recipe_book(:payloads, new_recipe_book)
 
     Enum.map(new_recipe_book, fn recipe ->
       Enum.map(recipe.stages, fn stage ->
