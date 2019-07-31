@@ -1,49 +1,71 @@
 defmodule OriginSimulator.PayloadTest do
   use ExUnit.Case, async: true
+  alias OriginSimulator.{RecipeRoute,Payload}
 
-  alias OriginSimulator.Recipe
+  setup do
+    payloads_store = start_supervised!(Payload)
+    ets_table = GenServer.call(payloads_store, :state)
 
-  describe "with origin" do
-    setup do
-      OriginSimulator.Payload.fetch(:payload, %Recipe{origin: "https://www.bbc.co.uk"})
+    %{payloads_store: payloads_store, ets_table: ets_table}
+  end
+  
+  describe "update payloads" do
+    test "with origin payload", %{payloads_store: payloads_store, ets_table: ets_table} do
+      Payload.update_payloads(payloads_store, [%RecipeRoute{origin: "https://www.bbc.co.uk"}])
+
+      assert :ets.lookup(ets_table, "/*") == [{"/*", "some content from origin"}]
     end
 
-    test "Always return an error body for 5xx" do
-      assert OriginSimulator.Payload.body(:payload, 500) == {:ok, "Error 500"}
+    test "with body payload", %{payloads_store: payloads_store, ets_table: ets_table} do
+      Payload.update_payloads(payloads_store, [%RecipeRoute{body: "foo"}])
+
+      assert :ets.lookup(ets_table, "/*") == [{"/*", "foo"}]
     end
 
-    test "Always return 'Not Found' for 404s" do
-      assert OriginSimulator.Payload.body(:payload, 404) == {:ok, "Not found"}
-    end
+    test "with random content", %{payloads_store: payloads_store, ets_table: ets_table} do
+      Payload.update_payloads(payloads_store, [%RecipeRoute{random_content: "1kb"}])
+      [{"/*", payload}] = :ets.lookup(ets_table, "/*")
 
-    test "Suggests to add a recipe for 406" do
-      assert OriginSimulator.Payload.body(:payload, 406) == {:ok, "Recipe not set, please POST a recipe to /add_recipe"}
-    end
-
-    test "returns the origin body for 200" do
-      assert OriginSimulator.Payload.body(:payload, 200) == {:ok, "some content from origin"}
+      assert String.length(payload) == 1024
     end
   end
 
-  describe "with content" do
-    setup do
-      OriginSimulator.Payload.fetch(:payload, %Recipe{body: "{\"hello\":\"world\"}"})
+  describe "body" do
+    test "with origin payload", %{payloads_store: payloads_store} do
+      Payload.update_payloads(payloads_store,
+        [%RecipeRoute{pattern: "/origin", origin: "https://www.bbc.co.uk"}])
+
+      assert Payload.body(payloads_store, 200, "/origin") == {:ok, "some content from origin"}
     end
 
-    test "Always return an error body for 5xx" do
-      assert OriginSimulator.Payload.body(:payload, 500) == {:ok, "Error 500"}
+    test "with body payload", %{payloads_store: payloads_store} do
+      Payload.update_payloads(payloads_store, [%RecipeRoute{pattern: "/body", body: "foo"}])
+
+      assert Payload.body(payloads_store, 200, "/body") == {:ok, "foo"}
     end
 
-    test "Always return 'Not Found' for 404s" do
-      assert OriginSimulator.Payload.body(:payload, 404) == {:ok, "Not found"}
+    test "with random content payload", %{payloads_store: payloads_store} do
+      Payload.update_payloads(payloads_store,
+        [%RecipeRoute{pattern: "/random", random_content: "1kb"}])
+      {:ok, random_payload_body } = Payload.body(payloads_store, 200, "/random")
+
+      assert String.length(random_payload_body) == 1024
     end
 
-    test "Suggests to add a recipe for 406" do
-      assert OriginSimulator.Payload.body(:payload, 406) == {:ok, "Recipe not set, please POST a recipe to /add_recipe"}
+    test "always return an error body for 5xx", %{payloads_store: payloads_store} do
+      Payload.update_payloads(payloads_store, [%RecipeRoute{pattern: "/foo", body: "bar"}])
+
+      assert Payload.body(payloads_store, 503, "/foo") == {:ok, "Error 503"}
     end
 
-    test "returns the origin body for 200" do
-      assert OriginSimulator.Payload.body(:payload, 200) == {:ok, "{\"hello\":\"world\"}"}
+    test "always return 'Not Found' for 404s", %{payloads_store: payloads_store} do
+      Payload.update_payloads(payloads_store, [%RecipeRoute{pattern: "/foo", body: "bar"}])
+
+      assert Payload.body(payloads_store, 404, "/foo") == {:ok, "Not found"}
+    end
+
+    test "errors if the the path is not in the ets store", %{payloads_store: payloads_store} do
+      assert Payload.body(payloads_store, 200, "/foo") == {:error, "Could not find the payload in the cache"}
     end
   end
 end

@@ -1,35 +1,35 @@
 defmodule OriginSimulator.Payload do
   use GenServer
 
-  alias OriginSimulator.{Body, Recipe}
+  alias OriginSimulator.{Body, RecipeRoute}
 
   ## Client API
 
   def start_link(opts) do
-    GenServer.start_link(__MODULE__, opts, name: :payloads)
+    GenServer.start_link(__MODULE__, :ok, opts)
   end
 
-  def update_recipe_book(server, recipe_book) do
-    GenServer.call(server, {:update_recipe_book, recipe_book})
+  def update_payloads(server, recipe) do
+    GenServer.call(server, {:update_payloads, recipe})
   end
 
-  def body(_server, status, route) do
+  def body(server, status, pattern) do
+    table = GenServer.call(server, :state)
     case status do
-      200 -> cache_lookup(route)
+      200 -> cache_lookup(table, pattern)
       404 -> {:ok, "Not found"}
-      406 -> {:ok, "Recipe not set, please POST a recipe to /add_recipe"}
       _   -> {:ok, "Error #{status}"}
     end
   end
 
-  def restart do
-    GenServer.stop(:payloads)
+  def stop(server) do
+    GenServer.stop(server)
   end
 
-  defp cache_lookup(route) do
-    case :ets.lookup(:payloads, route) do
-      [{^route, body}] -> {:ok, body}
-      [] -> {:error, "content not found"}
+  defp cache_lookup(table, pattern) do
+    case :ets.lookup(table, pattern) do
+      [{_, body}] -> {:ok, body}
+      [] -> {:error, "Could not find the payload in the cache"}
     end
   end
 
@@ -37,34 +37,37 @@ defmodule OriginSimulator.Payload do
 
   @impl true
   def init(_) do
-    :ets.new(:payloads, [:set, :protected, :named_table, read_concurrency: true])
-    {:ok, nil}
+    {:ok, :ets.new(:payloads, [:set, :protected, read_concurrency: true])}
   end
 
   @impl true
-  def handle_call({:update_recipe_book, recipe_book}, _from, state) do
-    Enum.each(recipe_book, &cache_payload/1)
-
+  def handle_call({:update_payloads, recipe}, _from, state) do
+    Enum.each(recipe, fn route -> cache_payload(state, route) end)
     {:reply, :ok, state}
   end
 
   @impl true
-  def terminate(_reason, _state) do
-    :ets.delete(:payloads)
+  def handle_call(:state, _from, state) do
+    {:reply, state, state}
   end
 
-  defp cache_payload(%Recipe{origin: origin, route: route}) when is_binary(origin) do
-    env = Application.get_env(:origin_simulator, :env)
-
-    {:ok, %HTTPoison.Response{body: body}} = OriginSimulator.HTTPClient.get(origin, env)
-    :ets.insert(:payloads, {route, body})
+  @impl true
+  def terminate(_reason, state) do
+    :ets.delete(state)
   end
 
-  defp cache_payload(%Recipe{body: body, route: route}) when is_binary(body) do
-    :ets.insert(:payloads, {route, Body.parse(body)})
+  defp cache_payload(table, %RecipeRoute{origin: origin, pattern: pattern}) when is_binary(origin) do
+    http_client = Application.get_env(:origin_simulator, :http_client)
+
+    {:ok, %HTTPoison.Response{body: body}} = http_client.get(origin)
+    :ets.insert(table, {pattern, body})
   end
 
-  defp cache_payload(%Recipe{random_content: size, route: route}) when is_binary(size) do
-    :ets.insert(:payloads, {route, Body.randomise(size) })
+  defp cache_payload(table, %RecipeRoute{body: body, pattern: pattern}) when is_binary(body) do
+    :ets.insert(table, {pattern, Body.parse(body)})
+  end
+
+  defp cache_payload(table, %RecipeRoute{random_content: size, pattern: pattern}) when is_binary(size) do
+    :ets.insert(table, {pattern, Body.randomise(size) })
   end
 end

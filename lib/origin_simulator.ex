@@ -1,6 +1,6 @@
 defmodule OriginSimulator do
   use Plug.Router
-  alias OriginSimulator.{Payload,RecipeBook,Simulation,PlugResponseCounter,Counter}
+  alias OriginSimulator.{Payload,Recipe,Simulation,RoutingTable,PlugResponseCounter,Counter}
   plug(PlugResponseCounter)
 
   plug(:match)
@@ -12,8 +12,8 @@ defmodule OriginSimulator do
     |> send_resp(200, "ok!")
   end
 
-  get "/current_recipe_book" do
-    msg = Simulation.recipe_book(:simulation) || "Not set, please POST a recipe book to /add_recipe_book"
+  get "/current_recipe" do
+    msg = Simulation.recipe(:simulation) || "Not set, please POST a recipe book to /add_recipe"
 
     conn
     |> put_resp_content_type("application/json")
@@ -34,39 +34,37 @@ defmodule OriginSimulator do
     |> send_resp(200, Poison.encode!(Counter.value()))
   end
 
-  post "/add_recipe_book" do
-    Simulation.restart
-    Payload.restart
+  post "/add_recipe" do
+    Simulation.stop
+    Payload.stop(:payloads)
     Process.sleep(10)
 
-    recipe_book = RecipeBook.parse(Plug.Conn.read_body(conn))
-    Simulation.add_recipe_book(:simulation, recipe_book)
+    recipe = Recipe.parse(Plug.Conn.read_body(conn))
+    Simulation.add_recipe(:simulation, recipe)
 
     conn
     |> put_resp_content_type("application/json")
-    |> send_resp(201, Poison.encode!(Simulation.recipe_book(:simulation)))
+    |> send_resp(201, Poison.encode!(Simulation.recipe(:simulation)))
   end
 
-  get "/*glob" do
-    serve_payload(conn)
+  match _, via: [:post, :get] do
+    create_response(conn.request_path)
+    |> serve_payload(conn)
   end
 
-  post "/*glob" do
-    serve_payload(conn)
+  defp create_response(request_path) do
+    with {:ok, pattern} <- RoutingTable.find_route(:routing_table, request_path),
+         {:ok, status, latency} <- Simulation.state(:simulation, pattern),
+         {:ok, body} <- Payload.body(:payloads, status, pattern)
+      do %{status: status, body: body, latency: latency} end
+      |> case do
+           {:error, message} -> %{status: 500, body: message, latency: 0}
+           response -> response
+         end
   end
 
-  match _ do
-    send_resp(conn, 404, "not found")
-  end
-
-  defp serve_payload(conn) do
-    route = conn.request_path
-    {:ok, status, latency} = Simulation.state(:simulation, route)
-
+  defp serve_payload(%{status: status, body: body, latency: latency}, conn) do
     sleep(latency)
-
-    {:ok, body} = Payload.body(:payload, status, route)
-
     conn
     |> put_resp_content_type(content_type(body))
     |> send_resp(status, body)

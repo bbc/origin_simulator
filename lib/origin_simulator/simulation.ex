@@ -1,7 +1,8 @@
+
 defmodule OriginSimulator.Simulation do
   use GenServer
 
-  alias OriginSimulator.{Payload,Duration}
+  alias OriginSimulator.{Payload,RoutingTable,Duration}
 
   ## Client API
 
@@ -9,19 +10,19 @@ defmodule OriginSimulator.Simulation do
     GenServer.start_link(__MODULE__, opts, name: :simulation)
   end
 
-  def state(server, route) do
-    GenServer.call(server, {:state, route})
+  def state(server, pattern) do
+    GenServer.call(server, {:state, pattern})
   end
 
-  def recipe_book(server) do
-    GenServer.call(server, :recipe_book)
+  def recipe(server) do
+    GenServer.call(server, :recipe)
   end
 
-  def add_recipe_book(server, new_recipe_book) do
-    GenServer.call(server, {:add_recipe_book, new_recipe_book})
+  def add_recipe(server, new_recipe) do
+    GenServer.call(server, {:add_recipe, new_recipe})
   end
 
-  def restart do
+  def stop do
     GenServer.stop(:simulation)
   end
 
@@ -29,44 +30,44 @@ defmodule OriginSimulator.Simulation do
 
   @impl true
   def init(_) do
-    {:ok, %{ recipe_book: nil, recipe_stages: %{} }}
+    {:ok, %{ recipe: nil, recipe_stages: %{} }}
   end
 
   @impl true
-  def handle_call({:state, route}, _from, state) do
-    stage = Map.get(state, :recipe_stages)
-    |> Map.get(route)
-
-    case stage do
-      nil -> {:reply, {:error}, state}
-      _   -> {:reply, {:ok, stage.status, stage.latency}, state}
-    end
+  def handle_call({:state, pattern}, _from, state) do
+     Map.get(state, :recipe_stages)
+    |> Map.get(pattern)
+    |> case do
+         nil -> {:reply, {:error, "Cannot find the simulation data"}, state}
+         stage  -> {:reply, {:ok, stage.status, stage.latency}, state}
+       end
   end
 
   @impl true
-  def handle_call(:recipe_book, _from, state) do
-    {:reply, state.recipe_book, state}
+  def handle_call(:recipe, _from, state) do
+    {:reply, state.recipe, state}
   end
 
   @impl true
-  def handle_call({:add_recipe_book, new_recipe_book}, _caller, state) do
-    Payload.update_recipe_book(:payloads, new_recipe_book)
+  def handle_call({:add_recipe, new_recipe}, _caller, state) do
+    RoutingTable.update_routing_table(:routing_table, new_recipe)
+    Payload.update_payloads(:payloads, new_recipe)
 
-    Enum.map(new_recipe_book, fn recipe ->
-      Enum.map(recipe.stages, fn stage ->
+    Enum.each(new_recipe, fn route ->
+      Enum.each(route.stages, fn stage ->
         Process.send_after(self(),
-          {:update, {recipe.route, stage["status"], Duration.parse(stage["latency"])}},
+          {:update, {route.pattern, stage["status"], Duration.parse(stage["latency"])}},
           Duration.parse(stage["at"]))
       end)
     end)
 
-    {:reply, :ok, %{state | recipe_book: new_recipe_book }}
+    {:reply, :ok, %{state | recipe: new_recipe }}
   end
 
   @impl true
-  def handle_info({:update, {route, status, latency}}, state) do
+  def handle_info({:update, {pattern, status, latency}}, state) do
     updated_stages = Map.get(state, :recipe_stages)
-    |> Map.put(route, %{status: status, latency: latency})
+    |> Map.put(pattern, %{status: status, latency: latency})
     {:noreply, Map.put(state, :recipe_stages, updated_stages)}
   end
 end
