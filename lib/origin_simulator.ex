@@ -13,7 +13,7 @@ defmodule OriginSimulator do
   end
 
   get "/current_recipe" do
-    msg = Simulation.recipe(:simulation) || "Not set, please POST a recipe book to /add_recipe"
+    msg = Simulation.recipe(:simulation) || "Not set, please POST a recipe to /add_recipe"
 
     conn
     |> put_resp_content_type("application/json")

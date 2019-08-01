@@ -7,7 +7,7 @@ defmodule OriginSimulator.Simulation do
   ## Client API
 
   def start_link(opts) do
-    GenServer.start_link(__MODULE__, opts, name: :simulation)
+    GenServer.start_link(__MODULE__, :ok, opts)
   end
 
   def state(server, pattern) do
@@ -49,8 +49,8 @@ defmodule OriginSimulator.Simulation do
   end
 
   @impl true
-  def handle_call({:add_recipe, new_recipe}, _caller, state) do
-    RoutingTable.update_routing_table(:routing_table, new_recipe)
+  def handle_call({:add_recipe, new_recipe}, _from, state) do
+    :ok = RoutingTable.update_routing_table(:routing_table, new_recipe)
     Payload.update_payloads(:payloads, new_recipe)
 
     Enum.each(new_recipe, fn route ->

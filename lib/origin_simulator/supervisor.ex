@@ -8,10 +8,10 @@ defmodule OriginSimulator.Supervisor do
   @impl true
   def init(_init_arg) do
     children = [
-      OriginSimulator.Simulation,
+      {OriginSimulator.Simulation, name: :simulation},
       {OriginSimulator.Payload, name: :payloads},
       OriginSimulator.Counter,
-      OriginSimulator.RoutingTable
+      {OriginSimulator.RoutingTable, name: :routing_table}
     ]
 
     opts = [

@@ -4,7 +4,7 @@ defmodule OriginSimulator.RoutingTable do
   ## Client API
   
   def start_link(opts) do
-    GenServer.start_link(__MODULE__, opts, name: :routing_table)
+    GenServer.start_link(__MODULE__, :ok, opts)
   end
 
   def find_route(server, path) do
@@ -34,12 +34,13 @@ defmodule OriginSimulator.RoutingTable do
   end
 
   @impl true
-  def handle_call({:update_routing_table, recipe}, _from, _state) do
+  def handle_call({:update_routing_table, recipe}, _from, state) do
     routing_table = Enum.map(recipe, fn route ->
       Regex.compile!(route.pattern)
       route.pattern
     end)
-
     {:reply, :ok, routing_table}
+  rescue
+    Regex.CompileError -> {:reply, :error, state} 
   end
 end

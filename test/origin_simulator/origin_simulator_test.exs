@@ -1,12 +1,15 @@
 defmodule OriginSimulatorTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: :true
   use Plug.Test
+
+  alias OriginSimulator.{Simulation}
 
   doctest OriginSimulator
 
   setup do
-    OriginSimulator.Simulation.restart()
-    Process.sleep(10)
+    simulation = start_supervised!(Simulation)
+
+    %{simulation: simulation}
   end
 
   describe "GET /status" do
@@ -31,12 +34,12 @@ defmodule OriginSimulatorTest do
     end
 
     test "will return the payload if set" do
-      payload = %{
+      payload = [%{
         "origin" => "https://www.bbc.co.uk/news",
         "stages" => [%{ "at" => 0, "status" => 200, "latency" => "100ms"}],
         "random_content" => nil,
         "body"   => nil
-      }
+      }]
 
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
 
@@ -50,12 +53,12 @@ defmodule OriginSimulatorTest do
     end
 
     test "will return the payload if set for ranged latencies" do
-      payload = %{
+      payload = [%{
         "origin" => "https://www.bbc.co.uk/news",
         "stages" => [%{ "at" => 0, "status" => 200, "latency" => "100ms..200ms"}],
         "random_content" => nil,
         "body"   => nil
-      }
+      }]
 
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
 
@@ -71,10 +74,10 @@ defmodule OriginSimulatorTest do
 
   describe "GET page with origin" do
     test "will return the origin page" do
-      payload = %{
+      payload = [%{
         "origin" => "https://www.bbc.co.uk/news",
         "stages" => [%{ "at" => 0, "status" => 200, "latency" => 0}]
-      }
+      }]
 
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
 
@@ -92,10 +95,10 @@ defmodule OriginSimulatorTest do
 
   describe "GET page with content" do
     test "will return the passed content" do
-      payload = %{
+      payload = [%{
         "body" =>   "{\"hello\":\"world\"}",
         "stages" => [%{ "at" => 0, "status" => 200, "latency" => 0}]
-      }
+      }]
 
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
 
@@ -113,10 +116,10 @@ defmodule OriginSimulatorTest do
 
   describe "GET page with random content" do
     test "will return random content of the passed size" do
-      payload = %{
+      payload = [%{
         "random_content" =>   "50kb",
         "stages" => [%{ "at" => 0, "status" => 200, "latency" => 0}]
-      }
+      }]
 
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
 
@@ -134,10 +137,10 @@ defmodule OriginSimulatorTest do
 
   describe "GET page with random latency within range" do
     test "will return the origin page" do
-      payload = %{
+      payload = [%{
         "body" =>   "{\"hello\":\"world\"}",
         "stages" => [%{ "at" => 0, "status" => 200, "latency" => "10ms..50ms"}]
-      }
+      }]
 
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
 
@@ -155,10 +158,10 @@ defmodule OriginSimulatorTest do
 
   describe "POST page with origin" do
     test "will return the simulated page" do
-      payload = %{
+      payload = [%{
         "origin" => "https://www.bbc.co.uk/news",
         "stages" => [%{ "at" => 0, "status" => 200, "latency" => 0}]
-      }
+      }]
 
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
 
@@ -176,10 +179,10 @@ defmodule OriginSimulatorTest do
 
   describe "POST page with content" do
     test "will return the simulated page" do
-      payload = %{
+      payload = [%{
         "body" =>   "{\"hello\":\"world\"}",
         "stages" => [%{ "at" => 0, "status" => 200, "latency" => 0}]
-      }
+      }]
 
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
 
