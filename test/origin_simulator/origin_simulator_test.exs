@@ -35,6 +35,7 @@ defmodule OriginSimulatorTest do
 
     test "will return the payload if set" do
       payload = [%{
+        "pattern" => "/foo",
         "origin" => "https://www.bbc.co.uk/news",
         "stages" => [%{ "at" => 0, "status" => 200, "latency" => "100ms"}],
         "random_content" => nil,
@@ -54,10 +55,11 @@ defmodule OriginSimulatorTest do
 
     test "will return the payload if set for ranged latencies" do
       payload = [%{
-        "origin" => "https://www.bbc.co.uk/news",
-        "stages" => [%{ "at" => 0, "status" => 200, "latency" => "100ms..200ms"}],
+        "pattern" => "/foo",
+        "origin"  => "https://www.bbc.co.uk/news",
+        "stages"  => [%{ "at" => 0, "status" => 200, "latency" => "100ms..200ms"}],
         "random_content" => nil,
-        "body"   => nil
+        "body"    => nil
       }]
 
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
