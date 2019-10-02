@@ -161,10 +161,10 @@ iex(1)>
 
 The app is now ready, but still waiting for a recipe:
 ```shell
-$ curl http://127.0.0.1:8084/current_recipe
+$ curl http://127.0.0.1:8080/current_recipe
 "Not set, please POST a recipe to /add_recipe"⏎
 
-$ curl -i http://127.0.0.1:8084/
+$ curl -i http://127.0.0.1:8080/
 HTTP/1.1 406 Not Acceptable
 cache-control: max-age=0, private, must-revalidate
 content-length: 2
@@ -175,30 +175,30 @@ server: Cowboy
 
 Let's add a simple recipe:
 ```shell
-$ cat examples/sample_recipe.json
+$ cat examples/demo.json
 {
-    "origin": "https://www.bbc.co.uk/news",
+    "origin": "https://www.bbc.co.uk",
     "stages": [
-        { "at": 0,    "status": 404, "latency": "50ms"},
-        { "at": "4s", "status": 503, "latency": "2s"},
-        { "at": "9s", "status": 200, "latency": "100ms"}
+        { "at": 0,    "status": 200, "latency": "200ms"},
+        { "at": "10s", "status": 500, "latency": "500ms"},
+        { "at": "30s", "status": 200, "latency": "200ms"}
     ]
 }
 
-$ cat examples/sample_recipe.json | curl -X POST -d @- http://127.0.0.1:8084/add_recipe
+$ cat examples/demo.json | curl -X POST -d @- http://127.0.0.1:8080/add_recipe
 ```
 
 All done! Now at different times the server will respond with the indicated HTTP status code and response time:
 ```
-$ curl -i http://127.0.0.1:8084/
+$ curl -i http://127.0.0.1:8080/
 HTTP/1.1 404 Not Found
 ...
 
-$ curl -i http://127.0.0.1:8084/
+$ curl -i http://127.0.0.1:8080/
 HTTP/1.1 503 Service Unavailable
 ...
 
-$ curl -i http://127.0.0.1:8084/
+$ curl -i http://127.0.0.1:8080/
 HTTP/1.1 200 OK
 ...
 ```
