@@ -67,6 +67,7 @@ defmodule OriginSimulator do
 
     conn
     |> put_resp_content_type(content_type(body))
+    |> merge_resp_headers(Simulation.recipe(:simulation).headers)
     |> send_resp(status, body)
   end
 

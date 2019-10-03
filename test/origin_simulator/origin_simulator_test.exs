@@ -175,6 +175,29 @@ defmodule OriginSimulatorTest do
     end
   end
 
+  describe "GET page with response headers" do
+    test "will return the passed content" do
+      payload = %{
+        "body" =>   "{\"hello\":\"world\"}",
+        "headers" => %{"response-header" => "Value123"},
+        "stages" => [%{ "at" => 0, "status" => 200, "latency" => 0}]
+      }
+
+      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+
+      Process.sleep 20
+
+      conn = conn(:get, "/")
+      conn = OriginSimulator.call(conn, [])
+
+      assert conn.state == :sent
+      assert conn.status == 200
+      assert get_resp_header(conn, "content-type") == ["application/json; charset=utf-8"]
+      assert get_resp_header(conn, "response-header") == ["Value123"]
+      assert conn.resp_body == "{\"hello\":\"world\"}"
+    end
+  end
+
   describe "POST page with origin" do
     test "will return the simulated page" do
       payload = %{
