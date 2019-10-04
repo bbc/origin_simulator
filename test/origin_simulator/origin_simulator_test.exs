@@ -35,7 +35,8 @@ defmodule OriginSimulatorTest do
         "origin" => "https://www.bbc.co.uk/news",
         "stages" => [%{ "at" => 0, "status" => 200, "latency" => "100ms"}],
         "random_content" => nil,
-        "body"   => nil
+        "body"   => nil,
+        "headers" => %{}
       }
 
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
@@ -54,7 +55,28 @@ defmodule OriginSimulatorTest do
         "origin" => "https://www.bbc.co.uk/news",
         "stages" => [%{ "at" => 0, "status" => 200, "latency" => "100ms..200ms"}],
         "random_content" => nil,
-        "body"   => nil
+        "body"   => nil,
+        "headers" => %{}
+      }
+
+      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+
+      conn = conn(:get, "/current_recipe")
+      conn = OriginSimulator.call(conn, [])
+
+      assert conn.state == :sent
+      assert conn.status == 200
+      assert get_resp_header(conn, "content-type") == ["application/json; charset=utf-8"]
+      assert Poison.decode!(conn.resp_body) == payload
+    end
+
+    test "will return the headers in the payload when provided" do
+      payload = %{
+        "origin" => "https://www.bbc.co.uk/news",
+        "stages" => [%{ "at" => 0, "status" => 200, "latency" => "100ms..200ms"}],
+        "random_content" => nil,
+        "body"   => nil,
+        "headers" => %{"X-Foo" => "bar"}
       }
 
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
@@ -149,6 +171,29 @@ defmodule OriginSimulatorTest do
       assert conn.state == :sent
       assert conn.status == 200
       assert get_resp_header(conn, "content-type") == ["application/json; charset=utf-8"]
+      assert conn.resp_body == "{\"hello\":\"world\"}"
+    end
+  end
+
+  describe "GET page with response headers" do
+    test "will return the passed content" do
+      payload = %{
+        "body" =>   "{\"hello\":\"world\"}",
+        "headers" => %{"response-header" => "Value123"},
+        "stages" => [%{ "at" => 0, "status" => 200, "latency" => 0}]
+      }
+
+      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+
+      Process.sleep 20
+
+      conn = conn(:get, "/")
+      conn = OriginSimulator.call(conn, [])
+
+      assert conn.state == :sent
+      assert conn.status == 200
+      assert get_resp_header(conn, "content-type") == ["application/json; charset=utf-8"]
+      assert get_resp_header(conn, "response-header") == ["Value123"]
       assert conn.resp_body == "{\"hello\":\"world\"}"
     end
   end
