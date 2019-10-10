@@ -306,7 +306,7 @@ concurrent requests.
 
 ## Load Tests
 
-For details on Load Test results visit the [Load Tests](https://github.com/bbc/origin_simulator/wiki/Load-Tests) Wiki section.
+For details on Load Test results visit the [Load Tests](docs/load-test-results/) results docs.
 
 ## Docker
 
