@@ -304,6 +304,10 @@ concurrent requests.
 
 ![100ms latency chart](/gnuplot/response_time_1s_latency.png)
 
+## Load Tests
+
+For details on Load Test results visit the [Load Tests](https://github.com/bbc/origin_simulator/wiki/Load-Tests) Wiki section.
+
 ## Docker
 
 > **NOTE:** if you plan to use OriginSimulator from Docker for Mac via `docker-compose up` you might notice slow response times.
