@@ -304,6 +304,10 @@ concurrent requests.
 
 ![100ms latency chart](/gnuplot/response_time_1s_latency.png)
 
+## Load Tests
+
+For details on Load Test results visit the [Load Tests](docs/load-test-results/) results docs.
+
 ## Docker
 
 > **NOTE:** if you plan to use OriginSimulator from Docker for Mac via `docker-compose up` you might notice slow response times.
