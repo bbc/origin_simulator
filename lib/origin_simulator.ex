@@ -1,6 +1,6 @@
 defmodule OriginSimulator do
   use Plug.Router
-  alias OriginSimulator.{Payload,Recipe,Simulation,PlugResponseCounter,Counter}
+  alias OriginSimulator.{Payload, Recipe, Simulation, PlugResponseCounter, Counter}
   plug(PlugResponseCounter)
 
   plug(:match)
@@ -35,7 +35,7 @@ defmodule OriginSimulator do
   end
 
   post "/add_recipe" do
-    Simulation.restart
+    Simulation.restart()
     Process.sleep(10)
 
     recipe = Recipe.parse(Plug.Conn.read_body(conn))
@@ -65,11 +65,16 @@ defmodule OriginSimulator do
 
     {:ok, body} = Payload.body(:payload, status)
 
+    recipe = Simulation.recipe(:simulation)
+
     conn
     |> put_resp_content_type(content_type(body))
-    |> merge_resp_headers(Simulation.recipe(:simulation).headers)
+    |> merge_resp_headers(recipe_headers(recipe))
     |> send_resp(status, body)
   end
+
+  defp recipe_headers(nil), do: []
+  defp recipe_headers(recipe), do: recipe.headers
 
   defp content_type(body) do
     if String.first(body) == "{" do

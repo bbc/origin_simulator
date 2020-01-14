@@ -198,6 +198,16 @@ defmodule OriginSimulatorTest do
     end
   end
 
+  describe "GET page with no recipe" do
+    test "will return an error message if recipe has not been set" do
+      conn = conn(:get, "/") |> OriginSimulator.call([])
+
+      assert conn.state == :sent
+      assert conn.status == 406
+      assert conn.resp_body == "Recipe not set, please POST a recipe to /add_recipe"
+    end
+  end
+
   describe "POST page with origin" do
     test "will return the simulated page" do
       payload = %{
