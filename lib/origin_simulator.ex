@@ -47,7 +47,8 @@ defmodule OriginSimulator do
   end
 
   get "/*glob" do
-    serve_payload(conn)
+    recipe_route = Simulation.route(:simulation)
+    serve_payload?(conn, recipe_route, conn.request_path)
   end
 
   post "/*glob" do
@@ -56,6 +57,14 @@ defmodule OriginSimulator do
 
   match _ do
     send_resp(conn, 404, "not found")
+  end
+
+  defp serve_payload?(conn, nil, _), do: serve_payload(conn)
+  defp serve_payload?(conn, route, req_path) when route == req_path, do: serve_payload(conn)
+
+  defp serve_payload?(conn, _, req_path) do
+    msg = "Recipe not set at #{req_path}, please POST a recipe for this route to /add_recipe"
+    conn |> send_resp(406, msg)
   end
 
   defp serve_payload(conn) do

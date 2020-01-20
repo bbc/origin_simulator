@@ -201,6 +201,76 @@ defmodule OriginSimulatorTest do
     end
   end
 
+  describe "GET routed page" do
+    setup do
+      origin_payload = %{
+        "origin" => "https://www.bbc.co.uk/news",
+        "stages" => [%{ "at" => 0, "status" => 200, "latency" => 0}],
+        "route" => "/news"
+      }
+
+      body_payload = %{
+        "body" =>   "{\"hello\":\"world\"}",
+        "stages" => [%{ "at" => 0, "status" => 200, "latency" => 0}],
+        "route" => "/news"
+      }
+
+      {:ok, origin_payload: origin_payload, body_payload: body_payload}
+    end
+
+    test "origin for route", %{origin_payload: payload} do
+      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+      Process.sleep 20
+
+      req_path = payload["route"]
+      conn = conn(:get, req_path)
+      conn = OriginSimulator.call(conn, [])
+
+      assert conn.state == :sent
+      assert conn.status == 200
+      assert conn.resp_body == "some content from origin"
+    end
+
+    test "body for route", %{body_payload: payload} do
+      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+      Process.sleep 20
+
+      req_path = payload["route"]
+      conn = conn(:get, req_path)
+      conn = OriginSimulator.call(conn, [])
+
+      assert conn.state == :sent
+      assert conn.status == 200
+      assert conn.resp_body == "{\"hello\":\"world\"}"
+    end
+
+    test "error message for origin with non-matching route", %{origin_payload: payload} do
+      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+      Process.sleep 20
+
+      req_path = "/random_path"
+      conn = conn(:get, req_path)
+      conn = OriginSimulator.call(conn, [])
+
+      assert conn.state == :sent
+      assert conn.status == 406
+      assert conn.resp_body == "Recipe not set at #{req_path}, please POST a recipe for this route to /add_recipe"
+    end
+
+    test "error message for body with non-matching route", %{body_payload: payload} do
+      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+      Process.sleep 20
+
+      req_path = "/random_path"
+      conn = conn(:get, req_path)
+      conn = OriginSimulator.call(conn, [])
+
+      assert conn.state == :sent
+      assert conn.status == 406
+      assert conn.resp_body == "Recipe not set at #{req_path}, please POST a recipe for this route to /add_recipe"
+    end
+  end
+
   describe "GET page with no recipe" do
     test "will return an error message if recipe has not been set" do
       conn = conn(:get, "/") |> OriginSimulator.call([])
