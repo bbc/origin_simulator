@@ -36,7 +36,8 @@ defmodule OriginSimulatorTest do
         "stages" => [%{ "at" => 0, "status" => 200, "latency" => "100ms"}],
         "random_content" => nil,
         "body"   => nil,
-        "headers" => %{}
+        "headers" => %{},
+        "route" => nil
       }
 
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
@@ -56,7 +57,8 @@ defmodule OriginSimulatorTest do
         "stages" => [%{ "at" => 0, "status" => 200, "latency" => "100ms..200ms"}],
         "random_content" => nil,
         "body"   => nil,
-        "headers" => %{}
+        "headers" => %{},
+        "route" => nil
       }
 
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
@@ -76,7 +78,8 @@ defmodule OriginSimulatorTest do
         "stages" => [%{ "at" => 0, "status" => 200, "latency" => "100ms..200ms"}],
         "random_content" => nil,
         "body"   => nil,
-        "headers" => %{"X-Foo" => "bar"}
+        "headers" => %{"X-Foo" => "bar"},
+        "route" => nil
       }
 
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
