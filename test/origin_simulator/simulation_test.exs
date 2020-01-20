@@ -32,6 +32,10 @@ defmodule OriginSimulator.SimulationTest do
     test "recipe() returns the loaded recipe" do
       assert Simulation.recipe(:simulation) == test_recipe()
     end
+
+    test "recipe() returns route" do
+      assert Simulation.route(:simulation) == test_recipe() |> Map.get(:route)
+    end
   end
 
   describe "with a recipe containing a range" do
@@ -78,6 +82,10 @@ defmodule OriginSimulator.SimulationTest do
 
     test "recipe() returns nil" do
       assert Simulation.recipe(:simulation) == nil
+    end
+
+    test "route() returns nil" do
+      assert Simulation.route(:simulation) == nil
     end
   end
 end

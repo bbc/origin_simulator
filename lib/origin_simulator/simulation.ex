@@ -1,7 +1,7 @@
 defmodule OriginSimulator.Simulation do
   use GenServer
 
-  alias OriginSimulator.{Payload,Duration}
+  alias OriginSimulator.{Recipe,Payload,Duration}
 
   ## Client API
 
@@ -15,6 +15,10 @@ defmodule OriginSimulator.Simulation do
 
   def recipe(server) do
     GenServer.call(server, :recipe)
+  end
+
+  def route(server) do
+    GenServer.call(server, :route)
   end
 
   def add_recipe(server, new_recipe) do
@@ -53,6 +57,12 @@ defmodule OriginSimulator.Simulation do
     end)
 
     {:reply, :ok, %{state | recipe: new_recipe }}
+  end
+
+  @impl true
+  def handle_call(:route, _from, state) do
+    recipe = if state.recipe, do: state.recipe, else: %Recipe{}
+    {:reply, recipe.route, state}
   end
 
   @impl true
