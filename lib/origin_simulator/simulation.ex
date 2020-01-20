@@ -1,7 +1,7 @@
 defmodule OriginSimulator.Simulation do
   use GenServer
 
-  alias OriginSimulator.{Recipe,Payload,Duration}
+  alias OriginSimulator.{Recipe, Payload, Duration}
 
   ## Client API
 
@@ -33,12 +33,12 @@ defmodule OriginSimulator.Simulation do
 
   @impl true
   def init(_) do
-    {:ok, %{ recipe: nil, status: 406, latency: 0 }}
+    {:ok, %{recipe: nil, status: 406, latency: 0}}
   end
 
   @impl true
   def handle_call(:state, _from, state) do
-    {:reply, { state.status, state.latency }, state}
+    {:reply, {state.status, state.latency}, state}
   end
 
   @impl true
@@ -51,12 +51,14 @@ defmodule OriginSimulator.Simulation do
     Payload.fetch(:payload, new_recipe)
 
     Enum.map(new_recipe.stages, fn item ->
-      Process.send_after(self(),
+      Process.send_after(
+        self(),
         {:update, item["status"], Duration.parse(item["latency"])},
-        Duration.parse(item["at"]))
+        Duration.parse(item["at"])
+      )
     end)
 
-    {:reply, :ok, %{state | recipe: new_recipe }}
+    {:reply, :ok, %{state | recipe: new_recipe}}
   end
 
   @impl true

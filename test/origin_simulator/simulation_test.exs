@@ -4,19 +4,27 @@ defmodule OriginSimulator.SimulationTest do
   alias OriginSimulator.Simulation
 
   def test_recipe() do
-    %OriginSimulator.Recipe{origin: "foo",
-                            stages: [%{"at" => 0, "status" => 200, "latency" => "1s"}]}
+    %OriginSimulator.Recipe{
+      origin: "foo",
+      stages: [%{"at" => 0, "status" => 200, "latency" => "1s"}]
+    }
   end
 
   def test_range_recipe() do
-    %OriginSimulator.Recipe{origin: "foo",
-                            stages: [%{"at" => 0, "status" => 200, "latency" => "1s..1200ms"}]}
+    %OriginSimulator.Recipe{
+      origin: "foo",
+      stages: [%{"at" => 0, "status" => 200, "latency" => "1s..1200ms"}]
+    }
   end
 
   def test_recipe_with_multiple_stages() do
-    %OriginSimulator.Recipe{origin: "foo",
-                            stages: [%{"at" => 0, "status" => 200, "latency" => "0s"},
-                                     %{"at" => "60ms", "status" => 503, "latency" => "1s"}]}
+    %OriginSimulator.Recipe{
+      origin: "foo",
+      stages: [
+        %{"at" => 0, "status" => 200, "latency" => "0s"},
+        %{"at" => "60ms", "status" => 503, "latency" => "1s"}
+      ]
+    }
   end
 
   describe "with loaded recipe" do
