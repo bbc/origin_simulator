@@ -60,19 +60,19 @@ defmodule OriginSimulator do
   end
 
   defp serve_payload?(conn, nil, _), do: serve_payload(conn)
-  defp serve_payload?(conn, route, req_path) when route == req_path, do: serve_payload(conn)
+  defp serve_payload?(conn, route, req_path) when route == req_path, do: serve_payload(conn, route)
 
   defp serve_payload?(conn, _, req_path) do
     msg = "Recipe not set at #{req_path}, please POST a recipe for this route to /add_recipe"
     conn |> send_resp(406, msg)
   end
 
-  defp serve_payload(conn) do
+  defp serve_payload(conn, route \\ nil) do
     {status, latency} = Simulation.state(:simulation)
 
     sleep(latency)
 
-    {:ok, body} = Payload.body(:payload, status)
+    {:ok, body} = Payload.body(:payload, status, route)
 
     recipe = Simulation.recipe(:simulation)
 
