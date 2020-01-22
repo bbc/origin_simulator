@@ -33,21 +33,23 @@ defmodule OriginSimulator.Simulation do
 
   @impl true
   def init(_) do
-    {:ok, %{recipe: nil, status: 406, latency: 0}}
+    route = nil
+    state = %{recipe: nil, status: 406, latency: 0}
+    {:ok, {route, state}}
   end
 
   @impl true
-  def handle_call(:state, _from, state) do
-    {:reply, {state.status, state.latency}, state}
+  def handle_call(:state, _from, {route, state}) do
+    {:reply, {state.status, state.latency}, {route, state}}
   end
 
   @impl true
-  def handle_call(:recipe, _from, state) do
-    {:reply, state.recipe, state}
+  def handle_call(:recipe, _from, {route, state}) do
+    {:reply, state.recipe, {route, state}}
   end
 
   @impl true
-  def handle_call({:add_recipe, new_recipe}, _caller, state) do
+  def handle_call({:add_recipe, new_recipe}, _caller, {route, state}) do
     Payload.fetch(:payload, new_recipe)
 
     Enum.map(new_recipe.stages, fn item ->
@@ -58,18 +60,18 @@ defmodule OriginSimulator.Simulation do
       )
     end)
 
-    {:reply, :ok, %{state | recipe: new_recipe}}
+    {:reply, :ok, {route, %{state | recipe: new_recipe}}}
   end
 
   @impl true
-  def handle_call(:route, _from, state) do
+  def handle_call(:route, _from, {route, state}) do
     recipe = if state.recipe, do: state.recipe, else: %Recipe{}
-    {:reply, recipe.route, state}
+    {:reply, recipe.route, {route, state}}
   end
 
   @impl true
-  def handle_info({:update, status, latency}, state) do
+  def handle_info({:update, status, latency}, {route, state}) do
     new_state = Map.merge(state, %{status: status, latency: latency})
-    {:noreply, new_state}
+    {:noreply, {route, new_state}}
   end
 end
