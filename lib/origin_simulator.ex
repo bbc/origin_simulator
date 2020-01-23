@@ -62,13 +62,17 @@ defmodule OriginSimulator do
   end
 
   defp serve_payload?(conn, @default_route, _), do: serve_payload(conn)
+  defp serve_payload?(conn, route, path) when route == path, do: serve_payload(conn, route)
 
-  defp serve_payload?(conn, route, req_path) when route == req_path,
-    do: serve_payload(conn, route)
-
-  defp serve_payload?(conn, _, req_path) do
-    msg = "Recipe not set at #{req_path}, please POST a recipe for this route to /add_recipe"
-    conn |> send_resp(406, msg)
+  defp serve_payload?(conn, route, path) do
+    cond do
+      # wildcard regex matching
+      String.ends_with?(route, "*") && String.match?(path, ~r/^#{route}/) ->
+        serve_payload(conn, route)
+      true ->
+        msg = "Recipe not set at #{path}, please POST a recipe for this route to /add_recipe"
+        conn |> send_resp(406, msg)
+    end
   end
 
   defp serve_payload(conn, route \\ @default_route) do

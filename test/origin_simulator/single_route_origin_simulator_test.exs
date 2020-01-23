@@ -43,15 +43,15 @@ defmodule SingleRouteOriginSimulatorTest do
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
       Process.sleep(20)
 
-      req_path = "/random_path"
-      conn = conn(:get, req_path)
+      path = "/random_path"
+      conn = conn(:get, path)
       conn = OriginSimulator.call(conn, [])
 
       assert conn.state == :sent
       assert conn.status == 406
 
       assert conn.resp_body ==
-               "Recipe not set at #{req_path}, please POST a recipe for this route to /add_recipe"
+               "Recipe not set at #{path}, please POST a recipe for this route to /add_recipe"
     end
 
     test "for default route", %{payload_default_route: payload, default_route: route} do
@@ -91,6 +91,35 @@ defmodule SingleRouteOriginSimulatorTest do
       assert conn.state == :sent
       assert conn.status == new_status
       assert conn.resp_body == "Error 500"
+    end
+
+    test "for arbitrary wildcard route", %{payload: payload} do
+      payload = Map.put(payload, "route", "/news*")
+      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+      Process.sleep(20)
+
+      conn = conn(:get, "/news/sport/id")
+      conn = OriginSimulator.call(conn, [])
+
+      assert conn.state == :sent
+      assert conn.status == 200
+      assert conn.resp_body == "some content from origin"
+    end
+
+    test "error message due to non-matching wildcard route", %{payload: payload} do
+      payload = Map.put(payload, "route", "/news*")
+      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+      Process.sleep(20)
+
+      path = "/cbbc"
+      conn = conn(:get, path)
+      conn = OriginSimulator.call(conn, [])
+
+      assert conn.state == :sent
+      assert conn.status == 406
+
+      assert conn.resp_body ==
+               "Recipe not set at #{path}, please POST a recipe for this route to /add_recipe"
     end
   end
 
@@ -130,15 +159,15 @@ defmodule SingleRouteOriginSimulatorTest do
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
       Process.sleep(20)
 
-      req_path = "/random_path"
-      conn = conn(:get, req_path)
+      path = "/random_path"
+      conn = conn(:get, path)
       conn = OriginSimulator.call(conn, [])
 
       assert conn.state == :sent
       assert conn.status == 406
 
       assert conn.resp_body ==
-               "Recipe not set at #{req_path}, please POST a recipe for this route to /add_recipe"
+               "Recipe not set at #{path}, please POST a recipe for this route to /add_recipe"
     end
 
     test "for default route", %{payload_default_route: payload, default_route: route} do
@@ -178,6 +207,35 @@ defmodule SingleRouteOriginSimulatorTest do
       assert conn.state == :sent
       assert conn.status == new_status
       assert conn.resp_body == "Error 500"
+    end
+
+    test "for arbitrary wildcard route", %{payload: payload} do
+      payload = Map.put(payload, "route", "/news*")
+      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+      Process.sleep(20)
+
+      conn = conn(:get, "/news/sport/id")
+      conn = OriginSimulator.call(conn, [])
+
+      assert conn.state == :sent
+      assert conn.status == 200
+      assert conn.resp_body == "{\"hello\":\"world\"}"
+    end
+
+    test "error message due to non-matching wildcard route", %{payload: payload} do
+      payload = Map.put(payload, "route", "/news*")
+      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+      Process.sleep(20)
+
+      path = "/"
+      conn = conn(:get, path)
+      conn = OriginSimulator.call(conn, [])
+
+      assert conn.state == :sent
+      assert conn.status == 406
+
+      assert conn.resp_body ==
+               "Recipe not set at #{path}, please POST a recipe for this route to /add_recipe"
     end
   end
 end
