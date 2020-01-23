@@ -1,8 +1,10 @@
 defmodule OriginSimulator do
   use Plug.Router
   alias OriginSimulator.{Payload, Recipe, Simulation, PlugResponseCounter, Counter}
-  plug(PlugResponseCounter)
 
+  @default_route Recipe.default_route()
+
+  plug(PlugResponseCounter)
   plug(:match)
   plug(:dispatch)
 
@@ -59,15 +61,17 @@ defmodule OriginSimulator do
     send_resp(conn, 404, "not found")
   end
 
-  defp serve_payload?(conn, nil, _), do: serve_payload(conn)
-  defp serve_payload?(conn, route, req_path) when route == req_path, do: serve_payload(conn, route)
+  defp serve_payload?(conn, @default_route, _), do: serve_payload(conn)
+
+  defp serve_payload?(conn, route, req_path) when route == req_path,
+    do: serve_payload(conn, route)
 
   defp serve_payload?(conn, _, req_path) do
     msg = "Recipe not set at #{req_path}, please POST a recipe for this route to /add_recipe"
     conn |> send_resp(406, msg)
   end
 
-  defp serve_payload(conn, route \\ nil) do
+  defp serve_payload(conn, route \\ @default_route) do
     {status, latency} = Simulation.state(:simulation)
 
     sleep(latency)

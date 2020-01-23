@@ -33,7 +33,7 @@ defmodule OriginSimulator.Simulation do
 
   @impl true
   def init(_) do
-    route = nil
+    route = Recipe.default_route()
     state = %{recipe: nil, status: 406, latency: 0}
     {:ok, {route, state}}
   end

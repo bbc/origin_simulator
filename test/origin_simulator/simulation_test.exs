@@ -1,7 +1,7 @@
 defmodule OriginSimulator.SimulationTest do
   use ExUnit.Case
 
-  alias OriginSimulator.Simulation
+  alias OriginSimulator.{Simulation, Recipe}
 
   def test_recipe() do
     %OriginSimulator.Recipe{
@@ -92,8 +92,8 @@ defmodule OriginSimulator.SimulationTest do
       assert Simulation.recipe(:simulation) == nil
     end
 
-    test "route() returns nil" do
-      assert Simulation.route(:simulation) == nil
+    test "route() returns default route" do
+      assert Simulation.route(:simulation) == Recipe.default_route()
     end
   end
 end
