@@ -2,6 +2,8 @@ defmodule OriginSimulatorTest do
   use ExUnit.Case
   use Plug.Test
 
+  import Fixtures
+
   doctest OriginSimulator
 
   setup do
@@ -27,15 +29,15 @@ defmodule OriginSimulatorTest do
       assert conn.state == :sent
       assert conn.status == 200
       assert get_resp_header(conn, "content-type") == ["application/json; charset=utf-8"]
-      assert conn.resp_body ==  "\"Not set, please POST a recipe to /add_recipe\""
+      assert conn.resp_body == "\"Not set, please POST a recipe to /add_recipe\""
     end
 
     test "will return the payload if set" do
       payload = %{
         "origin" => "https://www.bbc.co.uk/news",
-        "stages" => [%{ "at" => 0, "status" => 200, "latency" => "100ms"}],
+        "stages" => [%{"at" => 0, "status" => 200, "latency" => "100ms"}],
         "random_content" => nil,
-        "body"   => nil,
+        "body" => nil,
         "headers" => %{},
         "route" => nil
       }
@@ -54,9 +56,9 @@ defmodule OriginSimulatorTest do
     test "will return the payload if set for ranged latencies" do
       payload = %{
         "origin" => "https://www.bbc.co.uk/news",
-        "stages" => [%{ "at" => 0, "status" => 200, "latency" => "100ms..200ms"}],
+        "stages" => [%{"at" => 0, "status" => 200, "latency" => "100ms..200ms"}],
         "random_content" => nil,
-        "body"   => nil,
+        "body" => nil,
         "headers" => %{},
         "route" => nil
       }
@@ -75,9 +77,9 @@ defmodule OriginSimulatorTest do
     test "will return the headers in the payload when provided" do
       payload = %{
         "origin" => "https://www.bbc.co.uk/news",
-        "stages" => [%{ "at" => 0, "status" => 200, "latency" => "100ms..200ms"}],
+        "stages" => [%{"at" => 0, "status" => 200, "latency" => "100ms..200ms"}],
         "random_content" => nil,
-        "body"   => nil,
+        "body" => nil,
         "headers" => %{"X-Foo" => "bar"},
         "route" => nil
       }
@@ -98,12 +100,12 @@ defmodule OriginSimulatorTest do
     test "will return the origin page" do
       payload = %{
         "origin" => "https://www.bbc.co.uk/news",
-        "stages" => [%{ "at" => 0, "status" => 200, "latency" => 0}]
+        "stages" => [%{"at" => 0, "status" => 200, "latency" => 0}]
       }
 
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
 
-      Process.sleep 20
+      Process.sleep(20)
 
       conn = conn(:get, "/")
       conn = OriginSimulator.call(conn, [])
@@ -111,20 +113,20 @@ defmodule OriginSimulatorTest do
       assert conn.state == :sent
       assert conn.status == 200
       assert get_resp_header(conn, "content-type") == ["text/html; charset=utf-8"]
-      assert conn.resp_body == "some content from origin"
+      assert conn.resp_body == body_mock()
     end
   end
 
   describe "GET page with content" do
     test "will return the passed content" do
       payload = %{
-        "body" =>   "{\"hello\":\"world\"}",
-        "stages" => [%{ "at" => 0, "status" => 200, "latency" => 0}]
+        "body" => "{\"hello\":\"world\"}",
+        "stages" => [%{"at" => 0, "status" => 200, "latency" => 0}]
       }
 
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
 
-      Process.sleep 20
+      Process.sleep(20)
 
       conn = conn(:get, "/")
       conn = OriginSimulator.call(conn, [])
@@ -132,20 +134,20 @@ defmodule OriginSimulatorTest do
       assert conn.state == :sent
       assert conn.status == 200
       assert get_resp_header(conn, "content-type") == ["application/json; charset=utf-8"]
-      assert conn.resp_body == "{\"hello\":\"world\"}"
+      assert conn.resp_body == body_mock(type: :json)
     end
   end
 
   describe "GET page with random content" do
     test "will return random content of the passed size" do
       payload = %{
-        "random_content" =>   "50kb",
-        "stages" => [%{ "at" => 0, "status" => 200, "latency" => 0}]
+        "random_content" => "50kb",
+        "stages" => [%{"at" => 0, "status" => 200, "latency" => 0}]
       }
 
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
 
-      Process.sleep 20
+      Process.sleep(20)
 
       conn = conn(:get, "/")
       conn = OriginSimulator.call(conn, [])
@@ -160,13 +162,13 @@ defmodule OriginSimulatorTest do
   describe "GET page with random latency within range" do
     test "will return the origin page" do
       payload = %{
-        "body" =>   "{\"hello\":\"world\"}",
-        "stages" => [%{ "at" => 0, "status" => 200, "latency" => "10ms..50ms"}]
+        "body" => "{\"hello\":\"world\"}",
+        "stages" => [%{"at" => 0, "status" => 200, "latency" => "10ms..50ms"}]
       }
 
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
 
-      Process.sleep 20
+      Process.sleep(20)
 
       conn = conn(:get, "/")
       conn = OriginSimulator.call(conn, [])
@@ -174,21 +176,21 @@ defmodule OriginSimulatorTest do
       assert conn.state == :sent
       assert conn.status == 200
       assert get_resp_header(conn, "content-type") == ["application/json; charset=utf-8"]
-      assert conn.resp_body == "{\"hello\":\"world\"}"
+      assert conn.resp_body == body_mock(type: :json)
     end
   end
 
   describe "GET page with response headers" do
     test "will return the passed content" do
       payload = %{
-        "body" =>   "{\"hello\":\"world\"}",
+        "body" => "{\"hello\":\"world\"}",
         "headers" => %{"response-header" => "Value123"},
-        "stages" => [%{ "at" => 0, "status" => 200, "latency" => 0}]
+        "stages" => [%{"at" => 0, "status" => 200, "latency" => 0}]
       }
 
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
 
-      Process.sleep 20
+      Process.sleep(20)
 
       conn = conn(:get, "/")
       conn = OriginSimulator.call(conn, [])
@@ -197,7 +199,7 @@ defmodule OriginSimulatorTest do
       assert conn.status == 200
       assert get_resp_header(conn, "content-type") == ["application/json; charset=utf-8"]
       assert get_resp_header(conn, "response-header") == ["Value123"]
-      assert conn.resp_body == "{\"hello\":\"world\"}"
+      assert conn.resp_body == body_mock(type: :json)
     end
   end
 
@@ -207,7 +209,7 @@ defmodule OriginSimulatorTest do
 
       assert conn.state == :sent
       assert conn.status == 406
-      assert conn.resp_body == "Recipe not set, please POST a recipe to /add_recipe"
+      assert conn.resp_body == recipe_not_set_message()
     end
   end
 
@@ -215,12 +217,12 @@ defmodule OriginSimulatorTest do
     test "will return the simulated page" do
       payload = %{
         "origin" => "https://www.bbc.co.uk/news",
-        "stages" => [%{ "at" => 0, "status" => 200, "latency" => 0}]
+        "stages" => [%{"at" => 0, "status" => 200, "latency" => 0}]
       }
 
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
 
-      Process.sleep 20
+      Process.sleep(20)
 
       conn = conn(:post, "/", "")
       conn = OriginSimulator.call(conn, [])
@@ -228,20 +230,20 @@ defmodule OriginSimulatorTest do
       assert conn.state == :sent
       assert conn.status == 200
       assert get_resp_header(conn, "content-type") == ["text/html; charset=utf-8"]
-      assert conn.resp_body == "some content from origin"
+      assert conn.resp_body == body_mock()
     end
   end
 
   describe "POST page with content" do
     test "will return the simulated page" do
       payload = %{
-        "body" =>   "{\"hello\":\"world\"}",
-        "stages" => [%{ "at" => 0, "status" => 200, "latency" => 0}]
+        "body" => "{\"hello\":\"world\"}",
+        "stages" => [%{"at" => 0, "status" => 200, "latency" => 0}]
       }
 
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
 
-      Process.sleep 20
+      Process.sleep(20)
 
       conn = conn(:post, "/", "")
       conn = OriginSimulator.call(conn, [])
@@ -249,7 +251,7 @@ defmodule OriginSimulatorTest do
       assert conn.state == :sent
       assert conn.status == 200
       assert get_resp_header(conn, "content-type") == ["application/json; charset=utf-8"]
-      assert conn.resp_body == "{\"hello\":\"world\"}"
+      assert conn.resp_body == body_mock(type: :json)
     end
   end
 end

@@ -2,6 +2,8 @@ defmodule SingleRouteOriginSimulatorTest do
   use ExUnit.Case
   use Plug.Test
 
+  import Fixtures
+
   setup do
     OriginSimulator.Simulation.restart()
     Process.sleep(10)
@@ -36,7 +38,7 @@ defmodule SingleRouteOriginSimulatorTest do
 
       assert conn.state == :sent
       assert conn.status == 200
-      assert conn.resp_body == "some content from origin"
+      assert conn.resp_body == body_mock()
     end
 
     test "error message due to non-matching route", %{payload: payload} do
@@ -49,9 +51,7 @@ defmodule SingleRouteOriginSimulatorTest do
 
       assert conn.state == :sent
       assert conn.status == 406
-
-      assert conn.resp_body ==
-               "Recipe not set at #{path}, please POST a recipe for this route to /add_recipe"
+      assert conn.resp_body == recipe_not_set_message(path)
     end
 
     test "for default route", %{payload_default_route: payload, default_route: route} do
@@ -63,7 +63,7 @@ defmodule SingleRouteOriginSimulatorTest do
 
       assert conn.state == :sent
       assert conn.status == 200
-      assert conn.resp_body == "some content from origin"
+      assert conn.resp_body == body_mock()
     end
 
     test "for '/*' route", %{payload: payload} do
@@ -76,7 +76,7 @@ defmodule SingleRouteOriginSimulatorTest do
 
       assert conn.state == :sent
       assert conn.status == 200
-      assert conn.resp_body == "some content from origin"
+      assert conn.resp_body == body_mock()
 
       new_status = 500
       new_stages = [%{"at" => 0, "status" => new_status, "latency" => 0}]
@@ -90,7 +90,7 @@ defmodule SingleRouteOriginSimulatorTest do
 
       assert conn.state == :sent
       assert conn.status == new_status
-      assert conn.resp_body == "Error 500"
+      assert conn.resp_body == http_error_message(new_status)
     end
 
     test "for arbitrary wildcard route", %{payload: payload} do
@@ -103,7 +103,7 @@ defmodule SingleRouteOriginSimulatorTest do
 
       assert conn.state == :sent
       assert conn.status == 200
-      assert conn.resp_body == "some content from origin"
+      assert conn.resp_body == body_mock()
     end
 
     test "error message due to non-matching wildcard route", %{payload: payload} do
@@ -117,9 +117,7 @@ defmodule SingleRouteOriginSimulatorTest do
 
       assert conn.state == :sent
       assert conn.status == 406
-
-      assert conn.resp_body ==
-               "Recipe not set at #{path}, please POST a recipe for this route to /add_recipe"
+      assert conn.resp_body == recipe_not_set_message(path)
     end
   end
 
@@ -152,7 +150,7 @@ defmodule SingleRouteOriginSimulatorTest do
 
       assert conn.state == :sent
       assert conn.status == 200
-      assert conn.resp_body == "{\"hello\":\"world\"}"
+      assert conn.resp_body == body_mock(type: :json)
     end
 
     test "error message due to non-matching route", %{payload: payload} do
@@ -165,9 +163,7 @@ defmodule SingleRouteOriginSimulatorTest do
 
       assert conn.state == :sent
       assert conn.status == 406
-
-      assert conn.resp_body ==
-               "Recipe not set at #{path}, please POST a recipe for this route to /add_recipe"
+      assert conn.resp_body == recipe_not_set_message(path)
     end
 
     test "for default route", %{payload_default_route: payload, default_route: route} do
@@ -179,7 +175,7 @@ defmodule SingleRouteOriginSimulatorTest do
 
       assert conn.state == :sent
       assert conn.status == 200
-      assert conn.resp_body == "{\"hello\":\"world\"}"
+      assert conn.resp_body == body_mock(type: :json)
     end
 
     test "for '/*' route", %{payload: payload} do
@@ -192,7 +188,7 @@ defmodule SingleRouteOriginSimulatorTest do
 
       assert conn.state == :sent
       assert conn.status == 200
-      assert conn.resp_body == "{\"hello\":\"world\"}"
+      assert conn.resp_body == body_mock(type: :json)
 
       new_status = 500
       new_stages = [%{"at" => 0, "status" => new_status, "latency" => 0}]
@@ -206,7 +202,7 @@ defmodule SingleRouteOriginSimulatorTest do
 
       assert conn.state == :sent
       assert conn.status == new_status
-      assert conn.resp_body == "Error 500"
+      assert conn.resp_body == http_error_message(new_status)
     end
 
     test "for arbitrary wildcard route", %{payload: payload} do
@@ -219,7 +215,7 @@ defmodule SingleRouteOriginSimulatorTest do
 
       assert conn.state == :sent
       assert conn.status == 200
-      assert conn.resp_body == "{\"hello\":\"world\"}"
+      assert conn.resp_body == body_mock(type: :json)
     end
 
     test "error message due to non-matching wildcard route", %{payload: payload} do
@@ -233,9 +229,7 @@ defmodule SingleRouteOriginSimulatorTest do
 
       assert conn.state == :sent
       assert conn.status == 406
-
-      assert conn.resp_body ==
-               "Recipe not set at #{path}, please POST a recipe for this route to /add_recipe"
+      assert conn.resp_body == recipe_not_set_message(path)
     end
   end
 end
