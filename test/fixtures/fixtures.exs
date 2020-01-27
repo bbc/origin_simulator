@@ -1,5 +1,6 @@
 defmodule Fixtures do
   alias OriginSimulator.HTTPMockClient
+  alias OriginSimulator.Recipe
 
   def body_mock(opts \\ []) do
     [mock: mock, type: type] = [mock: HTTPMockClient, type: :html] |> Keyword.merge(opts)
@@ -15,5 +16,18 @@ defmodule Fixtures do
 
   def http_error_message(status) do
     "Error #{status}"
+  end
+
+  def test_recipe(opts \\ []) do
+    defaults = [
+      origin: nil,
+      body: nil,
+      random_content: nil,
+      headers: %{},
+      stages: [],
+      route: "/*"
+    ]
+
+    struct(Recipe, Keyword.merge(defaults, opts))
   end
 end
