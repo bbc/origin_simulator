@@ -23,8 +23,17 @@ defmodule OriginSimulator.SimulationTest do
       assert Simulation.recipe(:simulation) == recipe
     end
 
-    test "recipe() returns route", %{recipe: recipe} do
+    test "route() returns route", %{recipe: recipe} do
       assert Simulation.route(:simulation) == recipe |> Map.get(:route)
+    end
+  end
+
+  describe "with a list of multiple recipes" do
+    # multiple recipes currently unsupported
+    test "add_recipe() returns error" do
+      stages = [%{"at" => 0, "status" => 200, "latency" => "1s"}]
+      recipe = test_recipe(origin: "foo", stages: stages)
+      assert Simulation.add_recipe(:simulation, [recipe, recipe, recipe]) == :error
     end
   end
 

@@ -26,6 +26,9 @@ defmodule OriginSimulator.Simulation do
     GenServer.call(server, {:add_recipe, new_recipe |> hd})
   end
 
+  # returning error, pending current work on multi-route / recipes
+  def add_recipe(_server, new_recipe) when is_list(new_recipe), do: :error
+
   def add_recipe(server, new_recipe) do
     GenServer.call(server, {:add_recipe, new_recipe})
   end

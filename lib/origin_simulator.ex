@@ -41,11 +41,16 @@ defmodule OriginSimulator do
     Process.sleep(10)
 
     recipe = Recipe.parse(Plug.Conn.read_body(conn))
-    Simulation.add_recipe(:simulation, recipe)
+    response = Simulation.add_recipe(:simulation, recipe)
+
+    {code, message, content_type} = case response do
+      :ok -> {201, Poison.encode!(Simulation.recipe(:simulation)), "application/json"}
+      :error -> {406, "Not Acceptable", "text/html"}
+    end
 
     conn
-    |> put_resp_content_type("application/json")
-    |> send_resp(201, Poison.encode!(Simulation.recipe(:simulation)))
+    |> put_resp_content_type(content_type)
+    |> send_resp(code, message)
   end
 
   get "/*glob" do

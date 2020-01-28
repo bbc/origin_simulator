@@ -94,6 +94,41 @@ defmodule OriginSimulatorTest do
       assert get_resp_header(conn, "content-type") == ["application/json; charset=utf-8"]
       assert Poison.decode!(conn.resp_body) == payload
     end
+
+    # multiple recipes posting is currently not supported
+    test "/add_recipe returns error message if multiple recipes is posted" do
+      payload = [
+        %{
+          "route" => "/example/endpoint",
+          "body" => "Example body",
+          "stages" => [
+            %{"at" => 0, "status" => 200, "latency" => "400ms"},
+            %{"at" => "1s", "status" => 503, "latency" => "100ms"}
+          ]
+        },
+        %{
+          "route" => "/news",
+          "origin" => "https://www.bbc.co.uk/news",
+          "stages" => [
+            %{"at" => 0, "status" => 404, "latency" => "50ms"},
+            %{"at" => "2s", "status" => 503, "latency" => "2s"},
+            %{"at" => "4s", "status" => 200, "latency" => "100ms"}
+          ]
+        },
+        %{
+          "route" => "/*",
+          "body" => "Error - not defined",
+          "stages" => [%{"at" => 0, "status" => 406, "latency" => "0ms"}]
+        }
+      ]
+
+      conn = conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+
+      assert conn.state == :sent
+      assert conn.status == 406
+      assert get_resp_header(conn, "content-type") == ["text/html; charset=utf-8"]
+      assert conn.resp_body == "Not Acceptable"
+    end
   end
 
   describe "GET page" do
