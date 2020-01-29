@@ -42,22 +42,27 @@ defmodule OriginSimulator.Simulation do
   @impl true
   def init(_) do
     route = Recipe.default_route()
-    state = %{recipe: nil, status: 406, latency: 0}
-    {:ok, {route, state}}
+    state = default_simulation()
+
+    # Simulation state data structure
+    # %{"route1" => simulation_state1, "route2" => simulation_state2}
+    {:ok, [{route, state}] |> Enum.into(%{})}
   end
 
   @impl true
-  def handle_call(:state, _from, {route, state}) do
-    {:reply, {state.status, state.latency}, {route, state}}
+  def handle_call(:state, _from, state) do
+    [{_route, simulation}] = state |> Map.to_list()
+    {:reply, {simulation.status, simulation.latency}, state}
   end
 
   @impl true
-  def handle_call(:recipe, _from, {route, state}) do
-    {:reply, state.recipe, {route, state}}
+  def handle_call(:recipe, _from, state) do
+    [{_route, simulation}] = state |> Map.to_list()
+    {:reply, simulation.recipe, state}
   end
 
   @impl true
-  def handle_call({:add_recipe, new_recipe}, _caller, {route, state}) do
+  def handle_call({:add_recipe, new_recipe}, _caller, state) do
     Payload.fetch(:payload, new_recipe)
 
     Enum.map(new_recipe.stages, fn item ->
@@ -68,18 +73,26 @@ defmodule OriginSimulator.Simulation do
       )
     end)
 
-    {:reply, :ok, {route, %{state | recipe: new_recipe}}}
+    route = new_recipe.route
+    simulation = get(state[route])
+
+    {:reply, :ok, Map.put(%{}, route, %{simulation | recipe: new_recipe})}
   end
 
   @impl true
-  def handle_call(:route, _from, {route, state}) do
-    recipe = if state.recipe, do: state.recipe, else: %Recipe{}
-    {:reply, recipe.route, {route, state}}
+  def handle_call(:route, _from, state) do
+    [{route, _simulation}] = state |> Map.to_list()
+    {:reply, route, state}
   end
 
   @impl true
-  def handle_info({:update, status, latency}, {route, state}) do
-    new_state = Map.merge(state, %{status: status, latency: latency})
-    {:noreply, {route, new_state}}
+  def handle_info({:update, status, latency}, state) do
+    [{route, simulation}] = state |> Map.to_list()
+    {:noreply, Map.put(state, route, %{simulation | status: status, latency: latency})}
   end
+
+  defp get(nil), do: default_simulation()
+  defp get(current_state), do: current_state
+
+  defp default_simulation(), do: %{recipe: nil, status: 406, latency: 0}
 end
