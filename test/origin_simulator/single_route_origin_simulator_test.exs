@@ -3,6 +3,7 @@ defmodule SingleRouteOriginSimulatorTest do
   use Plug.Test
 
   import Fixtures
+  import TestHelpers
 
   alias OriginSimulator.Recipe
 
@@ -18,38 +19,27 @@ defmodule SingleRouteOriginSimulatorTest do
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
       Process.sleep(20)
 
-      req_path = payload["route"]
-      conn = conn(:get, req_path)
-      conn = OriginSimulator.call(conn, [])
-
-      assert conn.state == :sent
-      assert conn.status == 200
-      assert conn.resp_body == body_mock()
+      conn(:get, payload["route"])
+      |> OriginSimulator.call([])
+      |> assert_status_body(200, body_mock())
     end
 
     test "error message due to non-matching route", %{payload: payload} do
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
       Process.sleep(20)
 
-      path = "/random_path"
-      conn = conn(:get, path)
-      conn = OriginSimulator.call(conn, [])
-
-      assert conn.state == :sent
-      assert conn.status == 406
-      assert conn.resp_body == recipe_not_set_message(path)
+      conn(:get, "/random_path")
+      |> OriginSimulator.call([])
+      |> assert_status_body(406, recipe_not_set_message("/random_path"))
     end
 
     test "for default route", %{payload_no_route: payload} do
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
       Process.sleep(20)
 
-      conn = conn(:get, Recipe.default_route())
-      conn = OriginSimulator.call(conn, [])
-
-      assert conn.state == :sent
-      assert conn.status == 200
-      assert conn.resp_body == body_mock()
+      conn(:get, Recipe.default_route())
+      |> OriginSimulator.call([])
+      |> assert_status_body(200, body_mock())
     end
 
     test "for '/*' route", %{payload: payload} do
@@ -57,26 +47,13 @@ defmodule SingleRouteOriginSimulatorTest do
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
       Process.sleep(20)
 
-      conn = conn(:get, "/news/sport/id")
-      conn = OriginSimulator.call(conn, [])
+      conn(:get, "/news/uk-politics-51287430")
+      |> OriginSimulator.call([])
+      |> assert_status_body(200, body_mock())
 
-      assert conn.state == :sent
-      assert conn.status == 200
-      assert conn.resp_body == body_mock()
-
-      new_status = 500
-      new_stages = [%{"at" => 0, "status" => new_status, "latency" => 0}]
-      payload = Map.put(payload, "stages", new_stages)
-
-      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
-      Process.sleep(20)
-
-      conn = conn(:get, "/news/politcs/id")
-      conn = OriginSimulator.call(conn, [])
-
-      assert conn.state == :sent
-      assert conn.status == new_status
-      assert conn.resp_body == http_error_message(new_status)
+      conn(:get, "/sport/tennis/51291122")
+      |> OriginSimulator.call([])
+      |> assert_status_body(200, body_mock())
     end
 
     test "for arbitrary wildcard route", %{payload: payload} do
@@ -84,12 +61,9 @@ defmodule SingleRouteOriginSimulatorTest do
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
       Process.sleep(20)
 
-      conn = conn(:get, "/news/sport/id")
-      conn = OriginSimulator.call(conn, [])
-
-      assert conn.state == :sent
-      assert conn.status == 200
-      assert conn.resp_body == body_mock()
+      conn(:get, "/news/uk-politics-51287430")
+      |> OriginSimulator.call([])
+      |> assert_status_body(200, body_mock())
     end
 
     test "error message due to non-matching wildcard route", %{payload: payload} do
@@ -97,13 +71,9 @@ defmodule SingleRouteOriginSimulatorTest do
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
       Process.sleep(20)
 
-      path = "/cbbc"
-      conn = conn(:get, path)
-      conn = OriginSimulator.call(conn, [])
-
-      assert conn.state == :sent
-      assert conn.status == 406
-      assert conn.resp_body == recipe_not_set_message(path)
+      conn(:get, "/cbbc")
+      |> OriginSimulator.call([])
+      |> assert_status_body(406, recipe_not_set_message("/cbbc"))
     end
   end
 
@@ -114,38 +84,27 @@ defmodule SingleRouteOriginSimulatorTest do
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
       Process.sleep(20)
 
-      req_path = payload["route"]
-      conn = conn(:get, req_path)
-      conn = OriginSimulator.call(conn, [])
-
-      assert conn.state == :sent
-      assert conn.status == 200
-      assert conn.resp_body == body_mock(type: :json)
+      conn(:get, payload["route"])
+      |> OriginSimulator.call([])
+      |> assert_status_body(200, body_mock(type: :json))
     end
 
     test "error message due to non-matching route", %{payload: payload} do
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
       Process.sleep(20)
 
-      path = "/random_path"
-      conn = conn(:get, path)
-      conn = OriginSimulator.call(conn, [])
-
-      assert conn.state == :sent
-      assert conn.status == 406
-      assert conn.resp_body == recipe_not_set_message(path)
+      conn(:get, "/random_path")
+      |> OriginSimulator.call([])
+      |> assert_status_body(406, recipe_not_set_message("/random_path"))
     end
 
     test "for default route", %{payload_no_route: payload} do
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
       Process.sleep(20)
 
-      conn = conn(:get, Recipe.default_route())
-      conn = OriginSimulator.call(conn, [])
-
-      assert conn.state == :sent
-      assert conn.status == 200
-      assert conn.resp_body == body_mock(type: :json)
+      conn(:get, Recipe.default_route())
+      |> OriginSimulator.call([])
+      |> assert_status_body(200, body_mock(type: :json))
     end
 
     test "for '/*' route", %{payload: payload} do
@@ -153,26 +112,13 @@ defmodule SingleRouteOriginSimulatorTest do
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
       Process.sleep(20)
 
-      conn = conn(:get, "/news/sport/id")
-      conn = OriginSimulator.call(conn, [])
+      conn(:get, "/news/uk-politics-51287430")
+      |> OriginSimulator.call([])
+      |> assert_status_body(200, body_mock(type: :json))
 
-      assert conn.state == :sent
-      assert conn.status == 200
-      assert conn.resp_body == body_mock(type: :json)
-
-      new_status = 500
-      new_stages = [%{"at" => 0, "status" => new_status, "latency" => 0}]
-      payload = Map.put(payload, "stages", new_stages)
-
-      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
-      Process.sleep(20)
-
-      conn = conn(:get, "/news/politcs/id")
-      conn = OriginSimulator.call(conn, [])
-
-      assert conn.state == :sent
-      assert conn.status == new_status
-      assert conn.resp_body == http_error_message(new_status)
+      conn(:get, "/sport/tennis/51291122")
+      |> OriginSimulator.call([])
+      |> assert_status_body(200, body_mock(type: :json))
     end
 
     test "for arbitrary wildcard route", %{payload: payload} do
@@ -180,12 +126,9 @@ defmodule SingleRouteOriginSimulatorTest do
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
       Process.sleep(20)
 
-      conn = conn(:get, "/news/sport/id")
-      conn = OriginSimulator.call(conn, [])
-
-      assert conn.state == :sent
-      assert conn.status == 200
-      assert conn.resp_body == body_mock(type: :json)
+      conn(:get, "/news/uk-politics-51287430")
+      |> OriginSimulator.call([])
+      |> assert_status_body(200, body_mock(type: :json))
     end
 
     test "error message due to non-matching wildcard route", %{payload: payload} do
@@ -193,13 +136,9 @@ defmodule SingleRouteOriginSimulatorTest do
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
       Process.sleep(20)
 
-      path = "/"
-      conn = conn(:get, path)
-      conn = OriginSimulator.call(conn, [])
-
-      assert conn.state == :sent
-      assert conn.status == 406
-      assert conn.resp_body == recipe_not_set_message(path)
+      conn(:get, "/sport")
+      |> OriginSimulator.call([])
+      |> assert_status_body(406, recipe_not_set_message("/sport"))
     end
   end
 end
