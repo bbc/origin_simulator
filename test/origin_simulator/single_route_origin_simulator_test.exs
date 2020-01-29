@@ -141,4 +141,86 @@ defmodule SingleRouteOriginSimulatorTest do
       |> assert_status_body(406, recipe_not_set_message("/sport"))
     end
   end
+
+  describe "POST page origin" do
+    setup [:origin_payload, :origin_payload_no_route]
+
+    test "for a route", %{payload: payload} do
+      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+      Process.sleep(20)
+
+      conn(:post, payload["route"], "")
+      |> OriginSimulator.call([])
+      |> assert_status_body(200, body_mock())
+    end
+
+    test "error message due to non-matching route", %{payload: payload} do
+      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+      Process.sleep(20)
+
+      conn(:post, "/random_path")
+      |> OriginSimulator.call([])
+      |> assert_status_body(406, recipe_not_set_message("/random_path"))
+    end
+
+    test "for '/*' route", %{payload: payload} do
+      payload = Map.put(payload, "route", "/*")
+      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+      Process.sleep(20)
+
+      conn(:post, "/news/uk-politics-51287430")
+      |> OriginSimulator.call([])
+      |> assert_status_body(200, body_mock())
+
+      conn(:post, "/sport/tennis/51291122")
+      |> OriginSimulator.call([])
+      |> assert_status_body(200, body_mock())
+    end
+
+    test "for arbitrary wildcard route", %{payload: payload} do
+      payload = Map.put(payload, "route", "/news*")
+      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+      Process.sleep(20)
+
+      conn(:post, "/news/uk-politics-51287430")
+      |> OriginSimulator.call([])
+      |> assert_status_body(200, body_mock())
+    end
+  end
+
+  describe "POST page body" do
+    setup [:body_payload, :body_payload_no_route]
+
+    test "for a route", %{payload: payload} do
+      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+      Process.sleep(20)
+
+      conn(:post, payload["route"])
+      |> OriginSimulator.call([])
+      |> assert_status_body(200, body_mock(type: :json))
+    end
+
+    test "error message due to non-matching route", %{payload: payload} do
+      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+      Process.sleep(20)
+
+      conn(:post, "/random_path")
+      |> OriginSimulator.call([])
+      |> assert_status_body(406, recipe_not_set_message("/random_path"))
+    end
+
+    test "for '/*' route", %{payload: payload} do
+      payload = Map.put(payload, "route", "/*")
+      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+      Process.sleep(20)
+
+      conn(:post, "/news/uk-politics-51287430")
+      |> OriginSimulator.call([])
+      |> assert_status_body(200, body_mock(type: :json))
+
+      conn(:post, "/sport/tennis/51291122")
+      |> OriginSimulator.call([])
+      |> assert_status_body(200, body_mock(type: :json))
+    end
+  end
 end

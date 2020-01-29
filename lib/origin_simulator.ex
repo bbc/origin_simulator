@@ -55,21 +55,22 @@ defmodule OriginSimulator do
 
   get "/*glob" do
     recipe_route = Simulation.route(:simulation)
-    serve_payload?(conn, recipe_route, conn.request_path)
+    serve_payload_for_route(conn, recipe_route, conn.request_path)
   end
 
   post "/*glob" do
-    serve_payload(conn)
+    recipe_route = Simulation.route(:simulation)
+    serve_payload_for_route(conn, recipe_route, conn.request_path)
   end
 
   match _ do
     send_resp(conn, 404, "not found")
   end
 
-  defp serve_payload?(conn, @default_route, _), do: serve_payload(conn)
-  defp serve_payload?(conn, route, path) when route == path, do: serve_payload(conn, route)
+  defp serve_payload_for_route(conn, @default_route, _), do: serve_payload(conn)
+  defp serve_payload_for_route(conn, route, path) when route == path, do: serve_payload(conn, route)
 
-  defp serve_payload?(conn, route, path) do
+  defp serve_payload_for_route(conn, route, path) do
     cond do
       # wildcard regex matching
       String.ends_with?(route, "*") && String.match?(path, ~r/^#{route}/) ->
