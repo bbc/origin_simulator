@@ -8,7 +8,7 @@ defmodule OriginSimulator.SimulationTest do
   describe "with loaded recipe" do
     setup do
       stages = [%{"at" => 0, "status" => 200, "latency" => "1s"}]
-      recipe = test_recipe(origin: "foo", stages: stages)
+      recipe = recipe(origin: "foo", stages: stages)
       Simulation.add_recipe(:simulation, recipe)
       Process.sleep(5)
 
@@ -32,7 +32,7 @@ defmodule OriginSimulator.SimulationTest do
     # multiple recipes currently unsupported
     test "add_recipe() returns error" do
       stages = [%{"at" => 0, "status" => 200, "latency" => "1s"}]
-      recipe = test_recipe(origin: "foo", stages: stages)
+      recipe = recipe(origin: "foo", stages: stages)
       assert Simulation.add_recipe(:simulation, [recipe, recipe, recipe]) == :error
     end
   end
@@ -40,7 +40,7 @@ defmodule OriginSimulator.SimulationTest do
   describe "with a recipe containing a range" do
     setup do
       stages = [%{"at" => 0, "status" => 200, "latency" => "1s..1200ms"}]
-      recipe = test_recipe(origin: "foo", stages: stages)
+      recipe = recipe(origin: "foo", stages: stages)
       Simulation.add_recipe(:simulation, recipe)
       Process.sleep(5)
 
@@ -63,7 +63,7 @@ defmodule OriginSimulator.SimulationTest do
         %{"at" => "60ms", "status" => 503, "latency" => "1s"}
       ]
 
-      recipe = test_recipe(origin: "foo", stages: stages)
+      recipe = recipe(origin: "foo", stages: stages)
       Simulation.add_recipe(:simulation, recipe)
       Process.sleep(5)
 

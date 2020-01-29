@@ -4,29 +4,15 @@ defmodule SingleRouteOriginSimulatorTest do
 
   import Fixtures
 
+  alias OriginSimulator.Recipe
+
   setup do
     OriginSimulator.Simulation.restart()
     Process.sleep(10)
   end
 
   describe "GET page origin" do
-    setup do
-      origin_payload = %{
-        "origin" => "https://www.bbc.co.uk/news",
-        "stages" => [%{"at" => 0, "status" => 200, "latency" => 0}],
-        "route" => "/news"
-      }
-
-      origin_payload_default_route = %{
-        "origin" => "https://www.bbc.co.uk/news",
-        "stages" => [%{"at" => 0, "status" => 200, "latency" => 0}]
-      }
-
-      {:ok,
-       default_route: OriginSimulator.Recipe.default_route(),
-       payload: origin_payload,
-       payload_default_route: origin_payload_default_route}
-    end
+    setup [:origin_payload, :origin_payload_no_route]
 
     test "for a route", %{payload: payload} do
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
@@ -54,11 +40,11 @@ defmodule SingleRouteOriginSimulatorTest do
       assert conn.resp_body == recipe_not_set_message(path)
     end
 
-    test "for default route", %{payload_default_route: payload, default_route: route} do
+    test "for default route", %{payload_no_route: payload} do
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
       Process.sleep(20)
 
-      conn = conn(:get, route)
+      conn = conn(:get, Recipe.default_route())
       conn = OriginSimulator.call(conn, [])
 
       assert conn.state == :sent
@@ -122,23 +108,7 @@ defmodule SingleRouteOriginSimulatorTest do
   end
 
   describe "GET page body" do
-    setup do
-      body_payload = %{
-        "body" => "{\"hello\":\"world\"}",
-        "stages" => [%{"at" => 0, "status" => 200, "latency" => 0}],
-        "route" => "/news"
-      }
-
-      body_payload_default_route = %{
-        "body" => "{\"hello\":\"world\"}",
-        "stages" => [%{"at" => 0, "status" => 200, "latency" => 0}]
-      }
-
-      {:ok,
-       default_route: OriginSimulator.Recipe.default_route(),
-       payload: body_payload,
-       payload_default_route: body_payload_default_route}
-    end
+    setup [:body_payload, :body_payload_no_route]
 
     test "for a route", %{payload: payload} do
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
@@ -166,11 +136,11 @@ defmodule SingleRouteOriginSimulatorTest do
       assert conn.resp_body == recipe_not_set_message(path)
     end
 
-    test "for default route", %{payload_default_route: payload, default_route: route} do
+    test "for default route", %{payload_no_route: payload} do
       conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
       Process.sleep(20)
 
-      conn = conn(:get, route)
+      conn = conn(:get, Recipe.default_route())
       conn = OriginSimulator.call(conn, [])
 
       assert conn.state == :sent
