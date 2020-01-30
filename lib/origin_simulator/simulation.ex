@@ -25,6 +25,10 @@ defmodule OriginSimulator.Simulation do
     GenServer.call(server, {:route, route})
   end
 
+  def route(server) do
+    GenServer.call(server, :route)
+  end
+
   # for now, deal with minimum viable recipe: list containing a single recipe
   def add_recipe(server, new_recipe) when is_list(new_recipe) and length(new_recipe) == 1 do
     GenServer.call(server, {:add_recipe, new_recipe |> hd})
@@ -100,6 +104,9 @@ defmodule OriginSimulator.Simulation do
     recipe_route = match_route(state |> Map.keys(), route)
     {:reply, recipe_route, state}
   end
+
+  @impl true
+  def handle_call(:route, _from, state), do: {:reply, state |> Map.keys(), state}
 
   @impl true
   def handle_info({:update, route, status, latency}, state) do

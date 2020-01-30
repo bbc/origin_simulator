@@ -24,16 +24,24 @@ defmodule OriginSimulator.SimulationTest do
       assert Simulation.recipe(:simulation, route) == recipe
     end
 
-    test "route() returns matching route", %{recipe: recipe, route: route} do
+    test "route/2 returns matching route", %{recipe: recipe, route: route} do
       assert Simulation.route(:simulation, route) == recipe |> Map.get(:route)
     end
 
-    test "route() returns matching wildcard route", %{recipe: recipe} do
+    test "route/2 returns matching wildcard route", %{recipe: recipe} do
       Simulation.add_recipe(:simulation, %{recipe | route: "/news*"})
       Process.sleep(5)
 
       assert Simulation.route(:simulation, "/news/uk-politics") == "/news*"
       assert Simulation.route(:simulation, "/sport") == "/*"
+    end
+
+    test "route/1 returns all routes", %{recipe: recipe} do
+      Simulation.add_recipe(:simulation, %{recipe | route: "/random123123123*"})
+      Process.sleep(5)
+
+      assert length(Simulation.route(:simulation)) > 1
+      assert Simulation.route(:simulation) |> Enum.member?("/random123123123*")
     end
   end
 
