@@ -84,7 +84,7 @@ defmodule OriginSimulator do
   end
 
   defp serve_payload(conn, route \\ @default_route) do
-    {status, latency} = Simulation.state(:simulation)
+    {status, latency} = Simulation.state(:simulation, route)
 
     sleep(latency)
 

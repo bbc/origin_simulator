@@ -9,8 +9,8 @@ defmodule OriginSimulator.Simulation do
     GenServer.start_link(__MODULE__, opts, name: :simulation)
   end
 
-  def state(server) do
-    GenServer.call(server, :state)
+  def state(server, route) do
+    GenServer.call(server, {:state, route})
   end
 
   def recipe(server) do
@@ -50,8 +50,8 @@ defmodule OriginSimulator.Simulation do
   end
 
   @impl true
-  def handle_call(:state, _from, state) do
-    [{_route, simulation}] = state |> Map.to_list()
+  def handle_call({:state, route}, _from, state) do
+    simulation = state[route]
     {:reply, {simulation.status, simulation.latency}, state}
   end
 
