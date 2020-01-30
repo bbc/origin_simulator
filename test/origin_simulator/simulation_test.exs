@@ -46,11 +46,19 @@ defmodule OriginSimulator.SimulationTest do
   end
 
   describe "with a list of multiple recipes" do
-    # multiple recipes currently unsupported
-    test "add_recipe() returns error" do
-      stages = [%{"at" => 0, "status" => 200, "latency" => "1s"}]
-      recipe = recipe(origin: "foo", stages: stages)
-      assert Simulation.add_recipe(:simulation, [recipe, recipe, recipe]) == :error
+    test "add_recipe() works with multiple recipes" do
+      recipe =
+        recipe(
+          origin: "foo",
+          stages: [%{"at" => 0, "status" => 200, "latency" => 0}],
+          route: "/news"
+        )
+
+      assert Simulation.add_recipe(:simulation, [
+        recipe,
+        %{recipe | route: "/sports"},
+        %{recipe | route: "/weather"}
+      ]) == :ok
     end
   end
 

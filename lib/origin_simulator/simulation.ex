@@ -29,13 +29,14 @@ defmodule OriginSimulator.Simulation do
     GenServer.call(server, :route)
   end
 
-  # for now, deal with minimum viable recipe: list containing a single recipe
-  def add_recipe(server, new_recipe) when is_list(new_recipe) and length(new_recipe) == 1 do
-    GenServer.call(server, {:add_recipe, new_recipe |> hd})
-  end
+  def add_recipe(server, recipes) when is_list(recipes) do
+    resp =
+      for recipe <- recipes do
+        GenServer.call(server, {:add_recipe, recipe})
+      end
 
-  # returning error, pending current work on multi-route / recipes
-  def add_recipe(_server, new_recipe) when is_list(new_recipe), do: :error
+    if Enum.all?(resp, &(&1 == :ok)), do: :ok, else: :error
+  end
 
   def add_recipe(server, new_recipe) do
     GenServer.call(server, {:add_recipe, new_recipe})

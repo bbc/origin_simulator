@@ -59,14 +59,13 @@ defmodule OriginSimulatorTest do
       |> assert_resp_header({"content-type", ["application/json; charset=utf-8"]})
     end
 
-    # multiple recipes posting is currently not supported
-    test "/add_recipe returns error message if multiple recipes is posted" do
-      payload = multi_route_origin_payload() |> Poison.encode!()
+    test "will return multi-recipe payload if set" do
+      payload = multi_route_origin_recipes() |> Poison.encode!()
 
       conn(:post, "/add_recipe", payload)
       |> OriginSimulator.call([])
-      |> assert_status_body(406, "Not Acceptable")
-      |> assert_resp_header({"content-type", ["text/html; charset=utf-8"]})
+      |> assert_status_body(201, payload)
+      |> assert_resp_header({"content-type", ["application/json; charset=utf-8"]})
     end
   end
 
