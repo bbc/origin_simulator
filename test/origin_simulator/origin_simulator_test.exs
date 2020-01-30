@@ -30,7 +30,7 @@ defmodule OriginSimulatorTest do
     end
 
     test "will return the payload if set" do
-      payload = origin_recipe() |> Poison.encode!()
+      payload = [origin_recipe()] |> Poison.encode!()
       conn(:post, "/add_recipe", payload) |> OriginSimulator.call([])
 
       conn(:get, "/current_recipe")
@@ -40,7 +40,7 @@ defmodule OriginSimulatorTest do
     end
 
     test "will return the payload if set for ranged latencies" do
-      payload = origin_recipe_range_latency() |> Poison.encode!()
+      payload = [origin_recipe_range_latency()] |> Poison.encode!()
       conn(:post, "/add_recipe", payload) |> OriginSimulator.call([])
 
       conn(:get, "/current_recipe")
@@ -50,7 +50,7 @@ defmodule OriginSimulatorTest do
     end
 
     test "will return the headers in the payload when provided" do
-      payload = origin_recipe_headers() |> Poison.encode!()
+      payload = [origin_recipe_headers()] |> Poison.encode!()
       conn(:post, "/add_recipe", payload) |> OriginSimulator.call([])
 
       conn(:get, "/current_recipe")

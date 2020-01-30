@@ -20,8 +20,8 @@ defmodule OriginSimulator.SimulationTest do
       assert Simulation.state(:simulation, route) == {200, 1000}
     end
 
-    test "recipe() returns the loaded recipe", %{recipe: recipe} do
-      assert Simulation.recipe(:simulation) == recipe
+    test "recipe() returns the loaded recipe", %{recipe: recipe, route: route} do
+      assert Simulation.recipe(:simulation, route) == recipe
     end
 
     test "route() returns route", %{recipe: recipe} do
@@ -53,8 +53,8 @@ defmodule OriginSimulator.SimulationTest do
       assert Simulation.state(:simulation, route) == {200, 1000..1200}
     end
 
-    test "recipe() returns the loaded recipe", %{recipe: recipe} do
-      assert Simulation.recipe(:simulation) == recipe
+    test "recipe() returns the loaded recipe", %{recipe: recipe, route: route} do
+      assert Simulation.recipe(:simulation, route) == recipe
     end
   end
 
@@ -78,8 +78,8 @@ defmodule OriginSimulator.SimulationTest do
       assert Simulation.state(:simulation, route) == {503, 1000}
     end
 
-    test "recipe() returns the loaded recipe", %{recipe: recipe} do
-      assert Simulation.recipe(:simulation) == recipe
+    test "recipe() returns the loaded recipe", %{recipe: recipe, route: route} do
+      assert Simulation.recipe(:simulation, route) == recipe
     end
   end
 
@@ -93,8 +93,8 @@ defmodule OriginSimulator.SimulationTest do
       assert Simulation.state(:simulation, Recipe.default_route()) == {406, 0}
     end
 
-    test "recipe() returns nil" do
-      assert Simulation.recipe(:simulation) == nil
+    test "recipe() returns an empty list" do
+      assert Simulation.recipe(:simulation) == []
     end
 
     test "route() returns default route" do

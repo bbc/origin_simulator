@@ -15,7 +15,8 @@ defmodule OriginSimulator do
   end
 
   get "/current_recipe" do
-    msg = Simulation.recipe(:simulation) || "Not set, please POST a recipe to /add_recipe"
+    recipes = Simulation.recipe(:simulation)
+    msg = if recipes == [], do: "Not set, please POST a recipe to /add_recipe", else: recipes
 
     conn
     |> put_resp_content_type("application/json")
@@ -90,7 +91,7 @@ defmodule OriginSimulator do
 
     {:ok, body} = Payload.body(:payload, status, route)
 
-    recipe = Simulation.recipe(:simulation)
+    recipe = Simulation.recipe(:simulation, route)
 
     conn
     |> put_resp_content_type(content_type(body))

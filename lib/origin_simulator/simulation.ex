@@ -17,6 +17,10 @@ defmodule OriginSimulator.Simulation do
     GenServer.call(server, :recipe)
   end
 
+  def recipe(server, route) do
+    GenServer.call(server, {:recipe, route})
+  end
+
   def route(server) do
     GenServer.call(server, :route)
   end
@@ -56,9 +60,22 @@ defmodule OriginSimulator.Simulation do
   end
 
   @impl true
-  def handle_call(:recipe, _from, state) do
-    [{_route, simulation}] = state |> Map.to_list()
+  def handle_call({:recipe, route}, _from, state) do
+    simulation = state[route]
     {:reply, simulation.recipe, state}
+  end
+
+  # retrieve all recipes
+  @impl true
+  def handle_call(:recipe, _from, state) do
+    simulations = Map.values(state)
+
+    recipes =
+      simulations
+      |> Enum.filter(&(&1.recipe != nil))
+      |> Enum.map(& &1.recipe)
+
+    {:reply, recipes, state}
   end
 
   @impl true
