@@ -24,8 +24,16 @@ defmodule OriginSimulator.SimulationTest do
       assert Simulation.recipe(:simulation, route) == recipe
     end
 
-    test "route() returns route", %{recipe: recipe} do
-      assert Simulation.route(:simulation) == recipe |> Map.get(:route)
+    test "route() returns matching route", %{recipe: recipe, route: route} do
+      assert Simulation.route(:simulation, route) == recipe |> Map.get(:route)
+    end
+
+    test "route() returns matching wildcard route", %{recipe: recipe} do
+      Simulation.add_recipe(:simulation, %{recipe | route: "/news*"})
+      Process.sleep(5)
+
+      assert Simulation.route(:simulation, "/news/uk-politics") == "/news*"
+      assert Simulation.route(:simulation, "/sport") == "/*"
     end
   end
 
@@ -98,7 +106,7 @@ defmodule OriginSimulator.SimulationTest do
     end
 
     test "route() returns default route" do
-      assert Simulation.route(:simulation) == Recipe.default_route()
+      assert Simulation.route(:simulation, "/random_path") == "/*"
     end
   end
 end

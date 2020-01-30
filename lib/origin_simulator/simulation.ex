@@ -21,8 +21,8 @@ defmodule OriginSimulator.Simulation do
     GenServer.call(server, {:recipe, route})
   end
 
-  def route(server) do
-    GenServer.call(server, :route)
+  def route(server, route) do
+    GenServer.call(server, {:route, route})
   end
 
   # for now, deal with minimum viable recipe: list containing a single recipe
@@ -81,30 +81,29 @@ defmodule OriginSimulator.Simulation do
   @impl true
   def handle_call({:add_recipe, new_recipe}, _caller, state) do
     Payload.fetch(:payload, new_recipe)
+    route = new_recipe.route
 
     Enum.map(new_recipe.stages, fn item ->
       Process.send_after(
         self(),
-        {:update, item["status"], Duration.parse(item["latency"])},
+        {:update, route, item["status"], Duration.parse(item["latency"])},
         Duration.parse(item["at"])
       )
     end)
 
-    route = new_recipe.route
     simulation = get(state[route])
-
-    {:reply, :ok, Map.put(%{}, route, %{simulation | recipe: new_recipe})}
+    {:reply, :ok, Map.put(state, route, %{simulation | recipe: new_recipe})}
   end
 
   @impl true
-  def handle_call(:route, _from, state) do
-    [{route, _simulation}] = state |> Map.to_list()
-    {:reply, route, state}
+  def handle_call({:route, route}, _from, state) do
+    recipe_route = match_route(state |> Map.keys(), route)
+    {:reply, recipe_route, state}
   end
 
   @impl true
-  def handle_info({:update, status, latency}, state) do
-    [{route, simulation}] = state |> Map.to_list()
+  def handle_info({:update, route, status, latency}, state) do
+    simulation = state[route]
     {:noreply, Map.put(state, route, %{simulation | status: status, latency: latency})}
   end
 
@@ -112,4 +111,29 @@ defmodule OriginSimulator.Simulation do
   defp get(current_state), do: current_state
 
   defp default_simulation(), do: %{recipe: nil, status: 406, latency: 0}
+
+  def match_route(routes, route) do
+    case Enum.member?(routes, route) do
+      true ->
+        route
+
+      false ->
+        routes
+        |> Enum.filter(&String.ends_with?(&1, "*"))
+        |> match_wildcard_route(route)
+    end
+  end
+
+  # find the nearest wildcard, e.g.
+  # "/news/politics" matches "/news*" first, cf. "/*"
+  # "/sport" matches "/*" not "/news*"
+  defp match_wildcard_route(routes, route) do
+    routes
+    |> Enum.sort(&(&1 >= &2))
+    |> Enum.find(&matching_wildcard_route?(&1, route))
+  end
+
+  defp matching_wildcard_route?(r1, r2) do
+    String.starts_with?(r2, String.trim(r1, "*"))
+  end
 end

@@ -105,7 +105,32 @@ defmodule Fixtures do
     }
   end
 
-  def multi_origin_payload() do
+  def multi_route_origin_payload() do
+    [
+      %{
+        "route" => "/sport",
+        "origin" => "https://www.bbc.co.uk/sport",
+        "stages" => [%{"at" => 0, "status" => 200, "latency" => "0ms"}]
+      },
+      %{
+        "route" => "/news",
+        "origin" => "https://www.bbc.co.uk/news",
+        "stages" => [%{"at" => 0, "status" => 200, "latency" => "0ms"}]
+      },
+      %{
+        "route" => "/news/entertainment_and_arts",
+        "origin" => "https://www.bbc.co.uk/news/entertainment_and_arts",
+        "stages" => [%{"at" => 0, "status" => 200, "latency" => "0ms"}]
+      },
+      %{
+        "route" => "/weather",
+        "origin" => "https://www.bbc.co.uk/weather",
+        "stages" => [%{"at" => 0, "status" => 200, "latency" => "0ms"}]
+      } 
+    ]
+  end
+
+  def multi_route_mixed_payload() do
     [
       %{
         "route" => "/example/endpoint",

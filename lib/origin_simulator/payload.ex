@@ -21,11 +21,12 @@ defmodule OriginSimulator.Payload do
     GenServer.call(server, {:generate, value, route})
   end
 
-  def body(_server, status, route \\ Recipe.default_route()) do
-    case status do
-      200 -> cache_lookup(route)
-      404 -> {:ok, "Not found"}
-      406 -> {:ok, "Recipe not set, please POST a recipe to /add_recipe"}
+  def body(_server, status, path \\ Recipe.default_route(), route \\ Recipe.default_route()) do
+    case {status, path} do
+      {200, _} -> cache_lookup(route)
+      {404, _} -> {:ok, "Not found"}
+      {406, "/*"} -> {:ok, "Recipe not set, please POST a recipe to /add_recipe"}
+      {406, _} -> {:ok, "Recipe not set at #{path}, please POST a recipe for this route to /add_recipe"}
       _ -> {:ok, "Error #{status}"}
     end
   end

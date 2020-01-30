@@ -61,7 +61,7 @@ defmodule OriginSimulatorTest do
 
     # multiple recipes posting is currently not supported
     test "/add_recipe returns error message if multiple recipes is posted" do
-      payload = multi_origin_payload() |> Poison.encode!()
+      payload = multi_route_origin_payload() |> Poison.encode!()
 
       conn(:post, "/add_recipe", payload)
       |> OriginSimulator.call([])
@@ -135,7 +135,7 @@ defmodule OriginSimulatorTest do
     test "will return an error message if recipe has not been set" do
       conn(:get, "/")
       |> OriginSimulator.call([])
-      |> assert_status_body(406, recipe_not_set_message())
+      |> assert_status_body(406, recipe_not_set_message("/"))
     end
   end
 
