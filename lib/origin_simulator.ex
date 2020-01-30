@@ -43,24 +43,23 @@ defmodule OriginSimulator do
     recipe = Recipe.parse(Plug.Conn.read_body(conn))
     response = Simulation.add_recipe(:simulation, recipe)
 
-    {code, message, content_type} = case response do
-      :ok -> {201, Poison.encode!(Simulation.recipe(:simulation)), "application/json"}
-      :error -> {406, "Not Acceptable", "text/html"}
-    end
+    {status, body, content_type} =
+      case response do
+        :ok -> {201, Poison.encode!(Simulation.recipe(:simulation)), "application/json"}
+        :error -> {406, "Not Acceptable", "text/html"}
+      end
 
     conn
     |> put_resp_content_type(content_type)
-    |> send_resp(code, message)
+    |> send_resp(status, body)
   end
 
   get "/*glob" do
-    recipe_route = Simulation.route(:simulation)
-    serve_payload_for_route(conn, recipe_route, conn.request_path)
+    serve_payload_for_route(conn, Simulation.route(:simulation), conn.request_path)
   end
 
   post "/*glob" do
-    recipe_route = Simulation.route(:simulation)
-    serve_payload_for_route(conn, recipe_route, conn.request_path)
+    serve_payload_for_route(conn, Simulation.route(:simulation), conn.request_path)
   end
 
   match _ do
@@ -68,13 +67,16 @@ defmodule OriginSimulator do
   end
 
   defp serve_payload_for_route(conn, @default_route, _), do: serve_payload(conn)
-  defp serve_payload_for_route(conn, route, path) when route == path, do: serve_payload(conn, route)
+
+  defp serve_payload_for_route(conn, route, path) when route == path,
+    do: serve_payload(conn, route)
 
   defp serve_payload_for_route(conn, route, path) do
     cond do
       # wildcard regex matching
       String.ends_with?(route, "*") && String.match?(path, ~r/^#{route}/) ->
         serve_payload(conn, route)
+
       true ->
         msg = "Recipe not set at #{path}, please POST a recipe for this route to /add_recipe"
         conn |> send_resp(406, msg)
