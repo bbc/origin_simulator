@@ -25,8 +25,8 @@ defmodule OriginSimulator.Payload do
     case {status, path} do
       {200, _} -> cache_lookup(route)
       {404, _} -> {:ok, "Not found"}
-      {406, "/*"} -> {:ok, "Recipe not set, please POST a recipe to /add_recipe"}
-      {406, _} -> {:ok, "Recipe not set at #{path}, please POST a recipe for this route to /add_recipe"}
+      {406, "/*"} -> {:ok, OriginSimulator.recipe_not_set()}
+      {406, _} -> {:ok, OriginSimulator.recipe_not_set(path)}
       _ -> {:ok, "Error #{status}"}
     end
   end

@@ -8,10 +8,10 @@ defmodule Fixtures do
     body
   end
 
-  def recipe_not_set_message(), do: "Recipe not set, please POST a recipe to /add_recipe"
+  def recipe_not_set_message(), do: "Recipe not set, please POST a recipe to /#{OriginSimulator.admin_domain()}/add_recipe"
 
   def recipe_not_set_message(path) do
-    "Recipe not set at #{path}, please POST a recipe for this route to /add_recipe"
+    "Recipe not set at #{path}, please POST a recipe for this route to /#{OriginSimulator.admin_domain()}/add_recipe"
   end
 
   def http_error_message(status), do: "Error #{status}"

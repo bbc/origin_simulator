@@ -16,7 +16,7 @@ defmodule SingleRouteOriginSimulatorTest do
     setup [:origin_payload, :origin_payload_no_route]
 
     test "for a route", %{payload: payload} do
-      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+      conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
       Process.sleep(20)
 
       conn(:get, payload["route"])
@@ -25,7 +25,7 @@ defmodule SingleRouteOriginSimulatorTest do
     end
 
     test "error message due to non-matching route", %{payload: payload} do
-      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+      conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
       Process.sleep(20)
 
       conn(:get, "/random_path")
@@ -34,7 +34,7 @@ defmodule SingleRouteOriginSimulatorTest do
     end
 
     test "for default route", %{payload_no_route: payload} do
-      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+      conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
       Process.sleep(20)
 
       conn(:get, Recipe.default_route())
@@ -44,7 +44,7 @@ defmodule SingleRouteOriginSimulatorTest do
 
     test "for '/*' route", %{payload: payload} do
       payload = Map.put(payload, "route", "/*")
-      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+      conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
       Process.sleep(20)
 
       conn(:get, "/news/uk-politics-51287430")
@@ -58,7 +58,7 @@ defmodule SingleRouteOriginSimulatorTest do
 
     test "for arbitrary wildcard route", %{payload: payload} do
       payload = Map.put(payload, "route", "/news*")
-      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+      conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
       Process.sleep(20)
 
       conn(:get, "/news/uk-politics-51287430")
@@ -68,7 +68,7 @@ defmodule SingleRouteOriginSimulatorTest do
 
     test "error message due to non-matching wildcard route", %{payload: payload} do
       payload = Map.put(payload, "route", "/news*")
-      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+      conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
       Process.sleep(20)
 
       conn(:get, "/cbbc")
@@ -81,7 +81,7 @@ defmodule SingleRouteOriginSimulatorTest do
     setup [:body_payload, :body_payload_no_route]
 
     test "for a route", %{payload: payload} do
-      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+      conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
       Process.sleep(20)
 
       conn(:get, payload["route"])
@@ -90,7 +90,7 @@ defmodule SingleRouteOriginSimulatorTest do
     end
 
     test "error message due to non-matching route", %{payload: payload} do
-      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+      conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
       Process.sleep(20)
 
       conn(:get, "/random_path")
@@ -99,7 +99,7 @@ defmodule SingleRouteOriginSimulatorTest do
     end
 
     test "for default route", %{payload_no_route: payload} do
-      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+      conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
       Process.sleep(20)
 
       conn(:get, Recipe.default_route())
@@ -109,7 +109,7 @@ defmodule SingleRouteOriginSimulatorTest do
 
     test "for '/*' route", %{payload: payload} do
       payload = Map.put(payload, "route", "/*")
-      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+      conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
       Process.sleep(20)
 
       conn(:get, "/news/uk-politics-51287430")
@@ -123,7 +123,7 @@ defmodule SingleRouteOriginSimulatorTest do
 
     test "for arbitrary wildcard route", %{payload: payload} do
       payload = Map.put(payload, "route", "/news*")
-      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+      conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
       Process.sleep(20)
 
       conn(:get, "/news/uk-politics-51287430")
@@ -133,7 +133,7 @@ defmodule SingleRouteOriginSimulatorTest do
 
     test "error message due to non-matching wildcard route", %{payload: payload} do
       payload = Map.put(payload, "route", "/news*")
-      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+      conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
       Process.sleep(20)
 
       conn(:get, "/sport")
@@ -146,7 +146,7 @@ defmodule SingleRouteOriginSimulatorTest do
     setup [:origin_payload, :origin_payload_no_route]
 
     test "for a route", %{payload: payload} do
-      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+      conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
       Process.sleep(20)
 
       conn(:post, payload["route"], "")
@@ -155,7 +155,7 @@ defmodule SingleRouteOriginSimulatorTest do
     end
 
     test "error message due to non-matching route", %{payload: payload} do
-      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+      conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
       Process.sleep(20)
 
       conn(:post, "/random_path")
@@ -165,7 +165,7 @@ defmodule SingleRouteOriginSimulatorTest do
 
     test "for '/*' route", %{payload: payload} do
       payload = Map.put(payload, "route", "/*")
-      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+      conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
       Process.sleep(20)
 
       conn(:post, "/news/uk-politics-51287430")
@@ -179,7 +179,7 @@ defmodule SingleRouteOriginSimulatorTest do
 
     test "for arbitrary wildcard route", %{payload: payload} do
       payload = Map.put(payload, "route", "/news*")
-      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+      conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
       Process.sleep(20)
 
       conn(:post, "/news/uk-politics-51287430")
@@ -192,7 +192,7 @@ defmodule SingleRouteOriginSimulatorTest do
     setup [:body_payload, :body_payload_no_route]
 
     test "for a route", %{payload: payload} do
-      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+      conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
       Process.sleep(20)
 
       conn(:post, payload["route"])
@@ -201,7 +201,7 @@ defmodule SingleRouteOriginSimulatorTest do
     end
 
     test "error message due to non-matching route", %{payload: payload} do
-      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+      conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
       Process.sleep(20)
 
       conn(:post, "/random_path")
@@ -211,7 +211,7 @@ defmodule SingleRouteOriginSimulatorTest do
 
     test "for '/*' route", %{payload: payload} do
       payload = Map.put(payload, "route", "/*")
-      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+      conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
       Process.sleep(20)
 
       conn(:post, "/news/uk-politics-51287430")

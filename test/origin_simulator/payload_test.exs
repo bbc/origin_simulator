@@ -17,7 +17,7 @@ defmodule OriginSimulator.PayloadTest do
     end
 
     test "Suggests to add a recipe for 406" do
-      assert OriginSimulator.Payload.body(:payload, 406) == {:ok, "Recipe not set, please POST a recipe to /add_recipe"}
+      assert OriginSimulator.Payload.body(:payload, 406) == {:ok, "Recipe not set, please POST a recipe to /#{OriginSimulator.admin_domain()}/add_recipe"}
     end
 
     test "returns the origin body for 200" do
@@ -39,7 +39,7 @@ defmodule OriginSimulator.PayloadTest do
     end
 
     test "Suggests to add a recipe for 406" do
-      assert OriginSimulator.Payload.body(:payload, 406) == {:ok, "Recipe not set, please POST a recipe to /add_recipe"}
+      assert OriginSimulator.Payload.body(:payload, 406) == {:ok, "Recipe not set, please POST a recipe to /#{OriginSimulator.admin_domain()}/add_recipe"}
     end
 
     test "returns the origin body for 200" do

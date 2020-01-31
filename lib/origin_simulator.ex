@@ -6,77 +6,123 @@ defmodule OriginSimulator do
   plug(:match)
   plug(:dispatch)
 
-  get "/status" do
-    conn
-    |> put_resp_content_type("text/plain")
-    |> send_resp(200, "ok!")
+  get "/:admin/status" do
+    case admin_path?(conn.path_params) do
+      true ->
+        conn
+        |> put_resp_content_type("text/plain")
+        |> send_resp(200, "ok!")
+
+      _ ->
+        recipe_not_set_resp(conn)
+    end
   end
 
-  get "/current_recipe" do
-    recipes = Simulation.recipe(:simulation)
-    msg = if recipes == [], do: "Not set, please POST a recipe to /add_recipe", else: recipes
+  get "/:admin/current_recipe" do
+    case admin_path?(conn.path_params) do
+      true ->
+        recipes = Simulation.recipe(:simulation)
+        msg = if recipes == [], do: recipe_not_set(), else: recipes
 
-    conn
-    |> put_resp_content_type("application/json")
-    |> send_resp(200, Poison.encode!(msg))
+        conn
+        |> put_resp_content_type("application/json")
+        |> send_resp(200, Poison.encode!(msg))
+
+      _ ->
+        recipe_not_set_resp(conn)
+    end
   end
 
-  get "/clear_current_count" do
-    Counter.clear()
+  get "/:admin/clear_current_count" do
+    case admin_path?(conn.path_params) do
+      true ->
+        Counter.clear()
 
-    conn
-    |> put_resp_content_type("application/json")
-    |> send_resp(200, ~s({"cleared": "yes"}))
+        conn
+        |> put_resp_content_type("application/json")
+        |> send_resp(200, ~s({"cleared": "yes"}))
+
+      _ ->
+        recipe_not_set_resp(conn)
+    end
   end
 
-  get "/current_count" do
-    conn
-    |> put_resp_content_type("application/json")
-    |> send_resp(200, Poison.encode!(Counter.value()))
+  get "/:admin/current_count" do
+    case admin_path?(conn.path_params) do
+      true ->
+        conn
+        |> put_resp_content_type("application/json")
+        |> send_resp(200, Poison.encode!(Counter.value()))
+
+      _ ->
+        recipe_not_set_resp(conn)
+    end
   end
 
-  post "/add_recipe" do
-    recipe = Recipe.parse(Plug.Conn.read_body(conn))
-    response = Simulation.add_recipe(:simulation, recipe)
+  post "/:admin/add_recipe" do
+    case admin_path?(conn.path_params) do
+      true ->
+        recipe = Recipe.parse(Plug.Conn.read_body(conn))
+        response = Simulation.add_recipe(:simulation, recipe)
 
-    {status, body, content_type} =
-      case response do
-        :ok -> {201, Poison.encode!(Simulation.recipe(:simulation)), "application/json"}
-        :error -> {406, "Not Acceptable", "text/html"}
-      end
+        {status, body, content_type} =
+          case response do
+            :ok -> {201, Poison.encode!(Simulation.recipe(:simulation)), "application/json"}
+            :error -> {406, "Not Acceptable", "text/html"}
+          end
 
-    conn
-    |> put_resp_content_type(content_type)
-    |> send_resp(status, body)
+        conn
+        |> put_resp_content_type(content_type)
+        |> send_resp(status, body)
+
+      _ ->
+        recipe_not_set_resp(conn)
+    end
   end
 
-  get "/restart" do
-    Simulation.restart()
-    Process.sleep(10)
+  get "/:admin/restart" do
+    case admin_path?(conn.path_params) do
+      true ->
+        Simulation.restart()
+        Process.sleep(10)
 
-    conn
-    |> put_resp_content_type("text/plain")
-    |> send_resp(200, "ok!")
+        conn
+        |> put_resp_content_type("text/plain")
+        |> send_resp(200, "ok!")
+
+      _ ->
+        recipe_not_set_resp(conn)
+    end
   end
 
-  get "/routes" do
-    conn
-    |> put_resp_content_type("text/plain")
-    |> send_resp(200, Simulation.route(:simulation) |> Enum.join("\n"))
+  get "/:admin/routes" do
+    case admin_path?(conn.path_params) do
+      true ->
+        conn
+        |> put_resp_content_type("text/plain")
+        |> send_resp(200, Simulation.route(:simulation) |> Enum.join("\n"))
+
+      _ ->
+        recipe_not_set_resp(conn)
+    end
   end
 
-  get "/routes_status" do
-    state = Simulation.state(:simulation)
+  get "/:admin/routes_status" do
+    case admin_path?(conn.path_params) do
+      true ->
+        body =
+          for {route, simulation} <- Simulation.state(:simulation) do
+            "#{route} #{simulation.status} #{simulation.latency}"
+          end
+          |> Enum.join("\n")
 
-    body =
-      for {route, simulation} <- state do
-        "#{route} #{simulation.status} #{simulation.latency}"
-      end
-      |> Enum.join("\n")
+        conn
+        |> put_resp_content_type("text/plain")
+        |> send_resp(200, body)
 
-    conn
-    |> put_resp_content_type("text/plain")
-    |> send_resp(200, body)
+      _ ->
+        recipe_not_set_resp(conn)
+    end
   end
 
   get "/*glob" do
@@ -90,6 +136,10 @@ defmodule OriginSimulator do
   match _ do
     send_resp(conn, 404, "not found")
   end
+
+  def admin_domain(), do: Application.get_env(:origin_simulator, :admin_domain)
+
+  defp admin_path?(%{"admin" => admin}), do: admin == admin_domain()
 
   defp serve_payload(conn, route) do
     {status, latency} = Simulation.state(:simulation, route)
@@ -120,4 +170,17 @@ defmodule OriginSimulator do
   defp sleep(0), do: nil
   defp sleep(%Range{} = time), do: :timer.sleep(Enum.random(time))
   defp sleep(duration), do: :timer.sleep(duration)
+
+  defp recipe_not_set_resp(conn) do
+    conn
+    |> put_resp_content_type("text/plain")
+    |> send_resp(200, recipe_not_set(conn.request_path))
+  end
+
+  def recipe_not_set(),
+    do: "Recipe not set, please POST a recipe to /#{admin_domain()}/add_recipe"
+
+  def recipe_not_set(path) do
+    "Recipe not set at #{path}, please POST a recipe for this route to /#{admin_domain()}/add_recipe"
+  end
 end

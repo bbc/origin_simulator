@@ -2,6 +2,8 @@ defmodule MultiRouteOriginSimulatorTest do
   use ExUnit.Case
   use Plug.Test
 
+  import TestHelpers
+
   setup do
     OriginSimulator.Simulation.restart()
     Process.sleep(10)
@@ -17,7 +19,7 @@ defmodule MultiRouteOriginSimulatorTest do
         }
       ]
 
-      conn(:post, "/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
+      conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload)) |> OriginSimulator.call([])
       Process.sleep(20)
 
       path = "/any_path"
