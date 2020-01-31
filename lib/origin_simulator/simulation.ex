@@ -54,12 +54,9 @@ defmodule OriginSimulator.Simulation do
 
   @impl true
   def init(_) do
-    route = Recipe.default_route()
-    state = default_simulation()
-
     # Simulation state data structure
     # %{"route1" => simulation_state1, "route2" => simulation_state2}
-    {:ok, [{route, state}] |> Enum.into(%{})}
+    {:ok, [{Recipe.default_route(), default_simulation()}] |> Enum.into(%{})}
   end
 
   @impl true
@@ -69,33 +66,32 @@ defmodule OriginSimulator.Simulation do
 
   @impl true
   def handle_call({:state, route}, _from, state) do
-    simulation = state[route]
-    {:reply, {simulation.status, simulation.latency}, state}
+    {:reply, {state[route].status, state[route].latency}, state}
   end
 
   @impl true
   def handle_call({:recipe, route}, _from, state) do
-    simulation = state[route]
-    {:reply, simulation.recipe, state}
+    {:reply, state[route].recipe, state}
   end
 
   # retrieve all recipes
   @impl true
   def handle_call(:recipe, _from, state) do
-    simulations = Map.values(state)
-
-    recipes =
-      simulations
+    {
+      :reply,
+      Map.values(state)
       |> Enum.filter(&(&1.recipe != nil))
-      |> Enum.map(& &1.recipe)
-
-    {:reply, recipes, state}
+      |> Enum.map(& &1.recipe),
+      state
+    }
   end
 
   @impl true
   def handle_call({:add_recipe, new_recipe}, _caller, state) do
     Payload.fetch(:payload, new_recipe)
+
     route = new_recipe.route
+    simulation = get(state[route])
 
     Enum.map(new_recipe.stages, fn item ->
       Process.send_after(
@@ -105,14 +101,12 @@ defmodule OriginSimulator.Simulation do
       )
     end)
 
-    simulation = get(state[route])
     {:reply, :ok, Map.put(state, route, %{simulation | recipe: new_recipe})}
   end
 
   @impl true
   def handle_call({:route, route}, _from, state) do
-    recipe_route = match_route(state |> Map.keys(), route)
-    {:reply, recipe_route, state}
+    {:reply, match_route(state |> Map.keys(), route), state}
   end
 
   @impl true
@@ -120,8 +114,7 @@ defmodule OriginSimulator.Simulation do
 
   @impl true
   def handle_info({:update, route, status, latency}, state) do
-    simulation = state[route]
-    {:noreply, Map.put(state, route, %{simulation | status: status, latency: latency})}
+    {:noreply, Map.put(state, route, %{state[route] | status: status, latency: latency})}
   end
 
   defp get(nil), do: default_simulation()
