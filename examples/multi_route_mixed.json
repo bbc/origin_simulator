@@ -1,0 +1,55 @@
+[
+  {
+    "route": "/example/endpoint",
+    "body": "Example body",
+    "stages": [
+      {
+        "at": 0,
+        "latency": "400ms",
+        "status": 200
+      },
+      {
+        "at": "1s",
+        "latency": "100ms",
+        "status": 503
+      },
+      {
+        "at": "10s",
+        "latency": "100ms",
+        "status": 200
+      }
+    ]
+  },
+  {
+    "route": "/news",
+    "origin": "https://www.bbc.co.uk/news",
+    "stages": [
+      {
+        "at": 0,
+        "status": 404,
+        "latency": "50ms"
+      },
+      {
+        "at": "2s",
+        "status": 503,
+        "latency": "2s"
+      },
+      {
+        "at": "4s",
+        "status": 200,
+        "latency": "100ms"
+      }
+    ]
+  },
+  {
+    "route": "/*",
+    "body": "Error - not defined",
+    "stages": [
+      {
+        "at": 0,
+        "status": 406,
+        "latency": "0ms"
+      }
+    ]
+  }
+]

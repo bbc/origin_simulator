@@ -1,0 +1,5 @@
+{
+    "origin": "https://www.bbc.co.uk/sport",
+    "route": "/sport",
+    "stages": [{ "at": 0, "status": 504, "latency": "1s"}]
+}

@@ -21,6 +21,33 @@ defmodule OriginSimulatorTest do
     end
   end
 
+  describe "GET /routes" do
+    test "return default route" do
+      conn(:get, "/routes")
+      |> OriginSimulator.call([])
+      |> assert_status_body(200, "/*")
+      |> assert_resp_header({"content-type", ["text/plain; charset=utf-8"]})
+    end
+  end
+
+  describe "GET /routes_status" do
+    test "return default route" do
+      conn(:get, "/routes_status")
+      |> OriginSimulator.call([])
+      |> assert_status_body(200, "/* 406 0")
+      |> assert_resp_header({"content-type", ["text/plain; charset=utf-8"]})
+    end
+  end
+
+  describe "GET /restart" do
+    test "return default route" do
+      conn(:get, "/restart")
+      |> OriginSimulator.call([])
+      |> assert_status_body(200, "ok!")
+      |> assert_resp_header({"content-type", ["text/plain; charset=utf-8"]})
+    end
+  end
+
   describe "GET /current_recipe" do
     test "will return an error message if payload has not been set" do
       conn(:get, "/current_recipe")

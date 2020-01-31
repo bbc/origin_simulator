@@ -16,11 +16,11 @@ defmodule OriginSimulator.SimulationTest do
       {:ok, recipe: recipe, route: recipe.route}
     end
 
-    test "state() returns a tuple with http status and latency in ms", %{route: route} do
+    test "state() returns a tuple with http status and latency in ms for a route", %{route: route} do
       assert Simulation.state(:simulation, route) == {200, 1000}
     end
 
-    test "recipe() returns the loaded recipe", %{recipe: recipe, route: route} do
+    test "recipe() returns the loaded recipe for a route", %{recipe: recipe, route: route} do
       assert Simulation.recipe(:simulation, route) == recipe
     end
 
@@ -55,10 +55,10 @@ defmodule OriginSimulator.SimulationTest do
         )
 
       assert Simulation.add_recipe(:simulation, [
-        recipe,
-        %{recipe | route: "/sports"},
-        %{recipe | route: "/weather"}
-      ]) == :ok
+               recipe,
+               %{recipe | route: "/sports"},
+               %{recipe | route: "/weather"}
+             ]) == :ok
     end
   end
 

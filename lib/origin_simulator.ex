@@ -36,9 +36,6 @@ defmodule OriginSimulator do
   end
 
   post "/add_recipe" do
-    Simulation.restart()
-    Process.sleep(10)
-
     recipe = Recipe.parse(Plug.Conn.read_body(conn))
     response = Simulation.add_recipe(:simulation, recipe)
 
@@ -51,6 +48,35 @@ defmodule OriginSimulator do
     conn
     |> put_resp_content_type(content_type)
     |> send_resp(status, body)
+  end
+
+  get "/restart" do
+    Simulation.restart()
+    Process.sleep(10)
+
+    conn
+    |> put_resp_content_type("text/plain")
+    |> send_resp(200, "ok!")
+  end
+
+  get "/routes" do
+    conn
+    |> put_resp_content_type("text/plain")
+    |> send_resp(200, Simulation.route(:simulation) |> Enum.join("\n"))
+  end
+
+  get "/routes_status" do
+    state = Simulation.state(:simulation)
+
+    body =
+      for {route, simulation} <- state do
+        "#{route} #{simulation.status} #{simulation.latency}"
+      end
+      |> Enum.join("\n")
+
+    conn
+    |> put_resp_content_type("text/plain")
+    |> send_resp(200, body)
   end
 
   get "/*glob" do

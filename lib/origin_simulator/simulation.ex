@@ -9,6 +9,10 @@ defmodule OriginSimulator.Simulation do
     GenServer.start_link(__MODULE__, opts, name: :simulation)
   end
 
+  def state(server) do
+    GenServer.call(server, :state)
+  end
+
   def state(server, route) do
     GenServer.call(server, {:state, route})
   end
@@ -56,6 +60,11 @@ defmodule OriginSimulator.Simulation do
     # Simulation state data structure
     # %{"route1" => simulation_state1, "route2" => simulation_state2}
     {:ok, [{route, state}] |> Enum.into(%{})}
+  end
+
+  @impl true
+  def handle_call(:state, _from, state) do
+    {:reply, state, state}
   end
 
   @impl true
