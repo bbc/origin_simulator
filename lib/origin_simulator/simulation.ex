@@ -54,9 +54,7 @@ defmodule OriginSimulator.Simulation do
 
   @impl true
   def init(_) do
-    # Simulation state data structure
-    # %{"route1" => simulation_state1, "route2" => simulation_state2}
-    {:ok, [{Recipe.default_route(), default_simulation()}] |> Enum.into(%{})}
+    {:ok, %{Recipe.default_route() => default_simulation()}}
   end
 
   @impl true
@@ -106,7 +104,7 @@ defmodule OriginSimulator.Simulation do
 
   @impl true
   def handle_call({:route, route}, _from, state) do
-    {:reply, match_route(state |> Map.keys(), route), state}
+    {:reply, match_route(state, state[route], route), state}
   end
 
   @impl true
@@ -122,24 +120,20 @@ defmodule OriginSimulator.Simulation do
 
   defp default_simulation(), do: %{recipe: nil, status: 406, latency: 0}
 
-  def match_route(routes, route) do
-    case Enum.member?(routes, route) do
-      true ->
-        route
-
-      false ->
-        routes
-        |> Enum.filter(&String.ends_with?(&1, "*"))
-        |> match_wildcard_route(route)
-    end
+  defp match_route(state, nil, route) do
+    Map.keys(state)
+    |> Enum.filter(&String.ends_with?(&1, "*"))
+    |> match_wildcard_route(route)
   end
+
+  defp match_route(_state, simulation, _route), do: simulation.recipe.route
 
   # find the nearest wildcard, e.g.
   # "/news/politics" matches "/news*" first, cf. "/*"
   # "/sport" matches "/*" not "/news*"
   defp match_wildcard_route(routes, route) do
     routes
-    |> Enum.sort(&(&1 >= &2))
+    |> Enum.reverse()
     |> Enum.find(&matching_wildcard_route?(&1, route))
   end
 
