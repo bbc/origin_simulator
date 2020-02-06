@@ -12,148 +12,7 @@ defmodule OriginSimulatorTest do
     Process.sleep(10)
   end
 
-  describe "GET /_admin/status" do
-    test "will return 'OK'" do
-      conn(:get, "/#{admin_domain()}/status")
-      |> OriginSimulator.call([])
-      |> assert_status_body(200, "ok!")
-      |> assert_resp_header({"content-type", ["text/plain; charset=utf-8"]})
-    end
-
-    test "will not match request with similar path" do
-      conn(:get, "/another_domain/status")
-      |> OriginSimulator.call([])
-      |> assert_status_body(406, recipe_not_set_message("/another_domain/status"))
-      |> assert_resp_header({"content-type", ["text/html; charset=utf-8"]})
-    end
-  end
-
-  describe "GET /_admin/routes" do
-    test "return default route" do
-      conn(:get, "/#{admin_domain()}/routes")
-      |> OriginSimulator.call([])
-      |> assert_status_body(200, "/*")
-      |> assert_resp_header({"content-type", ["text/plain; charset=utf-8"]})
-    end
-
-    test "will not match request with similar path" do
-      conn(:get, "/another_domain/routes")
-      |> OriginSimulator.call([])
-      |> assert_status_body(406, recipe_not_set_message("/another_domain/routes"))
-      |> assert_resp_header({"content-type", ["text/html; charset=utf-8"]})
-    end
-  end
-
-  describe "GET /_admin/routes_status" do
-    test "return default route" do
-      conn(:get, "/#{admin_domain()}/routes_status")
-      |> OriginSimulator.call([])
-      |> assert_status_body(200, "/* 406 0")
-      |> assert_resp_header({"content-type", ["text/plain; charset=utf-8"]})
-    end
-
-    test "will not match request with similar path" do
-      conn(:get, "/another_domain/routes_status")
-      |> OriginSimulator.call([])
-      |> assert_status_body(406, recipe_not_set_message("/another_domain/routes_status"))
-      |> assert_resp_header({"content-type", ["text/html; charset=utf-8"]})
-    end
-  end
-
-  describe "GET /_admin/restart" do
-    test "return default route" do
-      conn(:get, "/_admin/restart")
-      |> OriginSimulator.call([])
-      |> assert_status_body(200, "ok!")
-      |> assert_resp_header({"content-type", ["text/plain; charset=utf-8"]})
-    end
-
-    test "will not match request with similar path" do
-      conn(:get, "/another_domain/restart")
-      |> OriginSimulator.call([])
-      |> assert_status_body(406, recipe_not_set_message("/another_domain/restart"))
-      |> assert_resp_header({"content-type", ["text/html; charset=utf-8"]})
-    end
-  end
-
-  describe "GET /_admin/current_recipe" do
-    test "will return an error message if payload has not been set" do
-      conn(:get, "/#{admin_domain()}/current_recipe")
-      |> OriginSimulator.call([])
-      |> assert_status_body(200, "\"Recipe not set, please POST a recipe to /_admin/add_recipe\"")
-      |> assert_resp_header({"content-type", ["application/json; charset=utf-8"]})
-    end
-
-    test "will not match request with similar path" do
-      conn(:get, "/another_domain/current_recipe")
-      |> OriginSimulator.call([])
-      |> assert_status_body(406, recipe_not_set_message("/another_domain/current_recipe"))
-      |> assert_resp_header({"content-type", ["text/html; charset=utf-8"]})
-    end
-
-    test "will return the payload if set" do
-      payload = [origin_recipe()] |> Poison.encode!()
-      conn(:post, "/#{admin_domain()}/add_recipe", payload) |> OriginSimulator.call([])
-
-      conn(:get, "/#{admin_domain()}/current_recipe")
-      |> OriginSimulator.call([])
-      |> assert_status_body(200, payload)
-      |> assert_resp_header({"content-type", ["application/json; charset=utf-8"]})
-    end
-
-    test "will return the payload if set for ranged latencies" do
-      payload = [origin_recipe_range_latency()] |> Poison.encode!()
-      conn(:post, "/#{admin_domain()}/add_recipe", payload) |> OriginSimulator.call([])
-
-      conn(:get, "/#{admin_domain()}/current_recipe")
-      |> OriginSimulator.call([])
-      |> assert_status_body(200, payload)
-      |> assert_resp_header({"content-type", ["application/json; charset=utf-8"]})
-    end
-
-    test "will return the headers in the payload when provided" do
-      payload = [origin_recipe_headers()] |> Poison.encode!()
-      conn(:post, "/#{admin_domain()}/add_recipe", payload) |> OriginSimulator.call([])
-
-      conn(:get, "/#{admin_domain()}/current_recipe")
-      |> OriginSimulator.call([])
-      |> assert_status_body(200, payload)
-      |> assert_resp_header({"content-type", ["application/json; charset=utf-8"]})
-    end
-
-    test "will return multi-recipe payload if set" do
-      payload = multi_route_origin_recipes() |> Poison.encode!()
-
-      conn(:post, "/#{admin_domain()}/add_recipe", payload)
-      |> OriginSimulator.call([])
-      |> assert_status_body(201, payload)
-      |> assert_resp_header({"content-type", ["application/json; charset=utf-8"]})
-    end
-  end
-
-  describe "POST /_admin/add_recipe" do
-    test "handle recipe upload" do
-      payload = [origin_recipe()] |> Poison.encode!()
-
-      conn(:post, "/#{admin_domain()}/add_recipe", payload)
-      |> OriginSimulator.call([])
-      |> assert_status_body(201, payload)
-      |> assert_resp_header({"content-type", ["application/json; charset=utf-8"]})
-    end
-
-    # TODO: need fixing, see comment near `post "/:admin/add_recipe"`
-    # in `lib/origin_simulator.ex` ~line 42
-    test "handle malformed recipe", do: true
-
-    test "will not match request with similar path" do
-      conn(:get, "/another_domain/add_recipe")
-      |> OriginSimulator.call([])
-      |> assert_status_body(406, recipe_not_set_message("/another_domain/add_recipe"))
-      |> assert_resp_header({"content-type", ["text/html; charset=utf-8"]})
-    end
-  end
-
-  describe "GET page" do
+  describe "GET / when a recipe is set" do
     test "will return the origin page" do
       payload = origin_recipe() |> Poison.encode!()
       conn(:post, "/#{admin_domain()}/add_recipe", payload) |> OriginSimulator.call([])
@@ -214,15 +73,9 @@ defmodule OriginSimulatorTest do
       assert get_resp_header(conn, "content-type") == ["text/html; charset=utf-8"]
       assert String.length(conn.resp_body) == 50 * 1024
     end
-
-    test "will return an error message if recipe has not been set" do
-      conn(:get, "/")
-      |> OriginSimulator.call([])
-      |> assert_status_body(406, recipe_not_set_message("/"))
-    end
   end
 
-  describe "POST page" do
+  describe "POST / when a recipe is set" do
     test "will return the origin page" do
       payload = origin_recipe() |> Poison.encode!()
       conn(:post, "/#{admin_domain()}/add_recipe", payload) |> OriginSimulator.call([])
@@ -243,6 +96,238 @@ defmodule OriginSimulatorTest do
       |> OriginSimulator.call([])
       |> assert_status_body(200, body_mock(type: :json))
       |> assert_resp_header({"content-type", ["application/json; charset=utf-8"]})
+    end
+  end
+
+  describe "when a recipe is not set" do
+    test "GET / will return an error message" do
+      conn(:get, "/")
+      |> OriginSimulator.call([])
+      |> assert_status_body(406, recipe_not_set_message("/"))
+    end
+
+    test "POST / will return an error message" do
+      conn(:post, "/")
+      |> OriginSimulator.call([])
+      |> assert_status_body(406, recipe_not_set_message("/"))
+    end
+  end
+
+  describe "when a recipe with route and origin is set" do
+    setup :origin_payload
+
+    test "GET routed page will return the origin page", %{payload: payload} do
+      conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload))
+      |> OriginSimulator.call([])
+
+      Process.sleep(20)
+
+      conn(:get, payload["route"])
+      |> OriginSimulator.call([])
+      |> assert_status_body(200, body_mock())
+    end
+
+    test "GET routed (wildcard) page will return the origin page", %{payload: payload} do
+      payload = Map.put(payload, "route", "/news*")
+
+      conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload))
+      |> OriginSimulator.call([])
+
+      Process.sleep(20)
+
+      conn(:get, "/news/uk-politics-51287430")
+      |> OriginSimulator.call([])
+      |> assert_status_body(200, body_mock())
+    end
+
+    test "POST \"\" to routed page will return the origin page", %{payload: payload} do
+      conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload))
+      |> OriginSimulator.call([])
+
+      Process.sleep(20)
+
+      conn(:post, payload["route"], "")
+      |> OriginSimulator.call([])
+      |> assert_status_body(200, body_mock())
+    end
+
+    test "POST \"\" to routed (wildcard) page will return the origin page", %{payload: payload} do
+      payload = Map.put(payload, "route", "/news*")
+
+      conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload))
+      |> OriginSimulator.call([])
+
+      Process.sleep(20)
+
+      conn(:post, "/news/uk-politics-51287430", "")
+      |> OriginSimulator.call([])
+      |> assert_status_body(200, body_mock())
+    end
+
+    test "GET /* will return the origin page", %{payload: payload} do
+      payload = Map.put(payload, "route", "/*")
+
+      conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload))
+      |> OriginSimulator.call([])
+
+      Process.sleep(20)
+
+      conn(:get, "/any_path")
+      |> OriginSimulator.call([])
+      |> assert_status_body(200, body_mock())
+    end
+
+    test "GET non-matching route will return error", %{payload: payload} do
+      conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload))
+      |> OriginSimulator.call([])
+
+      Process.sleep(20)
+
+      conn(:get, "/not_matching_random_path")
+      |> OriginSimulator.call([])
+      |> assert_status_body(406, recipe_not_set_message("/not_matching_random_path"))
+    end
+
+    test "GET non-matching route (widlcard) will return error", %{payload: payload} do
+      payload = Map.put(payload, "route", "/news*")
+
+      conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload))
+      |> OriginSimulator.call([])
+
+      Process.sleep(20)
+
+      conn(:get, "/cbbc")
+      |> OriginSimulator.call([])
+      |> assert_status_body(406, recipe_not_set_message("/cbbc"))
+    end
+  end
+
+  describe "when a recipe with route and body is set" do
+    setup :body_payload
+
+    test "GET routed page will return the body", %{payload: payload} do
+      conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload))
+      |> OriginSimulator.call([])
+
+      Process.sleep(20)
+
+      conn(:get, payload["route"])
+      |> OriginSimulator.call([])
+      |> assert_status_body(200, body_mock(type: :json))
+    end
+
+    test "GET routed (wildcard) page will return the body", %{payload: payload} do
+      payload = Map.put(payload, "route", "/news*")
+
+      conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload))
+      |> OriginSimulator.call([])
+
+      Process.sleep(20)
+
+      conn(:get, "/news/uk-politics-51287430")
+      |> OriginSimulator.call([])
+      |> assert_status_body(200, body_mock(type: :json))
+    end
+
+    test "POST \"\" to routed page will return the body", %{payload: payload} do
+      conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload))
+      |> OriginSimulator.call([])
+
+      Process.sleep(20)
+
+      conn(:post, payload["route"])
+      |> OriginSimulator.call([])
+      |> assert_status_body(200, body_mock(type: :json))
+    end
+
+    test "POST \"\" to routed (wildcard) page will return the body", %{payload: payload} do
+      payload = Map.put(payload, "route", "/news*")
+
+      conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload))
+      |> OriginSimulator.call([])
+
+      Process.sleep(20)
+
+      conn(:post, "/news/uk-politics-51287430")
+      |> OriginSimulator.call([])
+      |> assert_status_body(200, body_mock(type: :json))
+    end
+
+    test "GET /* will return the body", %{payload: payload} do
+      payload = Map.put(payload, "route", "/*")
+
+      conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload))
+      |> OriginSimulator.call([])
+
+      Process.sleep(20)
+
+      conn(:get, "/news/uk-politics-51287430")
+      |> OriginSimulator.call([])
+      |> assert_status_body(200, body_mock(type: :json))
+
+      conn(:get, "/sport/tennis/51291122")
+      |> OriginSimulator.call([])
+      |> assert_status_body(200, body_mock(type: :json))
+    end
+
+    test "GET non-matching route will return error", %{payload: payload} do
+      conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload))
+      |> OriginSimulator.call([])
+
+      Process.sleep(20)
+
+      conn(:get, "/random_path")
+      |> OriginSimulator.call([])
+      |> assert_status_body(406, recipe_not_set_message("/random_path"))
+    end
+
+    test "GET non-matching route (widlcard) will return error", %{payload: payload} do
+      payload = Map.put(payload, "route", "/news*")
+
+      conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload))
+      |> OriginSimulator.call([])
+
+      Process.sleep(20)
+
+      conn(:get, "/sport")
+      |> OriginSimulator.call([])
+      |> assert_status_body(406, recipe_not_set_message("/sport"))
+    end
+  end
+
+  describe "when a recipe with multiple routes and origins is set" do
+    test "GET /* route will return the origin page" do
+      payload = [
+        %{
+          "route" => "/*",
+          "origin" => "https://www.bbc.co.uk/news",
+          "stages" => [%{"at" => 0, "status" => 200, "latency" => 0}]
+        }
+      ]
+
+      conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload))
+      |> OriginSimulator.call([])
+
+      Process.sleep(20)
+
+      conn(:get, "/any_path")
+      |> OriginSimulator.call([])
+      |> assert_status_body(200, body_mock())
+    end
+
+    test "GET multiple routes will return the origin page" do
+      payload = multi_route_origin_payload()
+
+      conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload))
+      |> OriginSimulator.call([])
+
+      Process.sleep(20)
+
+      for route <- payload |> Enum.map(& &1["route"]) do
+        conn(:get, route)
+        |> OriginSimulator.call([])
+        |> assert_status_body(200, body_mock())
+      end
     end
   end
 end
