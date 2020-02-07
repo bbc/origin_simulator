@@ -4,6 +4,7 @@ defmodule OriginSimulator.AdminRouterTest do
 
   import Fixtures
   import TestHelpers
+  import OriginSimulator, only: [recipe_not_set: 1]
 
   setup do
     OriginSimulator.Simulation.restart()
@@ -21,7 +22,7 @@ defmodule OriginSimulator.AdminRouterTest do
     test "will not match request with similar path" do
       conn(:get, "/another_domain/status")
       |> OriginSimulator.call([])
-      |> assert_status_body(406, recipe_not_set_message("/another_domain/status"))
+      |> assert_status_body(406, recipe_not_set("/another_domain/status"))
       |> assert_resp_header({"content-type", ["text/html; charset=utf-8"]})
     end
   end
@@ -37,7 +38,7 @@ defmodule OriginSimulator.AdminRouterTest do
     test "will not match request with similar path" do
       conn(:get, "/another_domain/routes")
       |> OriginSimulator.call([])
-      |> assert_status_body(406, recipe_not_set_message("/another_domain/routes"))
+      |> assert_status_body(406, recipe_not_set("/another_domain/routes"))
       |> assert_resp_header({"content-type", ["text/html; charset=utf-8"]})
     end
   end
@@ -53,7 +54,7 @@ defmodule OriginSimulator.AdminRouterTest do
     test "will not match request with similar path" do
       conn(:get, "/another_domain/routes_status")
       |> OriginSimulator.call([])
-      |> assert_status_body(406, recipe_not_set_message("/another_domain/routes_status"))
+      |> assert_status_body(406, recipe_not_set("/another_domain/routes_status"))
       |> assert_resp_header({"content-type", ["text/html; charset=utf-8"]})
     end
   end
@@ -69,7 +70,7 @@ defmodule OriginSimulator.AdminRouterTest do
     test "will not match request with similar path" do
       conn(:get, "/another_domain/restart")
       |> OriginSimulator.call([])
-      |> assert_status_body(406, recipe_not_set_message("/another_domain/restart"))
+      |> assert_status_body(406, recipe_not_set("/another_domain/restart"))
       |> assert_resp_header({"content-type", ["text/html; charset=utf-8"]})
     end
   end
@@ -85,7 +86,7 @@ defmodule OriginSimulator.AdminRouterTest do
     test "will not match request with similar path" do
       conn(:get, "/another_domain/current_recipe")
       |> OriginSimulator.call([])
-      |> assert_status_body(406, recipe_not_set_message("/another_domain/current_recipe"))
+      |> assert_status_body(406, recipe_not_set("/another_domain/current_recipe"))
       |> assert_resp_header({"content-type", ["text/html; charset=utf-8"]})
     end
 
@@ -146,7 +147,7 @@ defmodule OriginSimulator.AdminRouterTest do
     test "will not match request with similar path" do
       conn(:get, "/another_domain/add_recipe")
       |> OriginSimulator.call([])
-      |> assert_status_body(406, recipe_not_set_message("/another_domain/add_recipe"))
+      |> assert_status_body(406, recipe_not_set("/another_domain/add_recipe"))
       |> assert_resp_header({"content-type", ["text/html; charset=utf-8"]})
     end
   end

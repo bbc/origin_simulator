@@ -4,6 +4,7 @@ defmodule OriginSimulatorTest do
 
   import Fixtures
   import TestHelpers
+  import OriginSimulator, only: [recipe_not_set: 1]
 
   doctest OriginSimulator
 
@@ -103,13 +104,13 @@ defmodule OriginSimulatorTest do
     test "GET / will return an error message" do
       conn(:get, "/")
       |> OriginSimulator.call([])
-      |> assert_status_body(406, recipe_not_set_message("/"))
+      |> assert_status_body(406, recipe_not_set("/"))
     end
 
     test "POST / will return an error message" do
       conn(:post, "/")
       |> OriginSimulator.call([])
-      |> assert_status_body(406, recipe_not_set_message("/"))
+      |> assert_status_body(406, recipe_not_set("/"))
     end
   end
 
@@ -185,7 +186,7 @@ defmodule OriginSimulatorTest do
 
       conn(:get, "/not_matching_random_path")
       |> OriginSimulator.call([])
-      |> assert_status_body(406, recipe_not_set_message("/not_matching_random_path"))
+      |> assert_status_body(406, recipe_not_set("/not_matching_random_path"))
     end
 
     test "GET non-matching route (widlcard) will return error", %{payload: payload} do
@@ -198,7 +199,7 @@ defmodule OriginSimulatorTest do
 
       conn(:get, "/cbbc")
       |> OriginSimulator.call([])
-      |> assert_status_body(406, recipe_not_set_message("/cbbc"))
+      |> assert_status_body(406, recipe_not_set("/cbbc"))
     end
   end
 
@@ -278,7 +279,7 @@ defmodule OriginSimulatorTest do
 
       conn(:get, "/random_path")
       |> OriginSimulator.call([])
-      |> assert_status_body(406, recipe_not_set_message("/random_path"))
+      |> assert_status_body(406, recipe_not_set("/random_path"))
     end
 
     test "GET non-matching route (widlcard) will return error", %{payload: payload} do
@@ -291,7 +292,7 @@ defmodule OriginSimulatorTest do
 
       conn(:get, "/sport")
       |> OriginSimulator.call([])
-      |> assert_status_body(406, recipe_not_set_message("/sport"))
+      |> assert_status_body(406, recipe_not_set("/sport"))
     end
   end
 
