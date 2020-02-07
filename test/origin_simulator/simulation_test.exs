@@ -1,7 +1,7 @@
 defmodule OriginSimulator.SimulationTest do
   use ExUnit.Case
 
-  import Fixtures
+  import Fixtures.Recipes
 
   alias OriginSimulator.{Simulation, Recipe}
 

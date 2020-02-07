@@ -3,6 +3,7 @@ defmodule OriginSimulatorTest do
   use Plug.Test
 
   import Fixtures
+  import Fixtures.Recipes
   import TestHelpers
   import OriginSimulator, only: [recipe_not_set: 1]
 
