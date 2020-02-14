@@ -1,8 +1,10 @@
 defmodule OriginSimulator do
   use Plug.Router
   alias OriginSimulator.{Payload, Recipe, Simulation, PlugResponseCounter, Counter}
-  plug(PlugResponseCounter)
 
+  @default_route Recipe.default_route()
+
+  plug(PlugResponseCounter)
   plug(:match)
   plug(:dispatch)
 
@@ -39,31 +41,54 @@ defmodule OriginSimulator do
     Process.sleep(10)
 
     recipe = Recipe.parse(Plug.Conn.read_body(conn))
-    Simulation.add_recipe(:simulation, recipe)
+    response = Simulation.add_recipe(:simulation, recipe)
+
+    {status, body, content_type} =
+      case response do
+        :ok -> {201, Poison.encode!(Simulation.recipe(:simulation)), "application/json"}
+        :error -> {406, "Not Acceptable", "text/html"}
+      end
 
     conn
-    |> put_resp_content_type("application/json")
-    |> send_resp(201, Poison.encode!(Simulation.recipe(:simulation)))
+    |> put_resp_content_type(content_type)
+    |> send_resp(status, body)
   end
 
   get "/*glob" do
-    serve_payload(conn)
+    serve_payload_for_route(conn, Simulation.route(:simulation), conn.request_path)
   end
 
   post "/*glob" do
-    serve_payload(conn)
+    serve_payload_for_route(conn, Simulation.route(:simulation), conn.request_path)
   end
 
   match _ do
     send_resp(conn, 404, "not found")
   end
 
-  defp serve_payload(conn) do
+  defp serve_payload_for_route(conn, @default_route, _), do: serve_payload(conn)
+
+  defp serve_payload_for_route(conn, route, path) when route == path,
+    do: serve_payload(conn, route)
+
+  defp serve_payload_for_route(conn, route, path) do
+    cond do
+      # wildcard regex matching
+      String.ends_with?(route, "*") && String.match?(path, ~r/^#{route}/) ->
+        serve_payload(conn, route)
+
+      true ->
+        msg = "Recipe not set at #{path}, please POST a recipe for this route to /add_recipe"
+        conn |> send_resp(406, msg)
+    end
+  end
+
+  defp serve_payload(conn, route \\ @default_route) do
     {status, latency} = Simulation.state(:simulation)
 
     sleep(latency)
 
-    {:ok, body} = Payload.body(:payload, status)
+    {:ok, body} = Payload.body(:payload, status, route)
 
     recipe = Simulation.recipe(:simulation)
 

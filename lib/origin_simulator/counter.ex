@@ -12,7 +12,7 @@ defmodule OriginSimulator.Counter do
   end
 
   def clear do
-    Agent.update(__MODULE__, fn state ->
+    Agent.update(__MODULE__, fn _state ->
       @initial_state
     end)
   end

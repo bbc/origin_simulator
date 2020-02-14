@@ -1,58 +1,73 @@
 defmodule OriginSimulator.SimulationTest do
   use ExUnit.Case
 
-  alias OriginSimulator.Simulation
+  import Fixtures
 
-  def test_recipe() do
-    %OriginSimulator.Recipe{origin: "foo",
-                            stages: [%{"at" => 0, "status" => 200, "latency" => "1s"}]}
-  end
-
-  def test_range_recipe() do
-    %OriginSimulator.Recipe{origin: "foo",
-                            stages: [%{"at" => 0, "status" => 200, "latency" => "1s..1200ms"}]}
-  end
-
-  def test_recipe_with_multiple_stages() do
-    %OriginSimulator.Recipe{origin: "foo",
-                            stages: [%{"at" => 0, "status" => 200, "latency" => "0s"},
-                                     %{"at" => "60ms", "status" => 503, "latency" => "1s"}]}
-  end
+  alias OriginSimulator.{Simulation, Recipe}
 
   describe "with loaded recipe" do
     setup do
-      Simulation.add_recipe(:simulation, test_recipe())
+      stages = [%{"at" => 0, "status" => 200, "latency" => "1s"}]
+      recipe = recipe(origin: "foo", stages: stages)
+      Simulation.add_recipe(:simulation, recipe)
       Process.sleep(5)
+
+      {:ok, recipe: recipe}
     end
 
     test "state() returns a tuple with http status and latency in ms" do
       assert Simulation.state(:simulation) == {200, 1000}
     end
 
-    test "recipe() returns the loaded recipe" do
-      assert Simulation.recipe(:simulation) == test_recipe()
+    test "recipe() returns the loaded recipe", %{recipe: recipe} do
+      assert Simulation.recipe(:simulation) == recipe
+    end
+
+    test "route() returns route", %{recipe: recipe} do
+      assert Simulation.route(:simulation) == recipe |> Map.get(:route)
+    end
+  end
+
+  describe "with a list of multiple recipes" do
+    # multiple recipes currently unsupported
+    test "add_recipe() returns error" do
+      stages = [%{"at" => 0, "status" => 200, "latency" => "1s"}]
+      recipe = recipe(origin: "foo", stages: stages)
+      assert Simulation.add_recipe(:simulation, [recipe, recipe, recipe]) == :error
     end
   end
 
   describe "with a recipe containing a range" do
     setup do
-      Simulation.add_recipe(:simulation, test_range_recipe())
+      stages = [%{"at" => 0, "status" => 200, "latency" => "1s..1200ms"}]
+      recipe = recipe(origin: "foo", stages: stages)
+      Simulation.add_recipe(:simulation, recipe)
       Process.sleep(5)
+
+      {:ok, recipe: recipe}
     end
 
     test "state() returns a tuple with http status and latency in ms" do
       assert Simulation.state(:simulation) == {200, 1000..1200}
     end
 
-    test "recipe() returns the loaded recipe" do
-      assert Simulation.recipe(:simulation) == test_range_recipe()
+    test "recipe() returns the loaded recipe", %{recipe: recipe} do
+      assert Simulation.recipe(:simulation) == recipe
     end
   end
 
   describe "with a recipe containing multiple stages" do
     setup do
-      Simulation.add_recipe(:simulation, test_recipe_with_multiple_stages())
+      stages = [
+        %{"at" => 0, "status" => 200, "latency" => "0s"},
+        %{"at" => "60ms", "status" => 503, "latency" => "1s"}
+      ]
+
+      recipe = recipe(origin: "foo", stages: stages)
+      Simulation.add_recipe(:simulation, recipe)
       Process.sleep(5)
+
+      {:ok, recipe: recipe}
     end
 
     test "state() returns a tuple with http status and latency in ms" do
@@ -61,8 +76,8 @@ defmodule OriginSimulator.SimulationTest do
       assert Simulation.state(:simulation) == {503, 1000}
     end
 
-    test "recipe() returns the loaded recipe" do
-      assert Simulation.recipe(:simulation) == test_recipe_with_multiple_stages()
+    test "recipe() returns the loaded recipe", %{recipe: recipe} do
+      assert Simulation.recipe(:simulation) == recipe
     end
   end
 
@@ -78,6 +93,10 @@ defmodule OriginSimulator.SimulationTest do
 
     test "recipe() returns nil" do
       assert Simulation.recipe(:simulation) == nil
+    end
+
+    test "route() returns default route" do
+      assert Simulation.route(:simulation) == Recipe.default_route()
     end
   end
 end
