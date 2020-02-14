@@ -1,10 +1,14 @@
 Code.require_file("fixtures/fixtures.exs", __DIR__)
+Code.require_file("fixtures/recipes.exs", __DIR__)
 
 ExUnit.start()
+
 
 defmodule TestHelpers do
   use Plug.Test
   import ExUnit.Assertions
+
+  def admin_domain(), do: OriginSimulator.admin_domain()
 
   def assert_status_body(conn, status, body) do
     assert conn.state == :sent

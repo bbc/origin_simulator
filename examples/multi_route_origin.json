@@ -1,0 +1,57 @@
+[
+  {
+    "route": "/",
+    "origin": "https://www.bbc.co.uk/",
+    "stages": [
+      {
+        "at": 0,
+        "status": 200,
+        "latency": 0
+      }
+    ]
+  },
+  {
+    "route": "/news*",
+    "origin": "https://www.bbc.co.uk/news",
+    "stages": [
+      {
+        "at": 0,
+        "status": 200,
+        "latency": 0
+      }
+    ]
+  },
+  {
+    "route": "/sport",
+    "origin": "https://www.bbc.co.uk/sport",
+    "stages": [
+      {
+        "at": 0,
+        "status": 200,
+        "latency": 0
+      }
+    ]
+  },
+  {
+    "route": "/sounds",
+    "origin": "https://www.bbc.co.uk/sounds",
+    "stages": [
+      {
+        "at": 0,
+        "status": 200,
+        "latency": 0
+      }
+    ]
+  },
+  {
+    "route": "/weather",
+    "origin": "https://www.bbc.co.uk/weather",
+    "stages": [
+      {
+        "at": 0,
+        "status": 200,
+        "latency": 0
+      }
+    ]
+  }
+]

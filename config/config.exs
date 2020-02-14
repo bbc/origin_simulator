@@ -20,5 +20,6 @@ use Mix.Config
 #
 config :origin_simulator, env: Mix.env()
 config :origin_simulator, http_port: 8080
+config :origin_simulator, admin_domain: "_admin"
 
 import_config "#{Mix.env()}.exs"

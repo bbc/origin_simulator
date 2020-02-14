@@ -6,7 +6,7 @@ defmodule Mix.Tasks.UploadRecipe do
 
     recipe = get_json("./examples/#{recipe}.json")
 
-    HTTPoison.post("#{host}/add_recipe", recipe)
+    HTTPoison.post("#{host}/_admin/add_recipe", recipe)
   end
 
   def run([recipe]) do

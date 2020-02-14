@@ -1,0 +1,112 @@
+[
+	{
+		"random_content": "50kb",
+		"route": "/payload_50kb",
+		"stages": [
+			{
+				"at": 0,
+				"status": 200,
+				"latency": 0
+			}
+		]
+	},
+	{
+		"random_content": "100kb",
+		"route": "/payload_100kb",
+		"stages": [
+			{
+				"at": 0,
+				"status": 200,
+				"latency": 0
+			}
+		]
+	},
+	{
+		"random_content": "150kb",
+		"route": "/payload_150kb",
+		"stages": [
+			{
+				"at": 0,
+				"status": 200,
+				"latency": 0
+			}
+		]
+	},
+	{
+		"random_content": "200kb",
+		"route": "/payload_200kb",
+		"stages": [
+			{
+				"at": 0,
+				"status": 200,
+				"latency": 0
+			}
+		]
+	},
+	{
+		"random_content": "250kb",
+		"route": "/payload_250kb",
+		"stages": [
+			{
+				"at": 0,
+				"status": 200,
+				"latency": 0
+			}
+		]
+	},
+	{
+		"random_content": "300kb",
+		"route": "/payload_300kb",
+		"stages": [
+			{
+				"at": 0,
+				"status": 200,
+				"latency": 0
+			}
+		]
+	},
+	{
+		"random_content": "350kb",
+		"route": "/payload_350kb",
+		"stages": [
+			{
+				"at": 0,
+				"status": 200,
+				"latency": 0
+			}
+		]
+	},
+	{
+		"random_content": "400kb",
+		"route": "/payload_400kb",
+		"stages": [
+			{
+				"at": 0,
+				"status": 200,
+				"latency": 0
+			}
+		]
+	},
+	{
+		"random_content": "450kb",
+		"route": "/payload_450kb",
+		"stages": [
+			{
+				"at": 0,
+				"status": 200,
+				"latency": 0
+			}
+		]
+	},
+	{
+		"random_content": "500kb",
+		"route": "/payload_500kb",
+		"stages": [
+			{
+				"at": 0,
+				"status": 200,
+				"latency": 0
+			}
+		]
+	}
+]

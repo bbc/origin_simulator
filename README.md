@@ -51,11 +51,34 @@ A JSON recipe defines the different stages of the scenario. This is an example o
 ```
 
 Where `at` represents the time points (in milliseconds) for a state mutation, and latency the simulated response time in milliseconds. In this case:
+
 ```
   0s                     4s                   6s                  ∞
   *──────────────────────*────────────────────*───────────────────▶
 
        HTTP 404 50ms           HTTP 503 2s       HTTP 200 100ms
+```
+
+The recipe can also be a list of simulation scenarios, as descirbed in [multi-route origin simulation](#multi-route-origin-simulation) below.
+
+```json
+[
+	{
+		"origin": "...",
+		"stages": "...",
+		..
+	},
+	{
+		"origin": "...",
+		"stages": "...",
+		..
+	},
+	{
+		"origin": "..",
+		"stages": "...",
+		..
+	}
+]
 ```
 
 ## Latency
@@ -146,6 +169,96 @@ simulate JSON contracts, structured text, etc.
 }
 ```
 
+## Multi-route origin simulation
+
+OriginSimulator can also provide multiple origins simulation. Each origin is specified with a recipe and accessible through a `route` (request path) on the simulator. This is an example of specifying multiple origins with different routes:
+
+```json
+[
+  {
+    "route": "/",
+    "origin": "https://www.bbc.co.uk/",
+    "stages": [
+      {
+        "at": 0,
+        "status": 200,
+        "latency": "100ms"
+      }
+    ]
+  },
+  {
+    "route": "/news*",
+    "origin": "https://www.bbc.co.uk/news",
+    "stages": [
+      {
+        "at": 0,
+        "status": 200,
+        "latency": 0
+      }
+    ]
+  },
+  {
+    "route": "/sport",
+    "origin": "https://www.bbc.co.uk/sport",
+    "stages": [
+      {
+        "at": 0,
+        "status": 200,
+        "latency": "1s"
+      },
+      {
+        "at": "5s",
+        "status": 200,
+        "latency": "100ms"
+      }
+    ]
+  }
+]
+```
+
+Where `route` is the request path on the simulator from which the corresponding origin can be accessed. A wildcard route may be used to match paths of the same domain, e.g. `/news*` (above) for `/news/business-51443421`. 
+
+The wildcard root route (`/*`) is the default If no route is specified for a scenario.
+
+Multiple origins of mixed sources can also be specified:
+
+```
+[
+  {
+    "route": "/data/api",
+    "body": "{\"data\":\"<<256kb>>\", \"metadata\":\"<<128b>>and<<16b>>\", \"collection\":[\"<<128kb>>\", \"<<256kb>>\"]}\"}",
+    "stages": [
+        {
+            "at": 0,
+            "latency": "100ms",
+            "status": 200
+        }
+    ]
+  },
+  {
+    "route": "/news",
+    "origin": "https://www.bbc.co.uk/news",
+    "stages": [
+      {
+        "at": 0,
+        "status": 404,
+        "latency": "50ms"
+      },
+      {
+        "at": "2s",
+        "status": 503,
+        "latency": "2s"
+      },
+      {
+        "at": "4s",
+        "status": 200,
+        "latency": "100ms"
+      }
+    ]
+  }
+]
+```
+
 ## Usage
 
 You can post recipes using `curl` and the `mix upload_recipe` task.
@@ -162,7 +275,7 @@ iex(1)>
 The app is now ready, but still waiting for a recipe:
 ```shell
 $ curl http://127.0.0.1:8080/current_recipe
-"Not set, please POST a recipe to /add_recipe"⏎
+"Recipe not set, please POST a recipe to /add_recipe"⏎
 
 $ curl -i http://127.0.0.1:8080/
 HTTP/1.1 406 Not Acceptable
@@ -203,13 +316,41 @@ HTTP/1.1 200 OK
 ...
 ```
 
-At any time you can reset the scenario by simply POSTing a new one to `/add_recipe`.
+At any time you can reset the scenario by simply POSTing a new one to `/add_recipe`. 
+
+In multiple origins scenario, new origins and routes can be added to the existing ones through `/add_recipe`. Existing scenarios can also be updated. For example you can "take down" an origin by updating its recipe with 500 status.
 
 #### Using `mix upload_recipe`
 `mix upload_recipe demo` will upload the recipe located at `examples/demo.json` to origin simulator running locally.
 
 If you have deployed origin simulator, you can specify the host when uploading the recipe. For example:
 `mix upload_recipe "http://origin-simulator.com" demo`
+
+#### Admin routes
+
+* /_admin/status
+
+Check if the simulator is running, return `ok!`
+
+* /_admin/add_recipe
+
+Post (POST) recipe: update or create new origins
+
+* /_admin/current_recipe
+
+List existing recipe for all origins and routes
+
+* /_admin/restart
+
+Reset the simulator: remove all recipes
+
+* /_admin/routes
+
+List all origins and routes
+
+* /_admin/routes_status
+
+List all origin and routes with the corresponding current status and latency values
 
 ## Performance
 

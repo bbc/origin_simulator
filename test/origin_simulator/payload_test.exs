@@ -3,6 +3,7 @@ defmodule OriginSimulator.PayloadTest do
 
   alias OriginSimulator.Recipe
 
+  # TODO: additional tests for fetching and storing multi-origin / source content in ETS
   describe "with origin" do
     setup do
       OriginSimulator.Payload.fetch(:payload, %Recipe{origin: "https://www.bbc.co.uk"})
@@ -17,7 +18,7 @@ defmodule OriginSimulator.PayloadTest do
     end
 
     test "Suggests to add a recipe for 406" do
-      assert OriginSimulator.Payload.body(:payload, 406) == {:ok, "Recipe not set, please POST a recipe to /add_recipe"}
+      assert OriginSimulator.Payload.body(:payload, 406) == {:ok, "Recipe not set, please POST a recipe to /#{OriginSimulator.admin_domain()}/add_recipe"}
     end
 
     test "returns the origin body for 200" do
@@ -39,7 +40,7 @@ defmodule OriginSimulator.PayloadTest do
     end
 
     test "Suggests to add a recipe for 406" do
-      assert OriginSimulator.Payload.body(:payload, 406) == {:ok, "Recipe not set, please POST a recipe to /add_recipe"}
+      assert OriginSimulator.Payload.body(:payload, 406) == {:ok, "Recipe not set, please POST a recipe to /#{OriginSimulator.admin_domain()}/add_recipe"}
     end
 
     test "returns the origin body for 200" do
