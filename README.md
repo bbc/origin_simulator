@@ -274,8 +274,8 @@ iex(1)>
 
 The app is now ready, but still waiting for a recipe:
 ```shell
-$ curl http://127.0.0.1:8080/current_recipe
-"Recipe not set, please POST a recipe to /add_recipe"⏎
+$ curl http://127.0.0.1:8080/_admin/current_recipe
+"Recipe not set, please POST a recipe to /_admin/add_recipe"⏎
 
 $ curl -i http://127.0.0.1:8080/
 HTTP/1.1 406 Not Acceptable
@@ -298,7 +298,7 @@ $ cat examples/demo.json
     ]
 }
 
-$ cat examples/demo.json | curl -X POST -d @- http://127.0.0.1:8080/add_recipe
+$ cat examples/demo.json | curl -X POST -d @- http://127.0.0.1:8080/_admin/add_recipe
 ```
 
 All done! Now at different times the server will respond with the indicated HTTP status code and response time:
@@ -316,9 +316,9 @@ HTTP/1.1 200 OK
 ...
 ```
 
-At any time you can reset the scenario by simply POSTing a new one to `/add_recipe`. 
+At any time you can reset the scenario by simply POSTing a new one to `/_admin/add_recipe`. 
 
-In multiple origins scenario, new origins and routes can be added to the existing ones through `/add_recipe`. Existing scenarios can also be updated. For example you can "take down" an origin by updating its recipe with 500 status.
+In multiple origins scenario, new origins and routes can be added to the existing ones through `/_admin/add_recipe`. Existing scenarios can also be updated. For example you can "take down" an origin by updating its recipe with 500 status.
 
 #### Using `mix upload_recipe`
 `mix upload_recipe demo` will upload the recipe located at `examples/demo.json` to origin simulator running locally.
