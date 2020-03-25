@@ -13,12 +13,12 @@ defmodule OriginSimulator.Payload do
     GenServer.call(server, {:fetch, value, route})
   end
 
-  def fetch(server, %Recipe{body: value, route: route}) when is_binary(value) do
-    GenServer.call(server, {:parse, value, route})
+  def fetch(server, %Recipe{body: value, route: route} = recipe) when is_binary(value) do
+    GenServer.call(server, {:parse, recipe, route})
   end
 
-  def fetch(server, %Recipe{random_content: value, route: route}) when is_binary(value) do
-    GenServer.call(server, {:generate, value, route})
+  def fetch(server, %Recipe{random_content: value, route: route} = recipe) when is_binary(value) do
+    GenServer.call(server, {:generate, recipe, route})
   end
 
   def body(_server, status, path \\ Recipe.default_route(), route \\ Recipe.default_route()) do
@@ -56,15 +56,15 @@ defmodule OriginSimulator.Payload do
   end
 
   @impl true
-  def handle_call({:parse, body, route}, _from, state) do
-    :ets.insert(:payload, {route, Body.parse(body)})
+  def handle_call({:parse, recipe, route}, _from, state) do
+    :ets.insert(:payload, {route, Body.parse(recipe.body)})
 
     {:reply, :ok, state}
   end
 
   @impl true
-  def handle_call({:generate, size, route}, _from, state) do
-    :ets.insert(:payload, {route, Body.randomise(size)})
+  def handle_call({:generate, recipe, route}, _from, state) do
+    :ets.insert(:payload, {route, Body.randomise(recipe.random_content)})
 
     {:reply, :ok, state}
   end
