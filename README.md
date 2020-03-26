@@ -320,6 +320,60 @@ At any time you can reset the scenario by simply POSTing a new one to `/_admin/a
 
 In multiple origins scenario, new origins and routes can be added to the existing ones through `/_admin/add_recipe`. Existing scenarios can also be updated. For example you can "take down" an origin by updating its recipe with 500 status.
 
+#### Response headers
+OriginSimulator can serve HTTP headers in responses. The headers can be specified in recipes:
+
+```json
+{
+  "route": "/news",
+  "origin": "https://www.bbc.co.uk/news",
+  "stages": [
+    {
+      "at": 0,
+      "latency": "100ms",
+      "status": 200
+    }
+  ],
+  "headers": {
+    "connection": "keepalive",
+    "cache-control": "private, max-age=0, no-cache"
+  }
+}
+```
+
+#### Response compression
+For posted and random content recipes, response compression can be specified via the `content-encoding` header. For example, the following recipe returns a gzip random content of 200kb size.
+
+```json
+{
+  "random_content": "200kb",
+  "stages": [
+      { "at": 0, "status": 200, "latency": 0}
+  ],
+  "headers": {
+    "content-encoding": "gzip"
+  }
+}
+```
+
+A corresponding `content-type` header is required for posted `body` which could be of any type (e.g. JSON, HTML, XML):
+
+```json
+{
+  "route": "/data/json",
+  "body": "{\"data\":\"<<256kb>>\", \"metadata\":\"<<128b>>and<<16b>>\", \"collection\":[\"<<128kb>>\", \"<<256kb>>\"]}\"}",
+  "stages": [
+      { "at": 0, "status": 200, "latency": 0}
+  ],
+  "headers": {
+    "content-encoding": "gzip",
+    "content-type": "application/json; charset=utf-8"
+  }
+}
+```
+
+Note: responses of recipes with HTTP origins are currently uncompressed. This will be addressed in due course.
+
 #### Using `mix upload_recipe`
 `mix upload_recipe demo` will upload the recipe located at `examples/demo.json` to origin simulator running locally.
 
