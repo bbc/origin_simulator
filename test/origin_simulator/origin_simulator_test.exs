@@ -49,8 +49,8 @@ defmodule OriginSimulatorTest do
     end
 
     test "will return the parsed body content with respond headers" do
-      payload = body_recipe_headers() |> Poison.encode!()
-      expected_header = body_recipe_headers().headers["response-header"]
+      headers = %{"response-header" => "123"}
+      payload = body_recipe(headers) |> Poison.encode!()
 
       conn(:post, "/#{admin_domain()}/add_recipe", payload) |> OriginSimulator.call([])
       Process.sleep(20)
@@ -59,11 +59,33 @@ defmodule OriginSimulatorTest do
       |> OriginSimulator.call([])
       |> assert_status_body(200, body_mock(type: :json))
       |> assert_resp_header({"content-type", ["application/json; charset=utf-8"]})
-      |> assert_resp_header({"response-header", [expected_header]})
+      |> assert_resp_header({"response-header", [headers["response-header"]]})
+    end
+
+    test "will return gzip parsed body with appropriate headers" do
+      headers = %{
+        "cache-control" => "public, max-age=30",
+        "connection" => "keepalive",
+        "content-encoding" => "gzip",
+        "content-type" => "application/json; charset=utf-8"
+      }
+
+      payload = body_recipe(headers) |> Poison.encode!()
+
+      conn(:post, "/#{admin_domain()}/add_recipe", payload) |> OriginSimulator.call([])
+      Process.sleep(20)
+
+      conn(:get, "/")
+      |> OriginSimulator.call([])
+      |> assert_status_body(200, body_mock(type: :json) |> :zlib.gzip())
+      |> assert_resp_header({"cache-control", ["public, max-age=30"]})
+      |> assert_resp_header({"content-type", ["application/json; charset=utf-8"]})
+      |> assert_resp_header({"content-encoding", ["gzip"]})
+      |> assert_resp_header({"connection", ["keepalive"]})
     end
 
     test "will return random content of the parsed size" do
-      payload = random_content_payload() |> Poison.encode!()
+      payload = random_content_recipe("50kb") |> Poison.encode!()
       conn(:post, "/#{admin_domain()}/add_recipe", payload) |> OriginSimulator.call([])
       Process.sleep(20)
 
@@ -74,6 +96,27 @@ defmodule OriginSimulatorTest do
       assert conn.status == 200
       assert get_resp_header(conn, "content-type") == ["text/html; charset=utf-8"]
       assert String.length(conn.resp_body) == 50 * 1024
+    end
+
+    test "will return gzip random content with appropriate headers" do
+      headers = %{
+        "cache-control" => "public, max-age=30",
+        "connection" => "keepalive",
+        "content-encoding" => "gzip",
+        "content-type" => "text/html; charset=utf-8"
+      }
+
+      payload = random_content_recipe("50kb", headers) |> Poison.encode!()
+      conn(:post, "/#{admin_domain()}/add_recipe", payload) |> OriginSimulator.call([])
+      Process.sleep(20)
+
+      conn = conn(:get, "/")
+      conn = OriginSimulator.call(conn, [])
+
+      assert conn.state == :sent
+      assert conn.status == 200
+      assert get_resp_header(conn, "content-type") == ["text/html; charset=utf-8"]
+      assert String.length(conn.resp_body |> :zlib.gunzip()) == 50 * 1024
     end
   end
 

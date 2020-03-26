@@ -26,18 +26,19 @@ defmodule Fixtures.Recipes do
     }
   end
 
-  def body_recipe() do
-    %Recipe{
-      body: "{\"hello\":\"world\"}",
-      stages: [%{"at" => 0, "status" => 200, "latency" => 0}]
-    }
-  end
-
-  def body_recipe_headers() do
+  def body_recipe(headers \\ %{}) do
     %Recipe{
       body: "{\"hello\":\"world\"}",
       stages: [%{"at" => 0, "status" => 200, "latency" => 0}],
-      headers: %{"response-header" => "Value123"}
+      headers: headers
+    }
+  end
+
+  def random_content_recipe(size \\ "50kb", headers \\ %{}) do
+    %Recipe{
+      random_content: size,
+      stages: [%{"at" => 0, "status" => 200, "latency" => 0}],
+      headers: headers
     }
   end
 
