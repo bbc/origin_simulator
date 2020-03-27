@@ -1,0 +1,14 @@
+{
+  "random_content": "200kb",
+  "stages": [
+    {
+      "at": 0,
+      "status": 200,
+      "latency": 0
+    }
+  ],
+  "headers": {
+    "content-encoding": "gzip",
+    "content-type": "text/html; charset=utf-8"
+  }
+}
