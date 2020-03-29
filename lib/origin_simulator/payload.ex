@@ -3,6 +3,8 @@ defmodule OriginSimulator.Payload do
 
   alias OriginSimulator.{Body, Recipe}
 
+  @http_client Application.get_env(:origin_simulator, :http_client)
+
   ## Client API
 
   def start_link(opts) do
@@ -49,9 +51,7 @@ defmodule OriginSimulator.Payload do
 
   @impl true
   def handle_call({:fetch, origin, route}, _from, state) do
-    env = Application.get_env(:origin_simulator, :env)
-
-    {:ok, %HTTPoison.Response{body: body}} = OriginSimulator.HTTPClient.get(origin, env)
+    {:ok, %HTTPoison.Response{body: body}} = @http_client.get(origin)
     :ets.insert(:payload, {route, body})
     {:reply, :ok, state}
   end
