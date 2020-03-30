@@ -4,10 +4,11 @@ defmodule Fixtures.Recipes do
   def recipe(overrides \\ []), do: struct(Recipe, Keyword.merge(recipe_defaults(), overrides))
   defp recipe_defaults(), do: %Recipe{} |> Map.to_list() |> tl
 
-  def origin_recipe() do
+  def origin_recipe(headers \\ %{}) do
     %Recipe{
       origin: "https://www.bbc.co.uk/news",
-      stages: [%{"at" => 0, "status" => 200, "latency" => 0}]
+      stages: [%{"at" => 0, "status" => 200, "latency" => 0}],
+      headers: headers
     }
   end
 
@@ -15,14 +16,6 @@ defmodule Fixtures.Recipes do
     %Recipe{
       origin: "https://www.bbc.co.uk/news",
       stages: [%{"at" => 0, "status" => 200, "latency" => "100ms..200ms"}]
-    }
-  end
-
-  def origin_recipe_headers() do
-    %Recipe{
-      origin: "https://www.bbc.co.uk/news",
-      stages: [%{"at" => 0, "status" => 200, "latency" => "100ms..200ms"}],
-      headers: %{"X-Foo" => "bar"}
     }
   end
 

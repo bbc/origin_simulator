@@ -111,7 +111,7 @@ defmodule OriginSimulator.AdminRouterTest do
     end
 
     test "will return the headers in the payload when provided" do
-      payload = [origin_recipe_headers()] |> Poison.encode!()
+      payload = [origin_recipe()] |> Poison.encode!()
       conn(:post, "/#{admin_domain()}/add_recipe", payload) |> OriginSimulator.call([])
 
       conn(:get, "/#{admin_domain()}/current_recipe")
