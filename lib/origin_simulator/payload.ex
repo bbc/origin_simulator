@@ -51,7 +51,7 @@ defmodule OriginSimulator.Payload do
 
   @impl true
   def handle_call({:fetch, recipe, route}, _from, state) do
-    {:ok, %HTTPoison.Response{body: body}} = @http_client.get(recipe.origin)
+    {:ok, %HTTPoison.Response{body: body}} = @http_client.get(recipe.origin, recipe.headers)
     :ets.insert(:payload, {route, body})
     {:reply, :ok, state}
   end

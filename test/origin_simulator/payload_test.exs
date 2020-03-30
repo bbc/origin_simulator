@@ -47,4 +47,13 @@ defmodule OriginSimulator.PayloadTest do
       assert OriginSimulator.Payload.body(:payload, 200) == {:ok, "{\"hello\":\"world\"}"}
     end
   end
+
+  describe "gzip response" do
+    test "returns the origin body for 200" do
+      recipe = %Recipe{origin: "https://www.bbc.co.uk", headers: %{"content-encoding" => "gzip"}}
+      OriginSimulator.Payload.fetch(:payload, recipe)
+
+      assert OriginSimulator.Payload.body(:payload, 200) == {:ok, :zlib.gzip("some content from origin")}
+    end
+  end
 end
