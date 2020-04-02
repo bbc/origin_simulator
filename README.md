@@ -342,7 +342,7 @@ OriginSimulator can serve HTTP headers in responses. The headers can be specifie
 ```
 
 #### Response compression
-For posted and random content recipes, response compression can be specified via the `content-encoding` header. For example, the following recipe returns a gzip random content of 200kb size.
+Response compression can be specified via the `content-encoding` header. For example, the following recipe returns a gzip random content of 200kb size.
 
 ```json
 {
@@ -372,7 +372,20 @@ A corresponding `content-type` header is required for posted `body` which could 
 }
 ```
 
-Note: responses of recipes with HTTP origins are currently uncompressed. This will be addressed in due course.
+For recipes with an origin, a gzip response may also be specified with the `"content-encoding": "gzip"` header. OriginSimulator will fetch content from the origin with a `accept-encoding: gzip` header. It will store and serve the gzip content from origin (if provided) during simulation.
+
+```json
+{
+  "route": "/news",
+  "origin": "https://www.bbc.co.uk/news",
+  "stages": [
+      { "at": 0, "status": 200, "latency": 0}
+  ],
+  "headers": {
+    "content-encoding": "gzip"
+  }
+}
+```
 
 #### Using `mix upload_recipe`
 `mix upload_recipe demo` will upload the recipe located at `examples/demo.json` to origin simulator running locally.

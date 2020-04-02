@@ -1,0 +1,10 @@
+{
+    "origin": "https://www.bbc.co.uk/news",
+    "route": "/news",
+    "stages": [
+        { "at": 0, "status": 200, "latency": 0}
+    ],
+    "headers": {
+      "content-encoding": "gzip"
+    }
+}

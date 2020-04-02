@@ -26,6 +26,26 @@ defmodule OriginSimulatorTest do
       |> assert_resp_header({"content-type", ["text/html; charset=utf-8"]})
     end
 
+    test "will return gzip origin page with appropriate headers" do
+      headers = %{
+        "cache-control" => "public, max-age=30",
+        "connection" => "keepalive",
+        "content-encoding" => "gzip"
+      }
+
+      payload = origin_recipe(headers) |> Poison.encode!()
+      conn(:post, "/#{admin_domain()}/add_recipe", payload) |> OriginSimulator.call([])
+      Process.sleep(20)
+
+      conn(:get, "/")
+      |> OriginSimulator.call([])
+      |> assert_status_body(200, body_mock() |> :zlib.gzip())
+      |> assert_resp_header({"cache-control", ["public, max-age=30"]})
+      |> assert_resp_header({"content-type", ["text/html; charset=utf-8"]})
+      |> assert_resp_header({"content-encoding", ["gzip"]})
+      |> assert_resp_header({"connection", ["keepalive"]})
+    end
+
     test "will return the origin page with random latency within range" do
       payload = origin_recipe_range_latency() |> Poison.encode!()
       conn(:post, "/#{admin_domain()}/add_recipe", payload) |> OriginSimulator.call([])

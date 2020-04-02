@@ -3,14 +3,16 @@ defmodule OriginSimulator.Payload do
 
   alias OriginSimulator.{Body, Recipe}
 
+  @http_client Application.get_env(:origin_simulator, :http_client)
+
   ## Client API
 
   def start_link(opts) do
     GenServer.start_link(__MODULE__, opts, name: :payload)
   end
 
-  def fetch(server, %Recipe{origin: value, route: route}) when is_binary(value) do
-    GenServer.call(server, {:fetch, value, route})
+  def fetch(server, %Recipe{origin: value, route: route} = recipe) when is_binary(value) do
+    GenServer.call(server, {:fetch, recipe, route})
   end
 
   def fetch(server, %Recipe{body: value, route: route} = recipe) when is_binary(value) do
@@ -48,10 +50,8 @@ defmodule OriginSimulator.Payload do
   end
 
   @impl true
-  def handle_call({:fetch, origin, route}, _from, state) do
-    env = Application.get_env(:origin_simulator, :env)
-
-    {:ok, %HTTPoison.Response{body: body}} = OriginSimulator.HTTPClient.get(origin, env)
+  def handle_call({:fetch, recipe, route}, _from, state) do
+    {:ok, %HTTPoison.Response{body: body}} = @http_client.get(recipe.origin, recipe.headers)
     :ets.insert(:payload, {route, body})
     {:reply, :ok, state}
   end
