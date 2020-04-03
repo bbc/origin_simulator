@@ -14,6 +14,7 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildArch: x86_64
 
 Requires: erlang
+Requires: belfrage-performance-tuning
 
 %description
 origin_simulator is an elixir web app which responds

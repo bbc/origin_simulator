@@ -8,5 +8,9 @@
     "type": "mirrorlist",
     "url": "https://mirrors.fedoraproject.org/metalink?repo=epel-7&arch=x86_64",
     "gpg_key": "-----BEGIN PGP PUBLIC KEY BLOCK-----\nVersion: GnuPG v1.4.11 (GNU/Linux)\n\nmQINBFKuaIQBEAC1UphXwMqCAarPUH/ZsOFslabeTVO2pDk5YnO96f+rgZB7xArBOSeQk7B90iqS\nJ85/c72OAn4OXYvT63gfCeXpJs5M7emXkPsNQWWSju99lW+AqSNmjYWhmRlLRGl0OO7gIwj776dI\nXvcMNFlzSPj00N2xAqjMbjlnV2n2abAE5gq6VpqPvFXVyfrVa/ualogDVmf6h2t4Rdpifq8qTHsH\nFU3xpCz+T6/dGWKGQ42ZQfTaLnDMjToAsmY0AyevkIbX6iZVtzGvanYpPcWW4X0RDPcpqfFNZk64\n3xI4lsZ+Y2Er9Yu5S/8x0ly+tmmIokaE0wwbdUu740YTZjCesroYWiRg5zuQ2xfKxJoV5E+Eh+tY\nwGDJn6HfWhRgnudRRwvuJ45ztYVtKulKw8QQpd2STWrcQQDJaRWmnMooX/PATTjCBExB9dkz38Dr\nuvk7IkHMtsIqlkAOQMdsX1d3Tov6BE2XDjIG0zFxLduJGbVwc/6rIc95T055j36Ez0HrjxdpTGOO\nHxRqMK5m9flFbaxxtDnS7w77WqzW7HjFrD0VeTx2vnjjGqchHEQpfDpFOzb8LTFhgYidyRNUflQY\n35WLOzLNV+pV3eQ3Jg11UFwelSNLqfQfuFRGc+zcwkNjHh5yPvm9odR1BIfqJ6sKGPGbtPNXo7ER\nMRypWyRz0zi0twARAQABtChGZWRvcmEgRVBFTCAoNykgPGVwZWxAZmVkb3JhcHJvamVjdC5vcmc+\niQI4BBMBAgAiBQJSrmiEAhsPBgsJCAcDAgYVCAIJCgsEFgIDAQIeAQIXgAAKCRBqL66iNSxk5cfG\nD/4spqpsTjtDM7qpytKLHKruZtvuWiqt5RfvT9ww9GUUFMZ4ZZGX4nUXg49qixDLayWR8ddG/s5k\nyOi3C0uX/6inzaYyRg+Bh70brqKUK14F1BrrPi29eaKfG+GuMFtXdBG2a7OtPmw3yuKmq9Epv6B0\nmP6E5KSdvSRSqJWtGcA6wRS/wDzXJENHp5re9Ism3CYydpy0GLRA5wo4fPB5uLdUhLEUDvh2KK//\nfMjja3o0L+SNz8N0aDZyn5AxCU9RB3EHcTecFgoy5umRj99BZrebR1NO+4gBrivIfdvD4fJNfNBH\nXwhSH9ACGCNvHnXVjHQF9iHWApKkRIeh8Fr2n5dtfJEF7SEX8GbX7FbsWo29kXMrVgNqHNyDnfAB\nVoPubgQdtJZJkVZAkaHrMu8AytwT62Q4eNqmJI1aWbZQNI5jWYqc6RKuCK6/F99qthFT9gJO17+y\nRuL6Uv2/vgzVR1RGdwVLKwlUjGPAjYflpCQwWMAASxiv9uPyYPHcErSrbRG0wjIfAR3vus1OSOx3\nxZHZpXFfmQTsDP7zVROLzV98R3JwFAxJ4/xqeON4vCPFU6OsT3lWQ8w7il5ohY95wmujfr6lk89k\nEzJdOTzcn7DBbUru33CQMGKZ3EvtRjsC7FDbL017qxS+ZVA/HGkyfiu4cpgV8VUnbql5eAZ+1Ll6\nDw==\n=hdPa\n-----END PGP PUBLIC KEY BLOCK-----\n"
+  },
+  "news-libraries": {
+    "type": "mirrorlist",
+    "url": "https://repository.api.bbci.co.uk/news-libraries/revisions/head"
   }
 }
