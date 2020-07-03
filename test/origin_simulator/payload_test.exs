@@ -11,12 +11,12 @@ defmodule OriginSimulator.PayloadTest do
       Payload.fetch(:payload, origin_recipe())
     end
 
-    test "Always return an error body for 5xx" do
-      assert Payload.body(:payload, 500) == {:ok, "Error 500"}
+    test "Always returns payload body for 5xx" do
+      assert Payload.body(:payload, 500) == {:ok, "some content from origin"}
     end
 
-    test "Always return 'Not Found' for 404s" do
-      assert Payload.body(:payload, 404) == {:ok, "Not found"}
+    test "Always returns payload body for 404s" do
+      assert Payload.body(:payload, 404) == {:ok, "some content from origin"}
     end
 
     test "Suggests to add a recipe for 406" do
@@ -33,12 +33,12 @@ defmodule OriginSimulator.PayloadTest do
       Payload.fetch(:payload, body_recipe())
     end
 
-    test "Always return an error body for 5xx" do
-      assert Payload.body(:payload, 500) == {:ok, "Error 500"}
+    test "Always returns payload body for 5xx" do
+      assert Payload.body(:payload, 500) == {:ok, ~s({"hello":"world"})}
     end
 
-    test "Always return 'Not Found' for 404s" do
-      assert Payload.body(:payload, 404) == {:ok, "Not found"}
+    test "Always returns payload body for 404s" do
+      assert Payload.body(:payload, 404) == {:ok, ~s({"hello":"world"})}
     end
 
     test "Suggests to add a recipe for 406" do
