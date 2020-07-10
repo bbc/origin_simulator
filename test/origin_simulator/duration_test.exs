@@ -9,7 +9,7 @@ defmodule OriginSimulator.DurationTest do
     end
 
     test "1" do
-      assert_raise RuntimeError, "Invalid timing, please define time in s or ms", fn () -> Duration.parse(1) end
+      assert_raise RuntimeError, "Invalid timing, please define time in s or ms", fn -> Duration.parse(1) end
     end
   end
 
@@ -47,7 +47,7 @@ defmodule OriginSimulator.DurationTest do
     end
 
     test "invalid range" do
-      assert_raise RuntimeError, "Invalid timing, please define time in s or ms", fn () -> Duration.parse("1..2s") end
+      assert_raise RuntimeError, "Invalid timing, please define time in s or ms", fn -> Duration.parse("1..2s") end
     end
   end
 
