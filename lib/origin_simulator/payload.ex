@@ -5,12 +5,19 @@ defmodule OriginSimulator.Payload do
 
   @http_client Application.get_env(:origin_simulator, :http_client)
 
+  @range_step_size 20
+  @unit "kb"
+  @unit_regex ~r/kb/
+
   ## Client API
 
   def start_link(opts) do
     GenServer.start_link(__MODULE__, opts, name: :payload)
   end
 
+  # TODO: rename `fetch` to `create` or `generate` to better reflect that OS actually create
+  # in-memory payload via various mechanisms, i.e. fetch from origin,
+  # provided in recipe or random content
   def fetch(server, %Recipe{origin: value, route: route} = recipe) when is_binary(value) do
     GenServer.call(server, {:fetch, recipe, route})
   end
@@ -19,8 +26,14 @@ defmodule OriginSimulator.Payload do
     GenServer.call(server, {:parse, recipe, route})
   end
 
-  def fetch(server, %Recipe{random_content: value, route: route} = recipe)
-      when is_binary(value) do
+  def fetch(server, %Recipe{random_content: value, route: route} = recipe) when is_binary(value) do
+    case String.contains?(value, "..") do
+      true -> fetch(server, %{recipe | random_content: String.split(value, "..")})
+      false -> GenServer.call(server, {:generate, recipe, route})
+    end
+  end
+
+  def fetch(server, %Recipe{random_content: [_min, _max], route: route} = recipe) do
     GenServer.call(server, {:generate, recipe, route})
   end
 
@@ -33,6 +46,8 @@ defmodule OriginSimulator.Payload do
       _ -> {:ok, "Error #{status}"}
     end
   end
+
+  def range_step_size, do: @range_step_size
 
   defp cache_lookup(route) do
     case :ets.lookup(:payload, route) do
@@ -53,12 +68,29 @@ defmodule OriginSimulator.Payload do
   def handle_call({:fetch, recipe, route}, _from, state) do
     {:ok, %HTTPoison.Response{body: body}} = @http_client.get(recipe.origin, recipe.headers)
     :ets.insert(:payload, {route, body})
+
     {:reply, :ok, state}
   end
 
   @impl true
   def handle_call({:parse, recipe, route}, _from, state) do
     :ets.insert(:payload, {route, Body.parse(recipe.body, recipe.headers)})
+
+    {:reply, :ok, state}
+  end
+
+  @impl true
+  def handle_call({:generate, %{random_content: [min, max]} = recipe, route}, _from, state) do
+    min_integer = Regex.replace(@unit_regex, min, "") |> String.to_integer()
+    max_integer = Regex.replace(@unit_regex, max, "") |> String.to_integer()
+
+    min_integer..max_integer
+    |> Enum.take_every(@range_step_size)
+    |> Enum.filter(&(&1 != 0))
+    |> Enum.each(fn size ->
+      size_kb = Integer.to_string(size) <> @unit
+      :ets.insert(:payload, {{route, size}, Body.randomise(size_kb, recipe.headers)})
+    end)
 
     {:reply, :ok, state}
   end
