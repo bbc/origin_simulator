@@ -76,12 +76,21 @@ defmodule OriginSimulator.Simulation do
 
   @impl true
   def handle_call({:state, route}, _from, state) do
-    {:reply, {state[route].status, state[route].latency, state[route].payload_id}, state}
+    case state[route] do
+      %{status: status, latency: latency, payload_id: payload_id} ->
+        {:reply, {status, latency, payload_id}, state}
+
+      nil ->
+        {:reply, {406, 0, nil}, state}
+    end
   end
 
   @impl true
   def handle_call({:recipe, route}, _from, state) do
-    {:reply, state[route].recipe, state}
+    case state[route] do
+      %{recipe: recipe} -> {:reply, recipe, state}
+      nil -> {:reply, nil, state}
+    end
   end
 
   # retrieve all recipes
