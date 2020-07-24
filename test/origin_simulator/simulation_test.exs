@@ -16,8 +16,8 @@ defmodule OriginSimulator.SimulationTest do
       {:ok, recipe: recipe, route: recipe.route}
     end
 
-    test "state() returns a tuple with http status and latency in ms for a route", %{route: route} do
-      assert Simulation.state(:simulation, route) == {200, 1000}
+    test "state() returns a tuple with http status, latency, payload_id for a route", %{route: route} do
+      assert Simulation.state(:simulation, route) == {200, 1000, route}
     end
 
     test "recipe() returns the loaded recipe for a route", %{recipe: recipe, route: route} do
@@ -73,8 +73,8 @@ defmodule OriginSimulator.SimulationTest do
       {:ok, recipe: recipe, route: recipe.route}
     end
 
-    test "state() returns a tuple with http status and latency in ms", %{route: route} do
-      assert Simulation.state(:simulation, route) == {200, 1000..1200}
+    test "state() returns a tuple with http status, latency in ms, payload id (route)", %{route: route} do
+      assert Simulation.state(:simulation, route) == {200, 1000..1200, route}
     end
 
     test "recipe() returns the loaded recipe", %{recipe: recipe, route: route} do
@@ -96,10 +96,10 @@ defmodule OriginSimulator.SimulationTest do
       {:ok, recipe: recipe, route: recipe.route}
     end
 
-    test "state() returns a tuple with http status and latency in ms", %{route: route} do
-      assert Simulation.state(:simulation, route) == {200, 0}
+    test "state() returns a tuple with http status, latency in ms, payload id (route)", %{route: route} do
+      assert Simulation.state(:simulation, route) == {200, 0, route}
       Process.sleep(80)
-      assert Simulation.state(:simulation, route) == {503, 1000}
+      assert Simulation.state(:simulation, route) == {503, 1000, route}
     end
 
     test "recipe() returns the loaded recipe", %{recipe: recipe, route: route} do
@@ -114,7 +114,7 @@ defmodule OriginSimulator.SimulationTest do
     end
 
     test "state() returns a tuple with default values" do
-      assert Simulation.state(:simulation, Recipe.default_route()) == {406, 0}
+      assert Simulation.state(:simulation, Recipe.default_route()) == {406, 0, nil}
     end
 
     test "recipe() returns an empty list" do

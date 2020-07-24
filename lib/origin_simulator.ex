@@ -23,11 +23,11 @@ defmodule OriginSimulator do
   def admin_domain(), do: Application.get_env(:origin_simulator, :admin_domain)
 
   defp serve_payload(conn, route) do
-    {status, latency} = Simulation.state(:simulation, route)
+    {status, latency, payload_id} = Simulation.state(:simulation, route)
 
     sleep(latency)
 
-    {:ok, body} = Payload.body(:payload, status, conn.request_path, route)
+    {:ok, body} = Payload.body(:payload, status, conn.request_path, payload_id)
 
     recipe = Simulation.recipe(:simulation, route)
 

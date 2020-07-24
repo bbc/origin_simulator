@@ -76,7 +76,7 @@ defmodule OriginSimulator.Simulation do
 
   @impl true
   def handle_call({:state, route}, _from, state) do
-    {:reply, {state[route].status, state[route].latency}, state}
+    {:reply, {state[route].status, state[route].latency, state[route].payload_id}, state}
   end
 
   @impl true
@@ -106,7 +106,7 @@ defmodule OriginSimulator.Simulation do
     Enum.map(new_recipe.stages, fn item ->
       Process.send_after(
         self(),
-        {:update, route, item["status"], Duration.parse(item["latency"])},
+        {:update, route, item["status"], Duration.parse(item["latency"]), route},
         Duration.parse(item["at"])
       )
     end)
@@ -123,8 +123,8 @@ defmodule OriginSimulator.Simulation do
   def handle_call(:route, _from, state), do: {:reply, state |> Map.keys(), state}
 
   @impl true
-  def handle_info({:update, route, status, latency}, state) do
-    {:noreply, Map.put(state, route, %{state[route] | status: status, latency: latency})}
+  def handle_info({:update, route, status, latency, payload_id}, state) do
+    {:noreply, Map.put(state, route, %{state[route] | status: status, latency: latency, payload_id: payload_id})}
   end
 
   defp get(nil), do: new()
