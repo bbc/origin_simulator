@@ -84,6 +84,8 @@ defmodule OriginSimulator.Payload do
     min_integer = Regex.replace(@unit_regex, min, "") |> String.to_integer()
     max_integer = Regex.replace(@unit_regex, max, "") |> String.to_integer()
 
+    :ets.insert(:payload, {route, Body.randomise(max, recipe.headers)})
+
     min_integer..max_integer
     |> Enum.take_every(@range_step_size)
     |> Enum.filter(&(&1 != 0))

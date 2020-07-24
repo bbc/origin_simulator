@@ -1,13 +1,25 @@
 defmodule OriginSimulator.Simulation do
   use GenServer
 
-  alias OriginSimulator.{Recipe, Payload, Duration}
+  alias OriginSimulator.{Recipe, Payload, Duration, Simulation}
+
+  defstruct latency: 0, payload_id: nil, recipe: nil, status: 406
+
+  @type recipe :: OriginSimulator.Recipe.t()
+  @type t :: %__MODULE__{
+          latency: integer(),
+          payload_id: binary(),
+          recipe: recipe,
+          status: integer()
+        }
 
   ## Client API
 
   def start_link(opts) do
     GenServer.start_link(__MODULE__, opts, name: :simulation)
   end
+
+  def new(), do: %Simulation{}
 
   def state(server) do
     GenServer.call(server, :state)
@@ -54,7 +66,7 @@ defmodule OriginSimulator.Simulation do
 
   @impl true
   def init(_) do
-    {:ok, %{Recipe.default_route() => default_simulation()}}
+    {:ok, %{Recipe.default_route() => new()}}
   end
 
   @impl true
@@ -115,10 +127,8 @@ defmodule OriginSimulator.Simulation do
     {:noreply, Map.put(state, route, %{state[route] | status: status, latency: latency})}
   end
 
-  defp get(nil), do: default_simulation()
+  defp get(nil), do: new()
   defp get(current_state), do: current_state
-
-  defp default_simulation(), do: %{recipe: nil, status: 406, latency: 0}
 
   defp match_route(state, nil, route) do
     Map.keys(state)
