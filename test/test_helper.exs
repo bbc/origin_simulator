@@ -3,7 +3,6 @@ Code.require_file("fixtures/recipes.exs", __DIR__)
 
 ExUnit.start()
 
-
 defmodule TestHelpers do
   use Plug.Test
   import ExUnit.Assertions

@@ -48,8 +48,7 @@ defmodule OriginSimulator.RandomiserTest do
     end
 
     test "produces a random string of the expected size" do
-      decoded_body =
-        Body.parse("{\"data\":\"some random<<4kb>>and also<<10kb>>this\"}") |> Poison.decode!()
+      decoded_body = Body.parse("{\"data\":\"some random<<4kb>>and also<<10kb>>this\"}") |> Poison.decode!()
 
       assert String.length(decoded_body["data"]) == 14_359
     end

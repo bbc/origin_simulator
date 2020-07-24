@@ -19,15 +19,15 @@ defmodule OriginSimulator.SizeTest do
 
   describe "failure" do
     test "123 as string" do
-      assert_raise RuntimeError, "Invalid size, please define size in b, kb or mb", fn () -> Size.parse("123") end
+      assert_raise RuntimeError, "Invalid size, please define size in b, kb or mb", fn -> Size.parse("123") end
     end
 
     test "123 as integer" do
-      assert_raise RuntimeError, "Invalid size, please define size in b, kb or mb", fn () -> Size.parse(123) end
+      assert_raise RuntimeError, "Invalid size, please define size in b, kb or mb", fn -> Size.parse(123) end
     end
 
     test "123tb" do
-      assert_raise RuntimeError, "Invalid size, please define size in b, kb or mb", fn () -> Size.parse("123tb") end
+      assert_raise RuntimeError, "Invalid size, please define size in b, kb or mb", fn -> Size.parse("123tb") end
     end
   end
 end
