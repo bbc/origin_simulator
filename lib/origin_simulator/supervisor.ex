@@ -17,6 +17,7 @@ defmodule OriginSimulator.Supervisor do
       strategy: :one_for_all,
       max_restarts: 30
     ]
+
     Supervisor.init(children, opts)
   end
 end

@@ -3,7 +3,7 @@
   inputs: [
     "{mix,.formatter}.exs",
     "{config,test}/**/*.{ex,exs}",
-    "lib/{belfrage, belfrage_web}/**/*.{ex,exs}"
+    "lib/**/*.{ex,exs}"
   ],
-  line_length: 120
+  line_length: 180
 ]
