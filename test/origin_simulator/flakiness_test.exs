@@ -10,7 +10,7 @@ defmodule OriginSimulator.FlakinessTest do
     assert Flakiness.new() == %Flakiness{interval: nil, payload: [], route: "/*", status: []}
   end
 
-  test "new/2 returns Flakiness struct with random payload series and route" do
+  test "new/2 returns a Flakiness struct for random payload series and route" do
     flakiness = Flakiness.new([150, 155, 160], "/an_origin_route")
 
     assert flakiness.payload == [150, 155, 160]
