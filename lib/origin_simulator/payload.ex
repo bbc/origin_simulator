@@ -5,7 +5,7 @@ defmodule OriginSimulator.Payload do
 
   @http_client Application.get_env(:origin_simulator, :http_client)
 
-  @range_step_size 20
+  @random_payload_step_size 5
   @unit "kb"
   @unit_regex ~r/kb/
 
@@ -47,7 +47,16 @@ defmodule OriginSimulator.Payload do
     end
   end
 
-  def range_step_size, do: @range_step_size
+  def random_payload_step_size, do: @random_payload_step_size
+
+  def random_payload_series([min, max]) do
+    min_integer = Regex.replace(@unit_regex, min, "") |> String.to_integer()
+    max_integer = Regex.replace(@unit_regex, max, "") |> String.to_integer()
+
+    min_integer..max_integer
+    |> Enum.take_every(@random_payload_step_size)
+    |> Enum.filter(&(&1 != 0))
+  end
 
   defp cache_lookup(route) do
     case :ets.lookup(:payload, route) do
@@ -81,14 +90,9 @@ defmodule OriginSimulator.Payload do
 
   @impl true
   def handle_call({:generate, %{random_content: [min, max]} = recipe, route}, _from, state) do
-    min_integer = Regex.replace(@unit_regex, min, "") |> String.to_integer()
-    max_integer = Regex.replace(@unit_regex, max, "") |> String.to_integer()
-
     :ets.insert(:payload, {route, Body.randomise(max, recipe.headers)})
 
-    min_integer..max_integer
-    |> Enum.take_every(@range_step_size)
-    |> Enum.filter(&(&1 != 0))
+    random_payload_series([min, max])
     |> Enum.each(fn size ->
       size_kb = Integer.to_string(size) <> @unit
       :ets.insert(:payload, {{route, size}, Body.randomise(size_kb, recipe.headers)})

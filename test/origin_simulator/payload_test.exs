@@ -5,7 +5,7 @@ defmodule OriginSimulator.PayloadTest do
 
   alias OriginSimulator.Payload
 
-  @range_step_size OriginSimulator.Payload.range_step_size()
+  @random_payload_step_size OriginSimulator.Payload.random_payload_step_size()
 
   # TODO: additional tests for fetching and storing multi-origin / source content in ETS
   describe "with origin" do
@@ -74,7 +74,7 @@ defmodule OriginSimulator.PayloadTest do
       Payload.fetch(:payload, random_content_recipe("0kb..100kb", %{"content-encoding" => "gzip"}))
 
       # currently with fixed 20kb step sizes
-      for size <- Enum.take_every(20..100, @range_step_size) do
+      for size <- Enum.take_every(20..100, @random_payload_step_size) do
         {:ok, gzip_content} = Payload.body(:payload, 200, "/*", {"/*", size})
         assert gzip_content |> :zlib.gunzip() |> String.length() == size * 1024
       end
