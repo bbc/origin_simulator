@@ -1,7 +1,7 @@
 defmodule OriginSimulator.Simulation do
   use GenServer
 
-  alias OriginSimulator.{Recipe, Payload, Duration, Simulation}
+  alias OriginSimulator.{Recipe, Payload, Duration, Simulation, Flakiness}
 
   defstruct latency: 0, payload_id: nil, recipe: nil, status: 406
 
@@ -112,6 +112,8 @@ defmodule OriginSimulator.Simulation do
     route = new_recipe.route
     simulation = get(state[route])
 
+    if auto_flakiness?(new_recipe), do: Flakiness.start(new_recipe, route)
+
     Enum.map(new_recipe.stages, fn item ->
       Process.send_after(
         self(),
@@ -135,6 +137,15 @@ defmodule OriginSimulator.Simulation do
   def handle_info({:update, route, status, latency, payload_id}, state) do
     {:noreply, Map.put(state, route, %{state[route] | status: status, latency: latency, payload_id: payload_id})}
   end
+
+  @impl true
+  def handle_info({:update, {route, payload_id}}, state) do
+    {:noreply, Map.put(state, route, %{state[route] | payload_id: {route, payload_id}})}
+  end
+
+  defp auto_flakiness?(%{random_content: nil}), do: false
+  defp auto_flakiness?(%{random_content: value}), do: String.contains?(value, "..")
+  defp auto_flakiness?(_other_recipe_type), do: false
 
   defp get(nil), do: new()
   defp get(current_state), do: current_state
