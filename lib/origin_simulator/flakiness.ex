@@ -22,8 +22,8 @@ defmodule OriginSimulator.Flakiness do
     GenServer.start_link(__MODULE__, opts, name: :flakiness)
   end
 
-  def new(), do: %Flakiness{}
-  def new(payload_series, route), do: %Flakiness{payload: payload_series, route: route}
+  def new(), do: %__MODULE__{}
+  def new(payload_series, route), do: %__MODULE__{payload: payload_series, route: route}
 
   def start(%{random_content: value}, route) do
     String.split(value, "..")
@@ -56,7 +56,7 @@ defmodule OriginSimulator.Flakiness do
 
   @impl true
   def handle_call(:start, _from, flakiness) do
-    send(self(), :flaky)
+    schedule_flakiness()
     {:reply, :ok, flakiness}
   end
 
@@ -72,6 +72,15 @@ defmodule OriginSimulator.Flakiness do
       {:update, {flakiness.route, flakiness.payload |> Enum.random()}}
     )
 
+    schedule_flakiness(flakiness.interval)
+
     {:noreply, flakiness}
+  end
+
+  defp schedule_flakiness(interval \\ 0)
+  defp schedule_flakiness(nil), do: :ok
+
+  defp schedule_flakiness(interval) do
+    Process.send_after(self(), :flaky, interval)
   end
 end

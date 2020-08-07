@@ -112,8 +112,6 @@ defmodule OriginSimulator.Simulation do
     route = new_recipe.route
     simulation = get(state[route])
 
-    if auto_flakiness?(new_recipe), do: Flakiness.start(new_recipe, route)
-
     Enum.map(new_recipe.stages, fn item ->
       Process.send_after(
         self(),
@@ -121,6 +119,8 @@ defmodule OriginSimulator.Simulation do
         Duration.parse(item["at"])
       )
     end)
+
+    if auto_flakiness?(new_recipe), do: Flakiness.start(new_recipe, route)
 
     {:reply, :ok, Map.put(state, route, %{simulation | recipe: new_recipe})}
   end
