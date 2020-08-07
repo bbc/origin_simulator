@@ -19,7 +19,6 @@ defmodule OriginSimulator.Counter do
 
   def increment(status_code) do
     Agent.update(__MODULE__, fn state ->
-
       state
       |> increment_key(:total_requests)
       |> increment_key(status_code)
@@ -27,10 +26,11 @@ defmodule OriginSimulator.Counter do
   end
 
   defp increment_key(state, key) do
-    {_, state} = Map.get_and_update(state, key, fn
-      nil -> {nil, 1}
-      current_value -> {current_value, current_value + 1}
-    end)
+    {_, state} =
+      Map.get_and_update(state, key, fn
+        nil -> {nil, 1}
+        current_value -> {current_value, current_value + 1}
+      end)
 
     state
   end
