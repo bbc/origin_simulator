@@ -3,22 +3,23 @@ defmodule OriginSimulator.Counter do
 
   @initial_state %{total_requests: 0}
 
-  def start_link(_opts) do
-    Agent.start_link(fn -> @initial_state end, name: __MODULE__)
+  def start_link(opts) do
+    name = Keyword.get(opts, :name)
+    Agent.start_link(fn -> @initial_state end, name: if(name, do: name, else: __MODULE__))
   end
 
-  def value do
-    Agent.get(__MODULE__, & &1)
+  def value(agent \\ __MODULE__) do
+    Agent.get(agent, & &1)
   end
 
-  def clear do
-    Agent.update(__MODULE__, fn _state ->
+  def clear(agent \\ __MODULE__) do
+    Agent.update(agent, fn _state ->
       @initial_state
     end)
   end
 
-  def increment(status_code) do
-    Agent.update(__MODULE__, fn state ->
+  def increment(status_code, agent \\ __MODULE__) do
+    Agent.update(agent, fn state ->
       state
       |> increment_key(:total_requests)
       |> increment_key(status_code)
