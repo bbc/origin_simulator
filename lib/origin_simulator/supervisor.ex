@@ -10,7 +10,8 @@ defmodule OriginSimulator.Supervisor do
     children = [
       OriginSimulator.Simulation,
       OriginSimulator.Payload,
-      OriginSimulator.Counter
+      OriginSimulator.Counter,
+      OriginSimulator.RateCalculator
     ]
 
     opts = [
