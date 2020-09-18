@@ -1,8 +1,8 @@
 defmodule OriginSimulator do
   use Plug.Router
-  alias OriginSimulator.{Payload, Simulation, PlugResponseCounter}
+  alias OriginSimulator.{Payload, Simulation, Plug.ResponseCounter}
 
-  plug(PlugResponseCounter)
+  plug(ResponseCounter)
   plug(:match)
   plug(:dispatch)
 
