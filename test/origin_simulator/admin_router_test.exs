@@ -41,6 +41,13 @@ defmodule OriginSimulator.AdminRouterTest do
       |> assert_status_body(406, recipe_not_set("/another_domain/routes"))
       |> assert_resp_header({"content-type", ["text/html; charset=utf-8"]})
     end
+
+    test "will not increment response counter" do
+      current_count = OriginSimulator.Counter.value().total_requests
+      conn(:get, "/#{admin_domain()}/routes") |> OriginSimulator.call([])
+
+      assert OriginSimulator.Counter.value().total_requests == current_count
+    end
   end
 
   describe "GET /#{admin_domain()}/routes_status" do

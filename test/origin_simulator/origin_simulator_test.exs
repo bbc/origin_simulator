@@ -138,6 +138,17 @@ defmodule OriginSimulatorTest do
       assert get_resp_header(conn, "content-type") == ["text/html; charset=utf-8"]
       assert String.length(conn.resp_body |> :zlib.gunzip()) == 50 * 1024
     end
+
+    test "will increment response counter" do
+      payload = origin_recipe() |> Poison.encode!()
+      conn(:post, "/#{admin_domain()}/add_recipe", payload) |> OriginSimulator.call([])
+      Process.sleep(20)
+
+      current_count = OriginSimulator.Counter.value().total_requests
+      conn(:get, "/") |> OriginSimulator.call([])
+
+      assert OriginSimulator.Counter.value().total_requests == current_count + 1
+    end
   end
 
   describe "POST / when a recipe is set" do

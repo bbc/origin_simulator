@@ -17,6 +17,9 @@ defmodule OriginSimulator.Counter do
     end)
   end
 
+  def increment("/_admin/" <> _path, _status_code), do: :ok
+  def increment(_path, status_code), do: increment(status_code)
+
   def increment(status_code) do
     Agent.update(__MODULE__, fn state ->
       state

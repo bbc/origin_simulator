@@ -6,7 +6,7 @@ defmodule OriginSimulator.Plug.ResponseCounter do
 
   def call(conn, _opts) do
     register_before_send(conn, fn conn ->
-      OriginSimulator.Counter.increment(conn.status)
+      OriginSimulator.Counter.increment(conn.request_path, conn.status)
       conn
     end)
   end
