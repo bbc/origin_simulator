@@ -1,4 +1,5 @@
 defmodule OriginSimulator.Duration do
+  @moduledoc false
   def parse(0), do: 0
 
   def parse(time) when is_integer(time) do
