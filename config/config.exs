@@ -20,7 +20,7 @@ use Mix.Config
 #
 config :origin_simulator,
   admin_domain: "_admin",
-  http_client: OriginSimulator.HTTPClient,
+  http_client: OriginSimulator.HTTP.Client,
   http_port: 8080
 
 import_config "#{Mix.env()}.exs"

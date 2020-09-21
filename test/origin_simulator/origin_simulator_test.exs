@@ -64,7 +64,7 @@ defmodule OriginSimulatorTest do
 
       conn(:get, "/")
       |> OriginSimulator.call([])
-      |> assert_status_body(200, body_mock(type: :json))
+      |> assert_status_body(200, body_mock(%{"content-type" => "application/json"}))
       |> assert_resp_header({"content-type", ["application/json; charset=utf-8"]})
     end
 
@@ -77,7 +77,7 @@ defmodule OriginSimulatorTest do
 
       conn(:get, "/")
       |> OriginSimulator.call([])
-      |> assert_status_body(200, body_mock(type: :json))
+      |> assert_status_body(200, body_mock(%{"content-type" => "application/json"}))
       |> assert_resp_header({"content-type", ["application/json; charset=utf-8"]})
       |> assert_resp_header({"response-header", [headers["response-header"]]})
     end
@@ -97,7 +97,7 @@ defmodule OriginSimulatorTest do
 
       conn(:get, "/")
       |> OriginSimulator.call([])
-      |> assert_status_body(200, body_mock(type: :json) |> :zlib.gzip())
+      |> assert_status_body(200, body_mock(%{"content-type" => "application/json"}) |> :zlib.gzip())
       |> assert_resp_header({"cache-control", ["public, max-age=30"]})
       |> assert_resp_header({"content-type", ["application/json; charset=utf-8"]})
       |> assert_resp_header({"content-encoding", ["gzip"]})
@@ -159,7 +159,7 @@ defmodule OriginSimulatorTest do
 
       conn(:post, "/", "")
       |> OriginSimulator.call([])
-      |> assert_status_body(200, body_mock(type: :json))
+      |> assert_status_body(200, body_mock(%{"content-type" => "application/json"}))
       |> assert_resp_header({"content-type", ["application/json; charset=utf-8"]})
     end
   end
@@ -278,7 +278,7 @@ defmodule OriginSimulatorTest do
 
       conn(:get, payload["route"])
       |> OriginSimulator.call([])
-      |> assert_status_body(200, body_mock(type: :json))
+      |> assert_status_body(200, body_mock(%{"content-type" => "application/json"}))
     end
 
     test "GET routed (wildcard) page will return the body", %{payload: payload} do
@@ -291,7 +291,7 @@ defmodule OriginSimulatorTest do
 
       conn(:get, "/news/uk-politics-51287430")
       |> OriginSimulator.call([])
-      |> assert_status_body(200, body_mock(type: :json))
+      |> assert_status_body(200, body_mock(%{"content-type" => "application/json"}))
     end
 
     test "POST \"\" to routed page will return the body", %{payload: payload} do
@@ -302,7 +302,7 @@ defmodule OriginSimulatorTest do
 
       conn(:post, payload["route"])
       |> OriginSimulator.call([])
-      |> assert_status_body(200, body_mock(type: :json))
+      |> assert_status_body(200, body_mock(%{"content-type" => "application/json"}))
     end
 
     test "POST \"\" to routed (wildcard) page will return the body", %{payload: payload} do
@@ -315,7 +315,7 @@ defmodule OriginSimulatorTest do
 
       conn(:post, "/news/uk-politics-51287430")
       |> OriginSimulator.call([])
-      |> assert_status_body(200, body_mock(type: :json))
+      |> assert_status_body(200, body_mock(%{"content-type" => "application/json"}))
     end
 
     test "GET /* will return the body", %{payload: payload} do
@@ -328,11 +328,11 @@ defmodule OriginSimulatorTest do
 
       conn(:get, "/news/uk-politics-51287430")
       |> OriginSimulator.call([])
-      |> assert_status_body(200, body_mock(type: :json))
+      |> assert_status_body(200, body_mock(%{"content-type" => "application/json"}))
 
       conn(:get, "/sport/tennis/51291122")
       |> OriginSimulator.call([])
-      |> assert_status_body(200, body_mock(type: :json))
+      |> assert_status_body(200, body_mock(%{"content-type" => "application/json"}))
     end
 
     test "GET non-matching route will return error", %{payload: payload} do

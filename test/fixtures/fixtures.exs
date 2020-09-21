@@ -1,9 +1,8 @@
 defmodule Fixtures do
-  alias OriginSimulator.HTTPMockClient
+  @http_client Application.get_env(:origin_simulator, :http_client)
 
-  def body_mock(opts \\ []) do
-    [mock: mock, type: type] = [mock: HTTPMockClient, type: :html] |> Keyword.merge(opts)
-    {:ok, %{body: body}} = mock.get("/", type: type)
+  def body_mock(headers \\ %{}) do
+    {:ok, %{body: body}} = @http_client.get("/", headers)
     body
   end
 
