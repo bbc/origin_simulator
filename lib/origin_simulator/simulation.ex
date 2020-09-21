@@ -1,38 +1,100 @@
 defmodule OriginSimulator.Simulation do
+  @moduledoc """
+  Server facilitating simulation recipe usage before and during load tests.
+  """
+
   use GenServer
 
   alias OriginSimulator.{Recipe, Payload, Duration}
 
+  @type latency :: integer()
+  @type recipe :: OriginSimulator.Recipe.t()
+  @type status :: integer()
+
+  @type route :: binary()
+  @type server :: :simulation | module()
+  @type simulation_state :: %{required(:latency) => latency, required(:recipe) => recipe, required(:status) => status}
+
   ## Client API
 
+  @doc false
   def start_link(opts) do
     GenServer.start_link(__MODULE__, opts, name: :simulation)
   end
 
+  @doc """
+  Retrieve the simulation state for all routes.
+  """
+  @spec state(server) :: %{required(route) => simulation_state}
   def state(server) do
     GenServer.call(server, :state)
   end
 
+  @doc """
+  Retrieve the latency and status data for a specific route.
+
+  ```
+  iex> OriginSimulator.Simulation.state(:simulation, "/news")
+  {200, 100}
+  ```
+  """
+  @spec state(server, route) :: {status, latency}
   def state(server, route) do
     GenServer.call(server, {:state, route})
   end
 
+  @doc """
+  Retrieve all recipes uploaded to OriginSimulator.
+  """
+  @spec recipe(server) :: list(recipe)
   def recipe(server) do
     GenServer.call(server, :recipe)
   end
 
+  @doc """
+  Retrieve the recipe for a specific route.
+  """
+  @spec recipe(server, route) :: recipe
   def recipe(server, route) do
     GenServer.call(server, {:recipe, route})
   end
 
+  @doc """
+  Find a matching recipe route pattern for a given path.
+
+  OriginSimulator is capable of serving multiple simulation recipes
+  on multiple routes which could also be wildcard routes. For example:
+
+  ```
+  iex> OriginSimulator.Simulation.route(:simulation, "/news/weather")
+  "/news*"
+  ```
+
+  The matching route is used for retrieving simulation state (latency, status)
+  in `state/2`.
+  """
+  @spec route(server, route) :: route
   def route(server, route) do
     GenServer.call(server, {:route, route})
   end
 
+  @doc """
+  Retrieve a list of simulated routes.
+
+  ```
+  iex> OriginSimulator.Simulation.route(:simulation)
+  ["/*", "/example/endpoint", "/news"]
+  ```
+  """
+  @spec route(server, route) :: list(route)
   def route(server) do
     GenServer.call(server, :route)
   end
 
+  @doc """
+  Add a recipe or a list of recipes to the server.
+  """
+  @spec add_recipe(server, recipe | list(recipe)) :: :ok | :error
   def add_recipe(server, recipes) when is_list(recipes) do
     resp =
       for recipe <- recipes do
@@ -46,6 +108,10 @@ defmodule OriginSimulator.Simulation do
     GenServer.call(server, {:add_recipe, new_recipe})
   end
 
+  @doc """
+  Deletes simulation state including recipes and restart server.
+  """
+  @spec restart() :: :ok
   def restart do
     GenServer.stop(:simulation)
   end
