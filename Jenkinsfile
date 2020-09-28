@@ -4,7 +4,8 @@ library 'BBCNews'
 
 def cosmosServices = [
     'origin-simulator',
-    'origin-simulator-data-pres'
+    'origin-simulator-data-pres',
+    'origin-simulator-fabl'
 ]
 
 node {
