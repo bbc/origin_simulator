@@ -64,7 +64,13 @@ defmodule OriginSimulator.Simulation do
 
   @impl true
   def handle_call({:state, route}, _from, state) do
-    {:reply, {state[route].status, state[route].latency}, state}
+    case state[route].status do
+      [h | t] ->
+        {:reply, {h, state[route].latency}, put_in(state, [route, :status], t ++ [h])}
+
+      _ ->
+        {:reply, {state[route].status, state[route].latency}, state}
+    end
   end
 
   @impl true
