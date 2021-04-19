@@ -4,6 +4,7 @@ After=network.target network-online.target
 [Service]
 Environment=HOME=/home/component
 Environment=PORT=8080
+LimitNOFILE=128000
 User=component
 Group=component
 WorkingDirectory=/home/component/origin_simulator

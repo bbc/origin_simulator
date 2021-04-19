@@ -9,8 +9,7 @@ Packager: BBC News Frameworks and Tools
 
 Source0: origin_simulator.tar.gz
 Source1: origin_simulator.service
-Source2: nofile.conf
-Source3: performance.conf
+Source2: performance.conf
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildArch: x86_64
@@ -37,8 +36,7 @@ mkdir -p %{buildroot}/home/component/origin_simulator
 tar -C %{buildroot}/home/component/origin_simulator -xzf %{SOURCE0}
 mkdir -p %{buildroot}/usr/lib/systemd/system
 cp %{SOURCE1} %{buildroot}/usr/lib/systemd/system/origin_simulator.service
-cp %{SOURCE2} %{buildroot}/etc/security/limits.d/nofile.conf
-cp %{SOURCE3} %{buildroot}/etc/sysctl.d/performance.conf
+cp %{SOURCE2} %{buildroot}/etc/sysctl.d/performance.conf
 
 %post
 systemctl enable origin_simulator
@@ -48,4 +46,3 @@ systemctl enable origin_simulator
 /home/component
 /usr/lib/systemd/system/origin_simulator.service
 /etc/sysctl.d/performance.conf
-/etc/security/limits.d/nofile.conf
