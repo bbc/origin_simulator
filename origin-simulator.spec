@@ -46,4 +46,3 @@ systemctl enable origin_simulator
 /home/component
 /usr/lib/systemd/system/origin_simulator.service
 /etc/sysctl.d/performance.conf
-/etc/security/limits.d/nofile.conf
