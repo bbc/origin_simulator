@@ -26,10 +26,12 @@ node {
 
   stage('Build executable') {
     docker.image(dockerImage).inside('-u root -e MIX_ENV=prod -e PORT=8080') {
-      sh 'elixir --version'
       sh 'mix deps.get'
       sh 'mix release'
     }
+    sh 'ls _build/prod/rel/origin_simulator/'
+    sh 'ls _build/prod/rel/origin_simulator/bin'
+    sh 'ls _build/prod/rel/origin_simulator/releases'
     sh 'cp _build/prod/rel/origin_simulator/releases/*/origin_simulator.tar.gz SOURCES/'
   }
 
