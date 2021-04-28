@@ -40,7 +40,7 @@ defmodule OriginSimulator.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:poison, "~> 4.0"},
       {:httpoison, "~> 1.5"},
-      {:distillery, "~> 2.0", runtime: false},
+      {:distillery, "~> 2.0"},
       {:ex_doc, "~> 0.22", only: :dev, runtime: false}
     ]
   end
