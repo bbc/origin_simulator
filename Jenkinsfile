@@ -30,11 +30,8 @@ node {
       sh 'mix deps.get'
       sh 'mix release'
     }
-    sh 'ls _build/prod/rel/origin_simulator/'
-    sh 'ls _build/prod/rel/origin_simulator/bin'
-    sh 'ls _build/prod/rel/origin_simulator/releases'
-    sh 'ls _build/prod/rel/origin_simulator/bin/origin_simulator'
-    sh 'ls _build/prod/rel/origin_simulator/releases/1.0.0'
+  
+    sh 'ls _build/prod/rel/origin_simulator/releases/*'
     sh 'cp _build/prod/rel/origin_simulator/releases/*/origin_simulator.tar.gz SOURCES/'
   }
 
