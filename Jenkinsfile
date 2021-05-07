@@ -1,5 +1,10 @@
 #!/usr/bin/env groovy
 
+library 'devops-tools-jenkins'
+
+def dockerRegistry = libraryResource('dockerregistry').trim()
+def dockerImage = "${dockerRegistry}/bbc-news/elixir-centos7:1.11.3"
+
 library 'BBCNews'
 
 def cosmosServices = [
@@ -20,9 +25,9 @@ node {
   ])
 
   stage('Build executable') {
-    docker.image('qixxit/elixir-centos').inside('-u root -e MIX_ENV=prod -e PORT=8080') {
+    docker.image(dockerImage).inside('-u root -e MIX_ENV=prod -e PORT=8080') {
       sh 'mix deps.get'
-      sh 'mix release'
+      sh 'mix distillery.release'
     }
     sh 'cp _build/prod/rel/origin_simulator/releases/*/origin_simulator.tar.gz SOURCES/'
   }
