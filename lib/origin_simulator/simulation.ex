@@ -1,13 +1,25 @@
 defmodule OriginSimulator.Simulation do
   use GenServer
 
-  alias OriginSimulator.{Recipe, Payload, Duration}
+  alias OriginSimulator.{Recipe, Payload, Duration, Simulation, Flakiness}
+
+  defstruct latency: 0, payload_id: nil, recipe: nil, status: 406
+
+  @type recipe :: OriginSimulator.Recipe.t()
+  @type t :: %__MODULE__{
+          latency: integer(),
+          payload_id: binary(),
+          recipe: recipe,
+          status: integer()
+        }
 
   ## Client API
 
   def start_link(opts) do
     GenServer.start_link(__MODULE__, opts, name: :simulation)
   end
+
+  def new(), do: %Simulation{}
 
   def state(server) do
     GenServer.call(server, :state)
@@ -54,7 +66,7 @@ defmodule OriginSimulator.Simulation do
 
   @impl true
   def init(_) do
-    {:ok, %{Recipe.default_route() => default_simulation()}}
+    {:ok, %{Recipe.default_route() => new()}}
   end
 
   @impl true
@@ -64,12 +76,21 @@ defmodule OriginSimulator.Simulation do
 
   @impl true
   def handle_call({:state, route}, _from, state) do
-    {:reply, {state[route].status, state[route].latency}, state}
+    case state[route] do
+      %{status: status, latency: latency, payload_id: payload_id} ->
+        {:reply, {status, latency, payload_id}, state}
+
+      nil ->
+        {:reply, {406, 0, nil}, state}
+    end
   end
 
   @impl true
   def handle_call({:recipe, route}, _from, state) do
-    {:reply, state[route].recipe, state}
+    case state[route] do
+      %{recipe: recipe} -> {:reply, recipe, state}
+      nil -> {:reply, nil, state}
+    end
   end
 
   # retrieve all recipes
@@ -94,10 +115,12 @@ defmodule OriginSimulator.Simulation do
     Enum.map(new_recipe.stages, fn item ->
       Process.send_after(
         self(),
-        {:update, route, item["status"], Duration.parse(item["latency"])},
+        {:update, route, item["status"], Duration.parse(item["latency"]), route},
         Duration.parse(item["at"])
       )
     end)
+
+    if auto_flakiness?(new_recipe), do: Flakiness.start(new_recipe, route)
 
     {:reply, :ok, Map.put(state, route, %{simulation | recipe: new_recipe})}
   end
@@ -111,14 +134,21 @@ defmodule OriginSimulator.Simulation do
   def handle_call(:route, _from, state), do: {:reply, state |> Map.keys(), state}
 
   @impl true
-  def handle_info({:update, route, status, latency}, state) do
-    {:noreply, Map.put(state, route, %{state[route] | status: status, latency: latency})}
+  def handle_info({:update, route, status, latency, payload_id}, state) do
+    {:noreply, Map.put(state, route, %{state[route] | status: status, latency: latency, payload_id: payload_id})}
   end
 
-  defp get(nil), do: default_simulation()
-  defp get(current_state), do: current_state
+  @impl true
+  def handle_info({:update, {route, payload_id}}, state) do
+    {:noreply, Map.put(state, route, %{state[route] | payload_id: {route, payload_id}})}
+  end
 
-  defp default_simulation(), do: %{recipe: nil, status: 406, latency: 0}
+  defp auto_flakiness?(%{random_content: nil}), do: false
+  defp auto_flakiness?(%{random_content: value}), do: String.contains?(value, "..")
+  defp auto_flakiness?(_other_recipe_type), do: false
+
+  defp get(nil), do: new()
+  defp get(current_state), do: current_state
 
   defp match_route(state, nil, route) do
     Map.keys(state)

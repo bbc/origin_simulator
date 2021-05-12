@@ -1,6 +1,7 @@
 defmodule OriginSimulator.Recipe do
   defstruct origin: nil, body: nil, random_content: nil, headers: %{}, stages: [], route: "/*"
 
+  # TODO: missing stage stages, type spec for 'stage'
   @type t :: %__MODULE__{
           origin: String.t(),
           body: String.t(),
