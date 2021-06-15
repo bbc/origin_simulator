@@ -1,4 +1,5 @@
 defmodule OriginSimulator.HTTP.Client do
+  @moduledoc false
   def get(endpoint, headers \\ %{})
 
   def get(endpoint, %{"content-encoding" => "gzip"} = headers) do

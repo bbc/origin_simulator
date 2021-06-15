@@ -1,4 +1,6 @@
 defmodule OriginSimulator.Counter do
+  @moduledoc false
+
   use Agent
 
   @initial_state %{total_requests: 0}
