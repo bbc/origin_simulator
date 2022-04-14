@@ -258,7 +258,6 @@ Multiple origins of mixed sources can also be specified:
   }
 ]
 ```
-
 ## Usage
 
 You can post recipes using `curl` and the `mix upload_recipe` task.
@@ -319,6 +318,13 @@ HTTP/1.1 200 OK
 At any time you can reset the scenario by simply POSTing a new one to `/_admin/add_recipe`. 
 
 In multiple origins scenario, new origins and routes can be added to the existing ones through `/_admin/add_recipe`. Existing scenarios can also be updated. For example you can "take down" an origin by updating its recipe with 500 status.
+
+### Using Belfrage with Origin Simulator locally
+1. Change dev config value in belfrage for `:origin_simulator` to 'http://localhost:8080'
+2. Follow the steps above in 'usage' to run origin-simulator
+3. Run Belfrage locally using `iex -S mix`
+4. Accessing Belfrage locally (http://localhost:7080) will route requests through origin-simulator
+5. It may be helpful to place some debug code ie `IO.inspect()` to view requests and responses
 
 #### Response headers
 OriginSimulator can serve HTTP headers in responses. The headers can be specified in recipes:
