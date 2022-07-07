@@ -27,6 +27,7 @@ defmodule OriginSimulator.Payload do
   def body(_server, status, path \\ Recipe.default_route(), route \\ Recipe.default_route()) do
     case {status, path} do
       {200, _} -> cache_lookup(route)
+      {304, _} -> {:ok, ""}
       {404, _} -> {:ok, "Not found"}
       {406, "/*"} -> {:ok, OriginSimulator.recipe_not_set()}
       {406, _} -> {:ok, OriginSimulator.recipe_not_set(path)}

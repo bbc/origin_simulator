@@ -149,6 +149,24 @@ defmodule OriginSimulatorTest do
 
       assert OriginSimulator.Counter.value().total_requests == current_count + 1
     end
+
+    test "will return an empty body with 304 status" do
+      recipe =
+        recipe(
+          body: "",
+          stages: [%{"at" => 0, "status" => 304, "latency" => 0}]
+        )
+
+      payload = recipe |> Poison.encode!()
+
+      conn(:post, "/#{admin_domain()}/add_recipe", payload) |> OriginSimulator.call([])
+      Process.sleep(20)
+
+      conn(:get, "/")
+      |> OriginSimulator.call([])
+      |> assert_status_body(304, "")
+      |> assert_resp_header({"content-type", ["text/html; charset=utf-8"]})
+    end
   end
 
   describe "POST / when a recipe is set" do

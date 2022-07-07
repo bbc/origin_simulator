@@ -50,6 +50,12 @@ defmodule OriginSimulator.PayloadTest do
     end
   end
 
+  describe "without content for not modified" do
+    test "returns an empty body" do
+      assert Payload.body(:payload, 304) == {:ok, ""}
+    end
+  end
+
   describe "recipe with gzip content-encoding header" do
     test "returns gzip body from origin" do
       Payload.fetch(:payload, origin_recipe(%{"content-encoding" => "gzip"}))
