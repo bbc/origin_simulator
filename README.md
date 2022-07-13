@@ -125,7 +125,24 @@ In this example we are requiring a continuous successful response with no simula
 
 ```json
 {
+    "route": "/*",
     "random_content": "428kb",
+    "stages": [
+        {
+            "at": 0,
+            "latency": 0,
+            "status": 200
+        }
+    ]
+}
+```
+
+To simulate serving payloads of different sizes, a random content range recipe can be used. For example, the example below enables OriginSimulator to serve payloads of random and varying sizes within a range of 300kb and 400kb. 
+
+```json
+{
+    "route": "/*",
+    "random_content": "300kb..400kb",
     "stages": [
         {
             "at": 0,

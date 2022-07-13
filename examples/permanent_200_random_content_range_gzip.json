@@ -1,0 +1,16 @@
+[
+  {
+    "stages": [
+      {
+        "status": 200,
+        "latency": 0,
+        "at": 0
+      }
+    ],
+    "route": "/*",
+    "random_content": "300kb..400kb",
+    "headers": {
+      "content-encoding": "gzip"
+    }
+  }
+]

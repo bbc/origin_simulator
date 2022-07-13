@@ -16,12 +16,20 @@ defmodule OriginSimulator.SimulationTest do
       {:ok, recipe: recipe, route: recipe.route}
     end
 
-    test "state() returns a tuple with http status and latency in ms for a route", %{route: route} do
-      assert Simulation.state(:simulation, route) == {200, 1000}
+    test "state/2 returns a tuple with http status, latency, payload_id for a route", %{route: route} do
+      assert Simulation.state(:simulation, route) == {200, 1000, route}
     end
 
-    test "recipe() returns the loaded recipe for a route", %{recipe: recipe, route: route} do
+    test "state/2 does not crash GenServer and returns default tuple for non existing routes" do
+      assert Simulation.state(:simulation, "/non_existing") == {406, 0, nil}
+    end
+
+    test "recipe/2 returns the loaded recipe for a route", %{recipe: recipe, route: route} do
       assert Simulation.recipe(:simulation, route) == recipe
+    end
+
+    test "recipe/2 does not crash GenServer and returns nil for non existing routes" do
+      assert Simulation.recipe(:simulation, "/non_existing") == nil
     end
 
     test "route/2 returns matching route", %{recipe: recipe, route: route} do
@@ -73,11 +81,11 @@ defmodule OriginSimulator.SimulationTest do
       {:ok, recipe: recipe, route: recipe.route}
     end
 
-    test "state() returns a tuple with http status and latency in ms", %{route: route} do
-      assert Simulation.state(:simulation, route) == {200, 1000..1200}
+    test "state/2 returns a tuple with http status, latency in ms, payload id (route)", %{route: route} do
+      assert Simulation.state(:simulation, route) == {200, 1000..1200, route}
     end
 
-    test "recipe() returns the loaded recipe", %{recipe: recipe, route: route} do
+    test "recipe/2 returns the loaded recipe", %{recipe: recipe, route: route} do
       assert Simulation.recipe(:simulation, route) == recipe
     end
   end
@@ -96,13 +104,13 @@ defmodule OriginSimulator.SimulationTest do
       {:ok, recipe: recipe, route: recipe.route}
     end
 
-    test "state() returns a tuple with http status and latency in ms", %{route: route} do
-      assert Simulation.state(:simulation, route) == {200, 0}
+    test "state/2 returns a tuple with http status, latency in ms, payload id (route)", %{route: route} do
+      assert Simulation.state(:simulation, route) == {200, 0, route}
       Process.sleep(80)
-      assert Simulation.state(:simulation, route) == {503, 1000}
+      assert Simulation.state(:simulation, route) == {503, 1000, route}
     end
 
-    test "recipe() returns the loaded recipe", %{recipe: recipe, route: route} do
+    test "recipe/2 returns the loaded recipe", %{recipe: recipe, route: route} do
       assert Simulation.recipe(:simulation, route) == recipe
     end
   end
@@ -113,15 +121,15 @@ defmodule OriginSimulator.SimulationTest do
       Process.sleep(5)
     end
 
-    test "state() returns a tuple with default values" do
-      assert Simulation.state(:simulation, Recipe.default_route()) == {406, 0}
+    test "state/2 returns a tuple with default values" do
+      assert Simulation.state(:simulation, Recipe.default_route()) == {406, 0, nil}
     end
 
-    test "recipe() returns an empty list" do
+    test "recipe/1 returns an empty list" do
       assert Simulation.recipe(:simulation) == []
     end
 
-    test "route() returns default route" do
+    test "route/2 returns default route" do
       assert Simulation.route(:simulation, "/random_path") == "/*"
     end
   end

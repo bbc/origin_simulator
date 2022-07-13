@@ -27,11 +27,12 @@ defmodule Fixtures.Recipes do
     }
   end
 
-  def random_content_recipe(size \\ "50kb", headers \\ %{}) do
+  def random_content_recipe(size \\ "50kb", headers \\ %{}, route \\ "/*") do
     %Recipe{
       random_content: size,
       stages: [%{"at" => 0, "status" => 200, "latency" => 0}],
-      headers: headers
+      headers: headers,
+      route: route
     }
   end
 
