@@ -1,4 +1,4 @@
-use Mix.Config
+import Config
 
 # This configuration is loaded before any dependency and is restricted
 # to this project. If another project depends on this project, this
@@ -21,6 +21,6 @@ use Mix.Config
 config :origin_simulator,
   admin_domain: "_admin",
   http_client: OriginSimulator.HTTP.Client,
-  http_port: 8080
+  http_port: 8082
 
 import_config "#{Mix.env()}.exs"
