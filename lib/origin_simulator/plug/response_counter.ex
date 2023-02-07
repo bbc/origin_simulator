@@ -1,4 +1,6 @@
 defmodule OriginSimulator.Plug.ResponseCounter do
+  @moduledoc false
+
   @behaviour Plug
   import Plug.Conn, only: [register_before_send: 2]
 

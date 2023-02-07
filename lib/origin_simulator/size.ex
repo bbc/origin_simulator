@@ -1,4 +1,5 @@
 defmodule OriginSimulator.Size do
+  @moduledoc false
   def parse(size) when is_binary(size) do
     Integer.parse(size) |> parse()
   end

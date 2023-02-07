@@ -1,4 +1,34 @@
 defmodule OriginSimulator.AdminRouter do
+  @moduledoc """
+  Router for handling and responding to admin requests.
+
+  #### Admin routes
+
+  * /_admin/status
+
+  Check if the simulator is running, return `ok!`
+
+  * /_admin/add_recipe
+
+  Post (POST) recipe: update or create new origins
+
+  * /_admin/current_recipe
+
+  List existing recipe for all origins and routes
+
+  * /_admin/restart
+
+  Reset the simulator: remove all recipes
+
+  * /_admin/routes
+
+  List all origins and routes
+
+  * /_admin/routes_status
+
+  List all origin and routes with the corresponding current status and latency values
+  """
+
   use Plug.Router
 
   alias OriginSimulator.{Recipe, Simulation, Counter}

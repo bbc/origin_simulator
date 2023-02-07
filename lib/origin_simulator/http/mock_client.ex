@@ -1,4 +1,5 @@
 defmodule OriginSimulator.HTTP.MockClient do
+  @moduledoc false
   def get(_endpoint, headers \\ %{})
   def get(_endpoint, %{"content-type" => "application/json"}), do: {:ok, %HTTPoison.Response{body: "{\"hello\":\"world\"}"}}
   def get(_endpoint, %{"content-encoding" => "gzip"}), do: {:ok, %HTTPoison.Response{body: :zlib.gzip("some content from origin")}}

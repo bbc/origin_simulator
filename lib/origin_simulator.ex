@@ -1,4 +1,8 @@
 defmodule OriginSimulator do
+  @moduledoc """
+  Main router for handling and responding to OriginSimulator requests.
+  """
+
   use Plug.Router
   alias OriginSimulator.{Payload, Simulation, Plug.ResponseCounter}
 
@@ -20,6 +24,7 @@ defmodule OriginSimulator do
     send_resp(conn, 404, "not found")
   end
 
+  @doc false
   def admin_domain(), do: Application.get_env(:origin_simulator, :admin_domain)
 
   defp serve_payload(conn, route) do
@@ -52,9 +57,11 @@ defmodule OriginSimulator do
   defp sleep(%Range{} = time), do: :timer.sleep(Enum.random(time))
   defp sleep(duration), do: :timer.sleep(duration)
 
+  @doc false
   def recipe_not_set(),
     do: "Recipe not set, please POST a recipe to /#{admin_domain()}/add_recipe"
 
+  @doc false
   def recipe_not_set(path) do
     "Recipe not set at #{path}, please POST a recipe for this route to /#{admin_domain()}/add_recipe"
   end
