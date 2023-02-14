@@ -16,6 +16,11 @@ defmodule TestHelpers do
     conn
   end
 
+  def assert_default_page(conn) do
+    assert conn.status == 200
+    assert conn.resp_body == OriginSimulator.DefaultRecipe.body() |> :zlib.gzip()
+  end
+
   def assert_resp_header(conn, {header, content}) do
     assert get_resp_header(conn, header) == content
     conn

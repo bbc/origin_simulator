@@ -13,6 +13,7 @@ defmodule OriginSimulator.Recipe do
   @spec parse({:ok, binary(), any()}) :: binary()
   def parse({:ok, "[" <> body, _conn}), do: Poison.decode!("[" <> body, as: [%__MODULE__{}])
   def parse({:ok, body, _conn}), do: Poison.decode!(body, as: %__MODULE__{})
+  def parse(body), do: Poison.decode!(body, as: %__MODULE__{})
 
   @spec default_route() :: binary()
   def default_route(), do: %__MODULE__{}.route

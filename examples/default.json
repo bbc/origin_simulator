@@ -1,0 +1,28 @@
+{
+    "headers": { "cache-control": "public, max-age=30", "content-encoding": "gzip" },
+    "stages": [
+        { "at": 0, "status": 200, "latency": "100ms"}
+    ],
+    "body": "<!doctype html>
+<html lang=\"en\">
+  <head>
+    <meta charset=\"utf-8\">
+    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">
+    <link rel=\"stylesheet\" href=\"https://unpkg.com/@picocss/pico@1.*/css/pico.min.css\">
+    <title>Hello, world!</title>
+  </head>
+  <body>
+    <main class=\"container\">
+      <h1>Origin Simulator</h1>
+      <p>
+        You can read more about Origin Simlulator <a href=\"https://github.com/bbc/origin_simulator\">here</a>, but to quickly start adding a recipe run:
+        <pre><code>curl -X POST -d @os_200.json http://origin-simulator.foo.bar/_admin/add_recipe</code></pre>
+      </p>
+      <p>
+        To see the current recipe use: 
+        <pre><code>curl http://origin-simulator.foo.bar/_admin/current_recipe</code></pre>
+      </p>      
+    </main>
+  </body>
+</html>"
+}

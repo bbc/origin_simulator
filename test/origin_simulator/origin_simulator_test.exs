@@ -194,16 +194,16 @@ defmodule OriginSimulatorTest do
   end
 
   describe "when a recipe is not set" do
-    test "GET / will return an error message" do
+    test "GET / will return the default content" do
       conn(:get, "/")
       |> OriginSimulator.call([])
-      |> assert_status_body(406, recipe_not_set("/"))
+      |> assert_default_page()
     end
 
     test "POST / will return an error message" do
       conn(:post, "/")
       |> OriginSimulator.call([])
-      |> assert_status_body(406, recipe_not_set("/"))
+      |> assert_default_page()
     end
   end
 
