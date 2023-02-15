@@ -12,8 +12,8 @@ defmodule OriginSimulator.Recipe do
   # TODO: parameters don't make sense, need fixing
   @spec parse({:ok, binary(), any()}) :: binary()
   def parse({:ok, "[" <> body, _conn}), do: Poison.decode!("[" <> body, as: [%__MODULE__{}])
-  def parse({:ok, body, _conn}), do: Poison.decode!(body, as: %__MODULE__{})
-  def parse(body), do: Poison.decode!(body, as: %__MODULE__{})
+  def parse({:ok, body, _conn}), do: String.replace(body, "\n", "") |> Poison.decode!(as: %__MODULE__{})
+  def parse(body), do: String.replace(body, "\n", "") |> Poison.decode!(as: %__MODULE__{})
 
   @spec default_route() :: binary()
   def default_route(), do: %__MODULE__{}.route
