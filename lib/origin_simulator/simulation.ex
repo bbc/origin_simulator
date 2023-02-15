@@ -86,19 +86,7 @@ defmodule OriginSimulator.Simulation do
 
   @impl true
   def handle_call({:add_recipe, new_recipe}, _caller, state) do
-    :ok = Payload.fetch(:payload, new_recipe)
-
-    route = new_recipe.route
-    simulation = get(state[route])
-
-    Enum.map(new_recipe.stages, fn item ->
-      Process.send_after(
-        self(),
-        {:update, route, item["status"], Duration.parse(item["latency"])},
-        Duration.parse(item["at"])
-      )
-    end)
-
+    {route, simulation} = ingest_recipe(state, new_recipe)
     {:reply, :ok, Map.put(state, route, %{simulation | recipe: new_recipe})}
   end
 
@@ -115,19 +103,35 @@ defmodule OriginSimulator.Simulation do
     {:noreply, Map.put(state, route, %{state[route] | status: status, latency: latency})}
   end
 
+  @impl true
   def handle_continue(:setup_default_recipe, state) do
-    recipe = DefaultRecipe.generate()
-    :ok = Payload.fetch(:payload, recipe)
+    recipe = File.read!(File.cwd!() <> "/examples/default.json") |> OriginSimulator.Recipe.parse()
+    {_route, simulation} = ingest_recipe(state, recipe)
 
-    simulation = %{recipe: recipe, status: 200, latency: 0, body: DefaultRecipe.body()}
+    {:noreply, simulation}
+  end
 
-    {:noreply, %{Recipe.default_route() => simulation}}
+  defp ingest_recipe(state, new_recipe)do
+    :ok = Payload.fetch(:payload, new_recipe)
+
+    route = new_recipe.route
+    simulation = get(state[route])
+
+    Enum.map(new_recipe.stages, fn item ->
+      Process.send_after(
+        self(),
+        {:update, route, item["status"], Duration.parse(item["latency"])},
+        Duration.parse(item["at"])
+      )
+    end)
+
+    {route, simulation}
   end
 
   defp get(nil), do: default_simulation()
   defp get(current_state), do: current_state
 
-  defp default_simulation, do: %{recipe: nil, status: 406, latency: 0}
+  defp default_simulation, do: %{recipe: File.read!(File.cwd!() <> "/examples/default.json"), status: 200, latency: 0}
 
   defp match_route(state, nil, route) do
     Map.keys(state)
