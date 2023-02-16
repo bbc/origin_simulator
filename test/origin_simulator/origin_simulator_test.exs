@@ -5,7 +5,6 @@ defmodule OriginSimulatorTest do
   import Fixtures
   import Fixtures.Recipes
   import TestHelpers
-  import OriginSimulator, only: [recipe_not_set: 1]
 
   doctest OriginSimulator
 
@@ -271,7 +270,7 @@ defmodule OriginSimulatorTest do
       |> assert_status_body(200, body_mock())
     end
 
-    test "GET non-matching route will return error", %{payload: payload} do
+    test "GET non-matching route will return the default page", %{payload: payload} do
       conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload))
       |> OriginSimulator.call([])
 
@@ -279,10 +278,10 @@ defmodule OriginSimulatorTest do
 
       conn(:get, "/not_matching_random_path")
       |> OriginSimulator.call([])
-      |> assert_status_body(406, recipe_not_set("/not_matching_random_path"))
+      |> assert_default_page()
     end
 
-    test "GET non-matching route (widlcard) will return error", %{payload: payload} do
+    test "GET non-matching route (widlcard) will return the default page", %{payload: payload} do
       payload = Map.put(payload, "route", "/news*")
 
       conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload))
@@ -292,7 +291,7 @@ defmodule OriginSimulatorTest do
 
       conn(:get, "/cbbc")
       |> OriginSimulator.call([])
-      |> assert_status_body(406, recipe_not_set("/cbbc"))
+      |> assert_default_page()
     end
   end
 
@@ -364,7 +363,7 @@ defmodule OriginSimulatorTest do
       |> assert_status_body(200, body_mock(%{"content-type" => "application/json"}))
     end
 
-    test "GET non-matching route will return error", %{payload: payload} do
+    test "GET non-matching route will return the default page", %{payload: payload} do
       conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload))
       |> OriginSimulator.call([])
 
@@ -372,10 +371,10 @@ defmodule OriginSimulatorTest do
 
       conn(:get, "/random_path")
       |> OriginSimulator.call([])
-      |> assert_status_body(406, recipe_not_set("/random_path"))
+      |> assert_default_page()
     end
 
-    test "GET non-matching route (widlcard) will return error", %{payload: payload} do
+    test "GET non-matching route (widlcard) will return the default page", %{payload: payload} do
       payload = Map.put(payload, "route", "/news*")
 
       conn(:post, "/#{admin_domain()}/add_recipe", Poison.encode!(payload))
@@ -385,7 +384,7 @@ defmodule OriginSimulatorTest do
 
       conn(:get, "/sport")
       |> OriginSimulator.call([])
-      |> assert_status_body(406, recipe_not_set("/sport"))
+      |> assert_default_page()
     end
   end
 

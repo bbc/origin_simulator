@@ -107,18 +107,18 @@ defmodule OriginSimulator.SimulationTest do
     end
   end
 
-  describe "with no recipe loaded" do
+  describe "with only the default recipe loaded" do
     setup do
       Simulation.restart()
       Process.sleep(5)
     end
 
     test "state() returns a tuple with default values" do
-      assert Simulation.state(:simulation, Recipe.default_route()) == {406, 0}
+      assert Simulation.state(:simulation, Recipe.default_route()) == {200, 100}
     end
 
     test "recipe() returns an empty list" do
-      assert Simulation.recipe(:simulation) == []
+      assert Simulation.recipe(:simulation) == [default_recipe()]
     end
 
     test "route() returns default route" do

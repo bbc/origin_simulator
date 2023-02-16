@@ -18,7 +18,8 @@ defmodule TestHelpers do
 
   def assert_default_page(conn) do
     assert conn.status == 200
-    assert conn.resp_body == OriginSimulator.DefaultRecipe.body() |> :zlib.gzip()
+    assert conn.resp_body |> :zlib.gunzip() =~ "BBC Origin Simulator - Default Content"
+    assert get_resp_header(conn, "content-type") == ["text/html; charset=utf-8"]
   end
 
   def assert_resp_header(conn, {header, content}) do

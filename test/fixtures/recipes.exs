@@ -36,7 +36,7 @@ defmodule Fixtures.Recipes do
   end
 
   def multi_route_origin_recipes() do
-    [
+    [default_recipe()] ++ [
       %Recipe{
         origin: "https://www.bbc.co.uk/news",
         stages: [%{"at" => 0, "status" => 200, "latency" => 0}],
@@ -58,5 +58,9 @@ defmodule Fixtures.Recipes do
         route: "news/entertainment_and_arts"
       }
     ]
+  end
+
+  def default_recipe do
+    File.read!(File.cwd!() <> "/examples/default.json") |> OriginSimulator.Recipe.parse()
   end
 end
