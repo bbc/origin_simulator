@@ -36,28 +36,29 @@ defmodule Fixtures.Recipes do
   end
 
   def multi_route_origin_recipes() do
-    [default_recipe()] ++ [
-      %Recipe{
-        origin: "https://www.bbc.co.uk/news",
-        stages: [%{"at" => 0, "status" => 200, "latency" => 0}],
-        route: "/news"
-      },
-      %Recipe{
-        origin: "https://www.bbc.co.uk/sport",
-        stages: [%{"at" => 0, "status" => 200, "latency" => 0}],
-        route: "/sport"
-      },
-      %Recipe{
-        origin: "https://www.bbc.co.uk/weather",
-        stages: [%{"at" => 0, "status" => 200, "latency" => 0}],
-        route: "/weather"
-      },
-      %Recipe{
-        origin: "https://www.bbc.co.uk/news/entertainment_and_arts",
-        stages: [%{"at" => 0, "status" => 200, "latency" => 0}],
-        route: "news/entertainment_and_arts"
-      }
-    ]
+    [default_recipe()] ++
+      [
+        %Recipe{
+          origin: "https://www.bbc.co.uk/news",
+          stages: [%{"at" => 0, "status" => 200, "latency" => 0}],
+          route: "/news"
+        },
+        %Recipe{
+          origin: "https://www.bbc.co.uk/sport",
+          stages: [%{"at" => 0, "status" => 200, "latency" => 0}],
+          route: "/sport"
+        },
+        %Recipe{
+          origin: "https://www.bbc.co.uk/weather",
+          stages: [%{"at" => 0, "status" => 200, "latency" => 0}],
+          route: "/weather"
+        },
+        %Recipe{
+          origin: "https://www.bbc.co.uk/news/entertainment_and_arts",
+          stages: [%{"at" => 0, "status" => 200, "latency" => 0}],
+          route: "news/entertainment_and_arts"
+        }
+      ]
   end
 
   def default_recipe do

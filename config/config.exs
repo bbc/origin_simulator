@@ -21,6 +21,6 @@ import Config
 config :origin_simulator,
   admin_domain: "_admin",
   http_client: OriginSimulator.HTTP.Client,
-  http_port: 8082
+  http_port: 8080
 
 import_config "#{Mix.env()}.exs"

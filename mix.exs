@@ -8,7 +8,7 @@ defmodule OriginSimulator.MixProject do
   def project do
     [
       app: :origin_simulator,
-      version: "1.0.0",
+      version: "1.1.0",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -51,13 +51,8 @@ defmodule OriginSimulator.MixProject do
       maintainers: [
         "bbc",
         "JoeARO",
-        "woodyblah",
-        "james-bowers",
         "ettomatic",
-        "samfrench",
-        "chrishop",
-        "astalker",
-        "boonious"
+        "samfrench"
       ],
       licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/bbc/origin_simulator"}

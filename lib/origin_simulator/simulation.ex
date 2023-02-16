@@ -112,7 +112,7 @@ defmodule OriginSimulator.Simulation do
     {:noreply, simulation}
   end
 
-  defp ingest_recipe(state, new_recipe)do
+  defp ingest_recipe(state, new_recipe) do
     :ok = Payload.fetch(:payload, new_recipe)
 
     route = new_recipe.route
