@@ -1,5 +1,5 @@
 defmodule Fixtures do
-  @http_client Application.get_env(:origin_simulator, :http_client)
+  @http_client Application.compile_env(:origin_simulator, :http_client)
 
   def body_mock(headers \\ %{}) do
     {:ok, %{body: body}} = @http_client.get("/", headers)

@@ -1,7 +1,7 @@
 defmodule OriginSimulator.Simulation do
   use GenServer
 
-  alias OriginSimulator.{Recipe, Payload, Duration}
+  alias OriginSimulator.{Payload, Duration}
 
   ## Client API
 
@@ -54,7 +54,7 @@ defmodule OriginSimulator.Simulation do
 
   @impl true
   def init(_) do
-    {:ok, %{Recipe.default_route() => default_simulation()}}
+    {:ok, %{}, {:continue, :setup_default_recipe}}
   end
 
   @impl true
@@ -86,20 +86,9 @@ defmodule OriginSimulator.Simulation do
 
   @impl true
   def handle_call({:add_recipe, new_recipe}, _caller, state) do
-    Payload.fetch(:payload, new_recipe)
+    simulation = ingest_recipe(state, new_recipe)
 
-    route = new_recipe.route
-    simulation = get(state[route])
-
-    Enum.map(new_recipe.stages, fn item ->
-      Process.send_after(
-        self(),
-        {:update, route, item["status"], Duration.parse(item["latency"])},
-        Duration.parse(item["at"])
-      )
-    end)
-
-    {:reply, :ok, Map.put(state, route, %{simulation | recipe: new_recipe})}
+    {:reply, :ok, simulation}
   end
 
   @impl true
@@ -115,10 +104,35 @@ defmodule OriginSimulator.Simulation do
     {:noreply, Map.put(state, route, %{state[route] | status: status, latency: latency})}
   end
 
+  @impl true
+  def handle_continue(:setup_default_recipe, state) do
+    recipe = File.read!(File.cwd!() <> "/examples/default.json") |> OriginSimulator.Recipe.parse()
+    simulation = ingest_recipe(state, recipe)
+
+    {:noreply, simulation}
+  end
+
+  defp ingest_recipe(state, new_recipe) do
+    :ok = Payload.fetch(:payload, new_recipe)
+
+    route = new_recipe.route
+    simulation = get(state[route])
+
+    Enum.map(new_recipe.stages, fn item ->
+      Process.send_after(
+        self(),
+        {:update, route, item["status"], Duration.parse(item["latency"])},
+        Duration.parse(item["at"])
+      )
+    end)
+
+    Map.put(state, route, %{simulation | recipe: new_recipe})
+  end
+
   defp get(nil), do: default_simulation()
   defp get(current_state), do: current_state
 
-  defp default_simulation(), do: %{recipe: nil, status: 406, latency: 0}
+  defp default_simulation, do: %{recipe: nil, status: 406, latency: 0}
 
   defp match_route(state, nil, route) do
     Map.keys(state)

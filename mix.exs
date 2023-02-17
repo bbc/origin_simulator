@@ -8,7 +8,7 @@ defmodule OriginSimulator.MixProject do
   def project do
     [
       app: :origin_simulator,
-      version: "1.0.0",
+      version: "1.1.0",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -35,13 +35,13 @@ defmodule OriginSimulator.MixProject do
 
   defp deps do
     [
-      {:plug, "~> 1.11"},
-      {:cowboy, "~> 2.8"},
-      {:plug_cowboy, "~> 2.5"},
-      {:poison, "~> 4.0"},
-      {:httpoison, "~> 1.8"},
+      {:plug, "~> 1.13"},
+      {:cowboy, "~> 2.9"},
+      {:plug_cowboy, "~> 2.6"},
+      {:poison, "~> 5.0"},
+      {:httpoison, "~> 2.0"},
       {:distillery, "~> 2.1"},
-      {:ex_doc, "~> 0.24", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.29", only: :dev, runtime: false}
     ]
   end
 
@@ -51,13 +51,8 @@ defmodule OriginSimulator.MixProject do
       maintainers: [
         "bbc",
         "JoeARO",
-        "woodyblah",
-        "james-bowers",
         "ettomatic",
-        "samfrench",
-        "chrishop",
-        "astalker",
-        "boonious"
+        "samfrench"
       ],
       licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/bbc/origin_simulator"}

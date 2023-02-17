@@ -4,7 +4,6 @@ defmodule OriginSimulator.AdminRouterTest do
 
   import Fixtures.Recipes
   import TestHelpers
-  import OriginSimulator, only: [recipe_not_set: 1]
 
   setup do
     OriginSimulator.Simulation.restart()
@@ -19,11 +18,10 @@ defmodule OriginSimulator.AdminRouterTest do
       |> assert_resp_header({"content-type", ["text/plain; charset=utf-8"]})
     end
 
-    test "will not match request with similar path" do
+    test "will not match request with similar path and get the default page" do
       conn(:get, "/another_domain/status")
       |> OriginSimulator.call([])
-      |> assert_status_body(406, recipe_not_set("/another_domain/status"))
-      |> assert_resp_header({"content-type", ["text/html; charset=utf-8"]})
+      |> assert_default_page()
     end
   end
 
@@ -35,11 +33,10 @@ defmodule OriginSimulator.AdminRouterTest do
       |> assert_resp_header({"content-type", ["text/plain; charset=utf-8"]})
     end
 
-    test "will not match request with similar path" do
+    test "will return the default content" do
       conn(:get, "/another_domain/routes")
       |> OriginSimulator.call([])
-      |> assert_status_body(406, recipe_not_set("/another_domain/routes"))
-      |> assert_resp_header({"content-type", ["text/html; charset=utf-8"]})
+      |> assert_default_page()
     end
 
     test "will not increment response counter" do
@@ -54,15 +51,14 @@ defmodule OriginSimulator.AdminRouterTest do
     test "will return default route" do
       conn(:get, "/#{admin_domain()}/routes_status")
       |> OriginSimulator.call([])
-      |> assert_status_body(200, "/* 406 0")
+      |> assert_status_body(200, "/* 200 100")
       |> assert_resp_header({"content-type", ["text/plain; charset=utf-8"]})
     end
 
-    test "will not match request with similar path" do
+    test "will return the default page" do
       conn(:get, "/another_domain/routes_status")
       |> OriginSimulator.call([])
-      |> assert_status_body(406, recipe_not_set("/another_domain/routes_status"))
-      |> assert_resp_header({"content-type", ["text/html; charset=utf-8"]})
+      |> assert_default_page()
     end
   end
 
@@ -74,27 +70,25 @@ defmodule OriginSimulator.AdminRouterTest do
       |> assert_resp_header({"content-type", ["text/plain; charset=utf-8"]})
     end
 
-    test "will not match request with similar path" do
+    test "will return the default content" do
       conn(:get, "/another_domain/restart")
       |> OriginSimulator.call([])
-      |> assert_status_body(406, recipe_not_set("/another_domain/restart"))
-      |> assert_resp_header({"content-type", ["text/html; charset=utf-8"]})
+      |> assert_default_page()
     end
   end
 
   describe "GET /#{admin_domain()}/current_recipe" do
-    test "will return an error message if payload has not been set" do
+    test "will return the default recipe" do
       conn(:get, "/#{admin_domain()}/current_recipe")
       |> OriginSimulator.call([])
-      |> assert_status_body(200, "\"Recipe not set, please POST a recipe to /_admin/add_recipe\"")
+      |> assert_status_body(200, [default_recipe()] |> Poison.encode!())
       |> assert_resp_header({"content-type", ["application/json; charset=utf-8"]})
     end
 
-    test "will not match request with similar path" do
+    test "will return the default content" do
       conn(:get, "/another_domain/current_recipe")
       |> OriginSimulator.call([])
-      |> assert_status_body(406, recipe_not_set("/another_domain/current_recipe"))
-      |> assert_resp_header({"content-type", ["text/html; charset=utf-8"]})
+      |> assert_default_page()
     end
 
     test "will return the payload if set" do
@@ -151,11 +145,10 @@ defmodule OriginSimulator.AdminRouterTest do
     # in `lib/origin_simulator.ex` ~line 42
     test "will mhandle malformed recipe", do: true
 
-    test "will not match request with similar path" do
+    test "will return the default content" do
       conn(:get, "/another_domain/add_recipe")
       |> OriginSimulator.call([])
-      |> assert_status_body(406, recipe_not_set("/another_domain/add_recipe"))
-      |> assert_resp_header({"content-type", ["text/html; charset=utf-8"]})
+      |> assert_default_page()
     end
   end
 end
