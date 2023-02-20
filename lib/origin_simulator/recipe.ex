@@ -1,4 +1,6 @@
 defmodule OriginSimulator.Recipe do
+  alias OriginSimulator.DefaultRecipe
+
   defstruct origin: nil, body: nil, random_content: nil, headers: %{}, stages: [], route: "/*"
 
   @type t :: %__MODULE__{
@@ -17,4 +19,6 @@ defmodule OriginSimulator.Recipe do
 
   @spec default_route() :: binary()
   def default_route(), do: %__MODULE__{}.route
+
+  def default_recipe, do: DefaultRecipe.recipe()
 end

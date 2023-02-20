@@ -62,6 +62,6 @@ defmodule Fixtures.Recipes do
   end
 
   def default_recipe do
-    File.read!(File.cwd!() <> "/examples/default.json") |> OriginSimulator.Recipe.parse()
+    Recipe.default_recipe()
   end
 end

@@ -1,7 +1,7 @@
 defmodule OriginSimulator.Simulation do
   use GenServer
 
-  alias OriginSimulator.{Payload, Duration}
+  alias OriginSimulator.{Duration, Payload, Recipe}
 
   ## Client API
 
@@ -106,8 +106,8 @@ defmodule OriginSimulator.Simulation do
 
   @impl true
   def handle_continue(:setup_default_recipe, state) do
-    recipe = File.read!(File.cwd!() <> "/examples/default.json") |> OriginSimulator.Recipe.parse()
-    simulation = ingest_recipe(state, recipe)
+    default_recipe = Recipe.default_recipe()
+    simulation = ingest_recipe(state, default_recipe)
 
     {:noreply, simulation}
   end
