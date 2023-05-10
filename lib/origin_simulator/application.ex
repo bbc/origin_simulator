@@ -10,7 +10,7 @@ defmodule OriginSimulator.Application do
         plug: OriginSimulator,
         options: [
           port: Application.fetch_env!(:origin_simulator, :http_port),
-          protocol_options: [max_keepalive: 5_000_000]
+          protocol_options: [max_keepalive: 5_000_000, max_header_value_length: 16_384, idle_timeout: 10_000]
         ]
       ),
       OriginSimulator.Supervisor
