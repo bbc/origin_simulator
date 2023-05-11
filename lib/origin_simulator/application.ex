@@ -5,14 +5,15 @@ defmodule OriginSimulator.Application do
 
   def start(_type, _args) do
     children = [
-      Plug.Adapters.Cowboy.child_spec(
-        scheme: :http,
-        plug: OriginSimulator,
-        options: [
-          port: Application.fetch_env!(:origin_simulator, :http_port),
-          protocol_options: [max_keepalive: 5_000_000, max_header_value_length: 16_384, idle_timeout: 10_000]
-        ]
-      ),
+      {Bandit,
+       plug: OriginSimulator,
+       scheme: :http,
+       thousand_island_options: [
+         shutdown_timeout: 10_000,
+         read_timeout: 45_000,
+         num_acceptors: 100,
+         num_connections: 16_384
+       ]},
       OriginSimulator.Supervisor
     ]
 
