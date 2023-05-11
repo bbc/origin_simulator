@@ -8,6 +8,7 @@ defmodule OriginSimulator.Application do
       {Bandit,
        plug: OriginSimulator,
        scheme: :http,
+       port: 8080,
        thousand_island_options: [
          shutdown_timeout: 10_000,
          read_timeout: 45_000,
