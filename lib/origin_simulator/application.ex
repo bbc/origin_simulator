@@ -12,8 +12,9 @@ defmodule OriginSimulator.Application do
        thousand_island_options: [
          shutdown_timeout: 10_000,
          read_timeout: 45_000,
-         num_acceptors: 200,
-         num_connections: 16_384
+         num_acceptors: 100,
+         num_connections: 16_384,
+         max_connections_retry_count: 0
        ]},
       OriginSimulator.Supervisor
     ]
