@@ -4,9 +4,6 @@ exported-variables:
     - COSMOS_VERSION
 
 phases:
-  pre_build:
-    commands:
-      - dnf install -y spectacle jq --disablerepo=epel # spectacle has a name clash with s/t in the el8 epel repo
   build:
     commands:
        - mix deps.get
@@ -18,5 +15,4 @@ phases:
        - export COSMOS_COMPONENT_NAME='origin-simulator'
        - export COSMOS_VERSION=`cosmos-release generate-version ${COSMOS_COMPONENT_NAME}`
        - echo COSMOS_VERSION=$COSMOS_VERSION
-       - spectacle $COSMOS_VERSION
        - rpmbuild -ba origin-simulator.spec
