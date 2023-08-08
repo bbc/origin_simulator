@@ -1,0 +1,11 @@
+version: 0.2
+
+phases:
+  build:
+    commands:
+       - mix deps.get
+       - mix distillery.release
+       - cp _build/prod/rel/origin_simulator/releases/*/origin_simulator.tar.gz SOURCES/
+       - cp origin-simulator.spec SOURCES/
+       - cd SOURCES
+       - rpmbuild -ba origin-simulator.spec
