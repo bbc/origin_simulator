@@ -12,7 +12,6 @@ phases:
        - cp origin-simulator.spec SOURCES/
        - cd SOURCES
        - echo "Generating version file"
-       - export COSMOS_COMPONENT_NAME='origin-simulator'
-       - export COSMOS_VERSION=`cosmos-release generate-version ${COSMOS_COMPONENT_NAME}`
+       - export COSMOS_VERSION=`cosmos-release generate-version origin-simulator`
        - echo COSMOS_VERSION=$COSMOS_VERSION
        - rpmbuild -ba origin-simulator.spec
