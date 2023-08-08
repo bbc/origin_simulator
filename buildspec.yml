@@ -6,7 +6,6 @@ exported-variables:
 phases:
   pre_build:
     commands:
-      - certee-fetch
       - yum install -y spectacle jq --disablerepo=epel # spectacle has a name clash with s/t in the el8 epel repo
   build:
     commands:
