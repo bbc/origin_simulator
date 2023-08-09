@@ -8,10 +8,10 @@ phases:
     commands:
        - mix deps.get
        - mix distillery.release
-       - mkdir -p root/rpmbuild/SOURCES
+       - mkdir -p /root/rpmbuild/SOURCES
        - pwd
-       - cp _build/prod/rel/origin_simulator/releases/*/origin_simulator.tar.gz ./root/rpmbuild/SOURCES/
-       - cp origin-simulator.spec ./root/rpmbuild/SOURCES/
+       - cp _build/prod/rel/origin_simulator/releases/*/origin_simulator.tar.gz /root/rpmbuild/SOURCES/
+       - cp origin-simulator.spec /root/rpmbuild/SOURCES/
        - cd root/rpmbuild/SOURCES
        - pwd
        - ls -l
