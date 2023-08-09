@@ -33,7 +33,7 @@ mkdir -p %{buildroot}/etc/sysctl.d
 mkdir -p %{buildroot}/etc/security/limits.d
 mkdir -p %{buildroot}/home/component
 mkdir -p %{buildroot}/home/component/origin_simulator
-tar -C %{buildroot}/home/component/origin_simulator -xzf %{SOURCE0}
+tar -C %{buildroot}/home/component/origin_simulator -xzf ./%{SOURCE0}
 mkdir -p %{buildroot}/usr/lib/systemd/system
 cp %{SOURCE1} %{buildroot}/usr/lib/systemd/system/origin_simulator.service
 cp %{SOURCE2} %{buildroot}/etc/sysctl.d/performance.conf
