@@ -8,9 +8,9 @@ phases:
     commands:
        - mix deps.get
        - mix distillery.release
-       - cp _build/prod/rel/origin_simulator/releases/*/origin_simulator.tar.gz SOURCES/
-       - cp origin-simulator.spec SOURCES/
-       - cd SOURCES
+       - cp _build/prod/rel/origin_simulator/releases/*/origin_simulator.tar.gz root/rpmbuild/SOURCES/
+       - cp origin-simulator.spec root/rpmbuild/SOURCES/
+       - cd root/rpmbuild/SOURCES
        - echo "Generating version file"
        - export COSMOS_VERSION=`cosmos-release generate-version origin-simulator`
        - echo COSMOS_VERSION=87
