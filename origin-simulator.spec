@@ -34,6 +34,7 @@ mkdir -p %{buildroot}/etc/sysctl.d
 mkdir -p %{buildroot}/etc/security/limits.d
 mkdir -p %{buildroot}/home/component
 mkdir -p %{buildroot}/home/component/origin_simulator
+env
 cd /root/rpmbuild/SOURCES
 pwd
 ls -l
