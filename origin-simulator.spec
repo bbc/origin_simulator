@@ -7,10 +7,9 @@ URL: https://github.com/bbc/origin_simulator
 Summary: Simulates a non perfect downstream service
 Packager: BBC News Frameworks and Tools
 
-
-Source0: $CODEBUILD_SRC_DIR/root/rpmbuild/SOURCES/origin_simulator.tar.gz
-Source1: $CODEBUILD_SRC_DIR/root/rpmbuild/SOURCES/origin_simulator.service
-Source2: $CODEBUILD_SRC_DIR/root/rpmbuild/SOURCES/performance.conf
+Source0: %{getenv:CODEBUILD_SRC_DIR}/root/rpmbuild/SOURCES/origin_simulator.tar.gz
+Source1: %{getenv:CODEBUILD_SRC_DIR}/root/rpmbuild/SOURCES/origin_simulator.service
+Source2: %{getenv:CODEBUILD_SRC_DIR}/root/rpmbuild/SOURCES/performance.conf
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildArch: x86_64
