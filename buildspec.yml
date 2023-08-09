@@ -12,6 +12,8 @@ phases:
        - pwd
        - cp _build/prod/rel/origin_simulator/releases/*/origin_simulator.tar.gz /root/rpmbuild/SOURCES/
        - cp origin-simulator.spec /root/rpmbuild/SOURCES/
+       - cp SOURCES/origin-simulator.service /root/rpmbuild/SOURCES/
+       - cp SOURCES/performance.conf /root/rpmbuild/SOURCES/
        - cd /root/rpmbuild/SOURCES
        - pwd
        - ls -l
