@@ -7,7 +7,7 @@ URL: https://github.com/bbc/origin_simulator
 Summary: Simulates a non perfect downstream service
 Packager: BBC News Frameworks and Tools
 
-Source0: origin_simulator.tar.gz
+Source0: origin_simulator-87-1.el8.x86_64.tar.gz
 Source1: origin_simulator.service
 Source2: performance.conf
 
