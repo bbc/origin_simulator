@@ -4,6 +4,10 @@ exported-variables:
     - COSMOS_VERSION
 
 phases:
+  pre_build:
+    commands:
+      - certee-fetch
+
   build:
     commands:
        - mix deps.get
@@ -19,5 +23,4 @@ phases:
        - ls -l
        - echo "Generating version file"
        - export COSMOS_VERSION=`cosmos-release generate-version origin-simulator`
-       - echo COSMOS_VERSION=87
        - rpmbuild -ba origin-simulator.spec
