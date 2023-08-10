@@ -23,4 +23,5 @@ phases:
        - ls -l
        - echo "Generating version file"
        - export COSMOS_VERSION=`cosmos-release generate-version origin-simulator`
-       - rpmbuild -ba origin-simulator.spec
+       - rpmbuild -ba --define "cosmos_version_ ${COSMOS_VERSION}" origin-simulator.spec
+
