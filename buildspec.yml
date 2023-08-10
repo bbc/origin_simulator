@@ -10,6 +10,7 @@ phases:
 
   build:
     commands:
+       - cosmos-release --help service
        - mix deps.get
        - mix distillery.release
        - mkdir -p /root/rpmbuild/SOURCES
