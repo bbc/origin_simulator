@@ -1,5 +1,5 @@
 Name: origin-simulator
-Version: %{cosmos_version_}
+Version: %{cosmos_version}
 Release: 1%{?dist}
 License: MPL-2.0
 Group: Development/Frameworks
@@ -33,10 +33,6 @@ mkdir -p %{buildroot}/etc/sysctl.d
 mkdir -p %{buildroot}/etc/security/limits.d
 mkdir -p %{buildroot}/home/component
 mkdir -p %{buildroot}/home/component/origin_simulator
-env
-cd /root/rpmbuild/SOURCES
-pwd
-ls -l
 tar -C %{buildroot}/home/component/origin_simulator -xzf %{SOURCE0}
 mkdir -p %{buildroot}/usr/lib/systemd/system
 cp %{SOURCE1} %{buildroot}/usr/lib/systemd/system/origin_simulator.service
