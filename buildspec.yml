@@ -7,6 +7,7 @@ phases:
 
   build:
     commands:
+       - dnf install chsh
        - mix deps.get
        - mix distillery.release
        - mkdir -p /root/rpmbuild/SOURCES
