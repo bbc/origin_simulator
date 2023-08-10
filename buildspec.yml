@@ -10,10 +10,10 @@ phases:
 
   build:
     commands:
-       - cosmos-release --help service
        - mix deps.get
        - mix distillery.release
        - mkdir -p /root/rpmbuild/SOURCES
+       - export GIT_HEAD=$(git rev-parse --short HEAD)
        - cp _build/prod/rel/origin_simulator/releases/*/origin_simulator.tar.gz /root/rpmbuild/SOURCES/
        - cp origin-simulator.spec /root/rpmbuild/SOURCES/
        - cp SOURCES/origin_simulator.service /root/rpmbuild/SOURCES/
@@ -21,7 +21,8 @@ phases:
        - cd /root/rpmbuild/SOURCES
        - echo "Generating version file"
        - export COSMOS_VERSION=`cosmos-release generate-version origin-simulator`
-       - rpmbuild -ba --define "cosmos_version ${COSMOS_VERSION}" origin-simulator.spec
+       - rpmbuild -ba --define "cosmos_version_git_head ${COSMOS_VERSION}.${GIT_HEAD}" origin-simulator.spec
        - echo "Releasing 'RPMS/x86_64/*.x86_64.rpm' to origin-simulator"
+       - env
        - cd $CODEBUILD_SRC_DIR
        - cosmos-release service 'origin-simulator' --release-version=v /root/rpmbuild/RPMS/x86_64/*.x86_64.rpm
