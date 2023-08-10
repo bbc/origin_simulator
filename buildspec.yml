@@ -23,5 +23,5 @@ phases:
        - export COSMOS_VERSION=`cosmos-release generate-version origin-simulator`
        - rpmbuild -ba --define "cosmos_version ${COSMOS_VERSION}" origin-simulator.spec
        - echo "Releasing 'RPMS/x86_64/*.x86_64.rpm' to origin-simulator"
-       - cosmos-release service origin-simulator --release-version=v /root/rpmbuild/RPMS/x86_64/*.x86_64.rpm
+       - cosmos-release service origin-simulator --stdout --release-version=v /root/rpmbuild/RPMS/x86_64/*.x86_64.rpm
 
