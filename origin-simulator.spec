@@ -1,5 +1,5 @@
 Name: origin-simulator
-Version: $COSMOS_VERSION
+Version: %{COSMOS_VERSION}
 Release: 1%{?dist}
 License: MPL-2.0
 Group: Development/Frameworks
