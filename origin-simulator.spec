@@ -1,5 +1,5 @@
 Name: origin-simulator
-Version: %{cosmosversion}
+Version: %{cosmos_version}
 Release: 1%{?dist}
 License: MPL-2.0
 Group: Development/Frameworks
@@ -7,9 +7,9 @@ URL: https://github.com/bbc/origin_simulator
 Summary: Simulates a non perfect downstream service
 Packager: BBC News Frameworks and Tools
 
-Source0: origin_simulator.tar.gz
-Source1: origin_simulator.service
-Source2: performance.conf
+Source0: /root/rpmbuild/SOURCES/origin_simulator.tar.gz
+Source1: /root/rpmbuild/SOURCES/origin_simulator.service
+Source2: /root/rpmbuild/SOURCES/performance.conf
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildArch: x86_64
@@ -25,7 +25,6 @@ on a Cosmos CentOS service.
 %pre
 /usr/bin/getent group component >/dev/null || groupadd -r component
 /usr/bin/getent passwd component >/dev/null || useradd -r -g component -G component -s /sbin/nologin -c 'component service' component
-/usr/bin/chsh -s /bin/bash component
 
 %install
 mkdir -p %{buildroot}

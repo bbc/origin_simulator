@@ -1,0 +1,25 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - certee-fetch
+
+  build:
+    commands:
+       - mix deps.get
+       - mix distillery.release
+       - mkdir -p /root/rpmbuild/SOURCES
+       - cp _build/prod/rel/origin_simulator/releases/*/origin_simulator.tar.gz /root/rpmbuild/SOURCES/
+       - cp origin-simulator.spec /root/rpmbuild/SOURCES/
+       - cp SOURCES/origin_simulator.service /root/rpmbuild/SOURCES/
+       - cp SOURCES/performance.conf /root/rpmbuild/SOURCES/
+       - cd /root/rpmbuild/SOURCES
+       - echo "Generating version file"
+       - export COSMOS_VERSION=`cosmos-release generate-version origin-simulator`
+       - rpmbuild -ba --define "cosmos_version ${COSMOS_VERSION}" origin-simulator.spec
+  post_build:
+    commands:
+       - echo "Releasing 'RPMS/x86_64/*.x86_64.rpm' to origin-simulator"
+       - cd $CODEBUILD_SRC_DIR
+       - cosmos-release service 'origin-simulator' --release-version=v /root/rpmbuild/RPMS/x86_64/*.x86_64.rpm
