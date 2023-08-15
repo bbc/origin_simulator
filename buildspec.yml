@@ -18,7 +18,7 @@ phases:
        - echo "Generating version file"
        - export COSMOS_VERSION=`cosmos-release generate-version origin-simulator`
        - rpmbuild -ba --define "cosmos_version ${COSMOS_VERSION}" origin-simulator.spec
-  post-build:
+  post_build:
     commands:
        - echo "Releasing 'RPMS/x86_64/*.x86_64.rpm' to origin-simulator"
        - cd $CODEBUILD_SRC_DIR
