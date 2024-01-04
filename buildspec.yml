@@ -2,10 +2,11 @@ version: 0.2
 
 phases:
   pre_build:
+    on-failure: ABORT
     commands:
       - certee-fetch
-
   build:
+    on-failure: ABORT
     commands:
        - mix deps.get
        - mix distillery.release
@@ -19,6 +20,7 @@ phases:
        - export COSMOS_VERSION=`cosmos-release generate-version origin-simulator`
        - rpmbuild -ba --define "cosmos_version ${COSMOS_VERSION}" origin-simulator.spec
   post_build:
+    on-failure: ABORT
     commands:
        - echo "Releasing 'RPMS/**/*.rpm' to origin-simulator"
        - cd $CODEBUILD_SRC_DIR
