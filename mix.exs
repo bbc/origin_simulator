@@ -35,9 +35,8 @@ defmodule OriginSimulator.MixProject do
 
   defp deps do
     [
-      {:plug, "~> 1.13"},
-      {:cowboy, "~> 2.9"},
-      {:plug_cowboy, "~> 2.6"},
+      {:plug, "~> 1.15"},
+      {:bandit, "~> 1.0"},
       {:poison, "~> 5.0"},
       {:httpoison, "~> 2.0"},
       {:distillery, "~> 2.1"},
