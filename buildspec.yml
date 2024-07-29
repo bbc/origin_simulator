@@ -25,3 +25,4 @@ phases:
        - echo "Releasing 'RPMS/**/*.rpm' to origin-simulator"
        - cd $CODEBUILD_SRC_DIR
        - cosmos-release service 'origin-simulator' --release-version=v /root/rpmbuild/RPMS/x86_64/*.x86_64.rpm
+       - cosmos-release service 'origin-simulator-fabl' --release-version=v /root/rpmbuild/RPMS/x86_64/*.x86_64.rpm
