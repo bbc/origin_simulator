@@ -1,0 +1,21 @@
+FROM elixir:1.14-alpine
+
+WORKDIR /opt
+
+COPY ./config ./config
+COPY ./lib ./lib
+COPY ./mix.exs .
+COPY ./mix.lock .
+
+ENV MIX_ENV=prod
+
+RUN mix local.rebar --force
+RUN mix local.hex --force
+RUN apk add --no-cache build-base
+
+RUN mix deps.get
+RUN mix deps.compile
+RUN mix release
+
+ENTRYPOINT ["/opt/_build/prod/rel/origin_simulator/bin/origin_simulator"]
+CMD ["start"]
