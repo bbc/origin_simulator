@@ -3,7 +3,7 @@ defmodule OriginSimulator.Payload do
 
   alias OriginSimulator.{Body, Recipe}
 
-  @http_client Application.get_env(:origin_simulator, :http_client)
+  @http_client Application.compile_env(:origin_simulator, :http_client)
 
   ## Client API
 

@@ -2,6 +2,7 @@ defmodule OriginSimulator do
   use Plug.Router
   alias OriginSimulator.{Payload, Simulation, Plug.ResponseCounter}
 
+  plug Plug.Head
   plug(ResponseCounter)
   plug(:match)
   plug(:dispatch)
